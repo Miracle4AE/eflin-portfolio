@@ -10,7 +10,7 @@ const aspectClasses: Record<AspectRatio, string> = {
   wide: "aspect-[16/9]",
 };
 
-export type ProjectImageMode = "cover" | "contain" | "natural";
+export type ProjectImageMode = "cover" | "contain" | "natural" | "editorial";
 
 interface ProjectImageProps {
   src?: string | null;
@@ -45,7 +45,40 @@ export function ProjectImage({
 }: ProjectImageProps) {
   const hasImage = Boolean(src);
   const objectFitClass = mode === "cover" ? "object-cover" : "object-contain";
-  const useFixedAspect = mode !== "natural";
+  const useFixedAspect = mode !== "natural" && mode !== "editorial";
+
+  if (mode === "editorial") {
+    return (
+      <div
+        data-cursor={interactive ? "open" : undefined}
+        className={cn(
+          "editorial-visual relative mx-auto aspect-[16/9] max-h-[680px] min-h-[240px] w-full max-w-[1100px] overflow-hidden bg-surface",
+          framed && "editorial-frame",
+          className,
+        )}
+      >
+        {hasImage ? (
+          <Image
+            src={src!}
+            alt={alt}
+            fill
+            priority={priority}
+            sizes={sizes}
+            placeholder="blur"
+            blurDataURL={blurDataURL}
+            className={cn("object-contain", imageClassName)}
+          />
+        ) : (
+          <div
+            className={cn("absolute inset-0 bg-gradient-to-br", gradient)}
+            role="img"
+            aria-label={alt}
+          />
+        )}
+        <div className="grain-overlay pointer-events-none" aria-hidden="true" />
+      </div>
+    );
+  }
 
   return (
     <div

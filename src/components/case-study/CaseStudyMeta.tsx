@@ -4,9 +4,11 @@ import { motion } from "framer-motion";
 import type { ResolvedProject } from "@/types";
 import { Container } from "@/components/ui/Container";
 import { ProjectImage } from "@/components/work/ProjectImage";
+import { VideoHero } from "@/components/case-study/VideoHero";
 import { ImageReveal, MaskReveal } from "@/components/motion/MaskReveal";
 import { ParallaxBlock } from "@/components/motion/ParallaxBlock";
 import { IMAGE_SIZES } from "@/lib/images";
+import { pickPrimaryProjectImage } from "@/lib/images.utils";
 import { useDictionary } from "@/i18n/locale-context";
 import { fadeUp, defaultViewport } from "@/lib/motion";
 
@@ -31,7 +33,8 @@ const metaItems = (
 
 export function CaseStudyMeta({ project }: CaseStudyMetaProps) {
   const dict = useDictionary();
-  const metaSrc = project.images.coverImage ?? project.images.heroImage;
+  const metaSrc = pickPrimaryProjectImage(project.images);
+  const heroVideo = project.images.videoPlaceholder;
 
   return (
     <section className="border-t border-border-soft py-16 md:py-24" aria-label="Project overview">
@@ -91,17 +94,29 @@ export function CaseStudyMeta({ project }: CaseStudyMetaProps) {
             <ParallaxBlock offset={20}>
               <MaskReveal>
                 <ImageReveal>
-                  <ProjectImage
-                    src={metaSrc}
-                    alt={project.images.imageAlt}
-                    gradient={project.gradient}
-                    blurDataURL={project.images.blurDataURL}
-                    aspectRatio="wide"
-                    sizes={IMAGE_SIZES.meta}
-                    framed
-                    overlay
-                    className="w-full"
-                  />
+                  {heroVideo ? (
+                    <div className="editorial-frame relative mx-auto aspect-[16/9] max-h-[680px] min-h-[240px] w-full max-w-[1100px] overflow-hidden bg-surface">
+                      <VideoHero
+                        src={heroVideo}
+                        poster={metaSrc}
+                        gradient={project.gradient}
+                        ariaLabel={project.images.imageAlt}
+                      />
+                    </div>
+                  ) : (
+                    <ProjectImage
+                      src={metaSrc}
+                      alt={project.images.imageAlt}
+                      gradient={project.gradient}
+                      blurDataURL={project.images.blurDataURL}
+                      aspectRatio="wide"
+                      mode="editorial"
+                      sizes={IMAGE_SIZES.meta}
+                      framed
+                      interactive={false}
+                      className="w-full"
+                    />
+                  )}
                 </ImageReveal>
               </MaskReveal>
             </ParallaxBlock>

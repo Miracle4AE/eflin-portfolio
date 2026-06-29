@@ -85,11 +85,11 @@ export function ProjectShowcase({ project }: ProjectShowcaseProps) {
                 gradient={project.gradient}
                 blurDataURL={project.images.blurDataURL}
                 aspectRatio="wide"
-                mode="contain"
+                mode="editorial"
                 sizes={IMAGE_SIZES.hero}
                 overlay
-                framed={false}
-                className="max-h-[min(72vh,820px)] md:aspect-[16/9] group-hover:[&_img]:scale-[1.01] [&_img]:transition-transform [&_img]:duration-700"
+                framed
+                className="w-full group-hover:[&_img]:scale-[1.01] [&_img]:transition-transform [&_img]:duration-700"
               />
 
               <motion.div
