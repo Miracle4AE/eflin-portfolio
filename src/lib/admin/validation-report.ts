@@ -46,11 +46,10 @@ function trMissing(field: LocaleField | undefined): boolean {
   return !field?.tr.trim();
 }
 
-function seoLength(text: string): "ok" | "short" | "long" {
+function seoLength(text: string): "ok" | "short" {
   const len = text.trim().length;
   if (len === 0) return "ok";
   if (len < 50) return "short";
-  if (len > 160) return "long";
   return "ok";
 }
 
@@ -279,30 +278,6 @@ export function buildValidationReport(content: SiteContent): ValidationReport {
         ),
       );
     }
-    if (seoLen === "long") {
-      warnings.push(
-        issue(
-          "warning",
-          `seo-long-${project.slug}`,
-          "seoDescriptionLong",
-          secKey,
-          undefined,
-          secParams,
-        ),
-      );
-    }
-  }
-
-  const siteSeoLen = seoLength(content.seo.siteDescription.en);
-  if (siteSeoLen === "long") {
-    warnings.push(
-      issue(
-        "warning",
-        "site-seo-long",
-        "siteSeoDescriptionLong",
-        "sectionSeo",
-      ),
-    );
   }
 
   if (!content.homepage.showcaseProjectSlug.trim()) {

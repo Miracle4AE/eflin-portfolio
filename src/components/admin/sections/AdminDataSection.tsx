@@ -102,9 +102,12 @@ export function AdminDataSection() {
           value={importText}
           onChange={(e) => setImportText(e.target.value)}
           rows={12}
-          className={`${adminInputClass()} mt-4 min-h-48 font-mono`}
+          className={`${adminInputClass()} mt-4 min-h-48 resize-y font-mono`}
           placeholder='{ "version": 1, ... }'
         />
+        <p className="mt-1 text-[10px] tabular-nums text-muted/80">
+          {interpolate(t.common.characterCount, { count: importText.length })}
+        </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <button
             type="button"

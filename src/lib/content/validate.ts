@@ -9,7 +9,8 @@ const VALID_CATEGORIES = new Set<ProjectCategory>([
   "art-direction",
 ]);
 
-const MAX_PAYLOAD_BYTES = 2 * 1024 * 1024;
+/** Total JSON size guard for API/Blob writes — not a per-field text limit. */
+const MAX_PAYLOAD_BYTES = 4 * 1024 * 1024;
 
 export type ValidationResult =
   | { ok: true; data: SiteContent }
@@ -75,7 +76,7 @@ export function validateSiteContent(payload: unknown): ValidationResult {
 
   const serialized = JSON.stringify(payload);
   if (serialized.length > MAX_PAYLOAD_BYTES) {
-    return { ok: false, errors: ["Payload exceeds maximum size (2MB)"] };
+    return { ok: false, errors: ["Payload exceeds maximum size (4MB)"] };
   }
 
   if (!payload || typeof payload !== "object") {

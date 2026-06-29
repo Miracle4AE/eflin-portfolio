@@ -18,6 +18,7 @@ export type AdminDictionary = {
     notSavedYet: string;
     untitled: string;
     copy: string;
+    characterCount: string;
   };
   login: {
     title: string;
