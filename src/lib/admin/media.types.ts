@@ -8,4 +8,13 @@ export type MediaFile = {
   height: number | null;
   type: MediaFileType;
   projectSlug: string | null;
+  source: "local" | "blob";
+  blobPathname?: string;
+};
+
+export type UploadResult = {
+  publicPath: string;
+  filename: string;
+  blobPathname?: string;
+  source: "local" | "blob";
 };

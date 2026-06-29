@@ -50,6 +50,21 @@ export function AdminMediaSection({ contentProjectSlugs: slugsProp }: AdminMedia
     await navigator.clipboard.writeText(path);
   }
 
+  async function deleteFile(path: string) {
+    if (!window.confirm(t.media.deleteConfirm)) return;
+    const response = await fetch("/api/admin/media", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path }),
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      window.alert(data.error || t.media.deleteFailed);
+      return;
+    }
+    await refreshMedia();
+  }
+
   return (
     <div className="space-y-6">
       <MediaUploadPanel projectSlugs={allProjectSlugs} />
@@ -118,14 +133,25 @@ export function AdminMediaSection({ contentProjectSlugs: slugsProp }: AdminMedia
                     {" · "}
                     {file.type}
                     {file.projectSlug ? ` · ${file.projectSlug}` : ""}
+                    {" · "}
+                    {file.source}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => void copyPath(file.path)}
-                    className="rounded border border-border px-2 py-1 text-xs text-accent"
-                  >
-                    {t.media.copyPath}
-                  </button>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => void copyPath(file.path)}
+                      className="rounded border border-border px-2 py-1 text-xs text-accent"
+                    >
+                      {t.media.copyPath}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void deleteFile(file.path)}
+                      className="rounded border border-border px-2 py-1 text-xs text-muted"
+                    >
+                      {t.media.deleteImage}
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}

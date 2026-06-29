@@ -46,7 +46,7 @@ export function ImagePathField({
             value={value}
             onChange={(e) => onChange(e.target.value)}
             className={adminInputClass()}
-            placeholder="/images/..."
+            placeholder="/images/... or /media/..."
           />
           <div className="flex flex-wrap gap-2">
             <button

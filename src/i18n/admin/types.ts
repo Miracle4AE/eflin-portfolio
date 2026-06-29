@@ -210,6 +210,8 @@ export type AdminDictionary = {
   };
   media: {
     library: string;
+    uploadTitle: string;
+    uploadImage: string;
     uploadDev: string;
     uploadDesc: string;
     destination: string;
@@ -219,6 +221,12 @@ export type AdminDictionary = {
     uploading: string;
     uploadedTo: string;
     uploadFailed: string;
+    overwriteConfirm: string;
+    useThisImage: string;
+    deleteImage: string;
+    deleteConfirm: string;
+    deleteFailed: string;
+    hideUpload: string;
     allTypes: string;
     portrait: string;
     cover: string;

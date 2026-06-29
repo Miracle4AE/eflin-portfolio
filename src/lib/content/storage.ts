@@ -230,6 +230,11 @@ export async function readContent(): Promise<SiteContent> {
   return fallback;
 }
 
+export async function isBlobStorageAvailable(force = false): Promise<boolean> {
+  const probe = await probeBlobAccess(force);
+  return probe.available;
+}
+
 export async function writeContent(content: SiteContent): Promise<"local" | "blob"> {
   if (isDevelopment()) {
     writeLocalFile(content);

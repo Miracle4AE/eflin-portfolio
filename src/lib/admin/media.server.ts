@@ -1,26 +1,33 @@
 import fs from "fs";
 import path from "path";
+import { isBlobStorageAvailable } from "@/lib/content/storage";
 import {
-  ALLOWED_UPLOAD_EXTENSIONS,
-  ALLOWED_UPLOAD_MIME,
-  type MediaFileType,
+  isDevelopmentMediaUpload,
   type UploadDestination,
-  UPLOAD_SIZE_LIMITS,
 } from "@/lib/admin/media.constants";
-import type { MediaFile } from "@/lib/admin/media.types";
-
-export type { MediaFile };
-
-const PUBLIC_IMAGES = path.join(process.cwd(), "public", "images");
-const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
-
-function formatBytes(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
+import {
+  deleteBlobMedia,
+  getExistingGalleryNames,
+  listBlobMediaFiles,
+  uploadBlobMedia,
+} from "@/lib/admin/media-blob";
+import {
+  resolveUploadTarget,
+  uploadTargetExists,
+} from "@/lib/admin/media-paths";
+import type { MediaFile, UploadResult } from "@/lib/admin/media.types";
+import {
+  classifyMediaFile,
+  extractProjectSlug,
+  formatBytes,
+  resolveContentType,
+  validateUploadFile,
+} from "@/lib/admin/media.utils";
 
 export { formatBytes };
+
+const PUBLIC_IMAGES = path.join(process.cwd(), "public", "images");
+const IMAGE_EXTENSIONS = new Set([".jpg", ".jpeg", ".png", ".webp", ".avif"]);
 
 function getImageDimensions(filePath: string): { width: number; height: number } | null {
   try {
@@ -60,20 +67,6 @@ function getImageDimensions(filePath: string): { width: number; height: number }
   }
 }
 
-export function classifyMediaFile(publicPath: string): MediaFileType {
-  const filename = path.basename(publicPath).toLowerCase();
-  if (filename === "portrait.jpg" || filename === "portrait.webp") return "portrait";
-  if (filename === "cover.jpg" || filename === "cover.webp") return "cover";
-  if (filename === "hero.jpg" || filename === "hero.webp") return "hero";
-  if (/^gallery-\d{2}\.(jpg|jpeg|webp|png)$/i.test(filename)) return "gallery";
-  return "other";
-}
-
-export function extractProjectSlug(publicPath: string): string | null {
-  const match = publicPath.match(/^\/images\/projects\/([^/]+)\//);
-  return match?.[1] ?? null;
-}
-
 function walkImages(dir: string, results: string[]): void {
   if (!fs.existsSync(dir)) return;
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -89,7 +82,7 @@ function walkImages(dir: string, results: string[]): void {
   }
 }
 
-export function listMediaFiles(): MediaFile[] {
+function listLocalMediaFiles(): MediaFile[] {
   const files: string[] = [];
   walkImages(PUBLIC_IMAGES, files);
 
@@ -112,133 +105,129 @@ export function listMediaFiles(): MediaFile[] {
         height: dimensions?.height ?? null,
         type: classifyMediaFile(publicPath),
         projectSlug: extractProjectSlug(publicPath),
+        source: "local" as const,
       };
     })
     .sort((a, b) => a.path.localeCompare(b.path));
 }
 
+export async function listMediaFiles(): Promise<MediaFile[]> {
+  const localFiles = listLocalMediaFiles();
+
+  if (isDevelopmentMediaUpload()) {
+    return localFiles;
+  }
+
+  try {
+    const blobAvailable = await isBlobStorageAvailable();
+    if (!blobAvailable) {
+      return localFiles;
+    }
+
+    const blobFiles = await listBlobMediaFiles();
+    const merged = new Map<string, MediaFile>();
+    for (const file of localFiles) merged.set(file.path, file);
+    for (const file of blobFiles) merged.set(file.path, file);
+    return [...merged.values()].sort((a, b) => a.path.localeCompare(b.path));
+  } catch {
+    return localFiles;
+  }
+}
+
 export function publicPathExists(webPath: string): boolean {
   if (!webPath.trim()) return false;
+  if (webPath.startsWith("https://") || webPath.startsWith("/media/")) return true;
   const normalized = webPath.startsWith("/") ? webPath : `/${webPath}`;
   const fullPath = path.join(process.cwd(), "public", normalized.replace(/^\//, ""));
   return fs.existsSync(fullPath);
 }
 
-function normalizeUploadExtension(filename: string): string {
-  const ext = path.extname(filename).toLowerCase();
-  if (ext === ".jpeg") return ".jpg";
-  if (ALLOWED_UPLOAD_EXTENSIONS.has(ext)) return ext === ".jpeg" ? ".jpg" : ext;
-  return ".jpg";
-}
-
-function nextGalleryFilename(projectDir: string, ext: string): string {
-  const files = fs.existsSync(projectDir) ? fs.readdirSync(projectDir) : [];
-  let max = 0;
-  for (const file of files) {
-    const match = file.match(/^gallery-(\d{2})\./i);
-    if (match) max = Math.max(max, Number.parseInt(match[1], 10));
-  }
-  return `gallery-${String(max + 1).padStart(2, "0")}${ext}`;
-}
-
-export function resolveUploadTarget(
-  destination: UploadDestination,
-  projectSlug: string | undefined,
-  originalFilename: string,
-): { diskPath: string; publicPath: string } {
-  const ext = normalizeUploadExtension(originalFilename);
-
-  if (destination === "portrait") {
-    const filename = ext === ".webp" ? "portrait.webp" : "portrait.jpg";
-    const diskPath = path.join(PUBLIC_IMAGES, filename);
-    return { diskPath, publicPath: `/images/${filename}` };
-  }
-
-  if (!projectSlug?.trim()) {
-    throw new Error("Project slug is required for project uploads");
-  }
-
-  const safeSlug = projectSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-");
-  const projectDir = path.join(PUBLIC_IMAGES, "projects", safeSlug);
-  fs.mkdirSync(projectDir, { recursive: true });
-
-  if (destination === "cover") {
-    const filename = ext === ".webp" ? "cover.webp" : "cover.jpg";
-    const diskPath = path.join(projectDir, filename);
-    return { diskPath, publicPath: `/images/projects/${safeSlug}/${filename}` };
-  }
-
-  if (destination === "hero") {
-    const filename = ext === ".webp" ? "hero.webp" : "hero.jpg";
-    const diskPath = path.join(projectDir, filename);
-    return { diskPath, publicPath: `/images/projects/${safeSlug}/${filename}` };
-  }
-
-  if (destination === "gallery") {
-    const filename = nextGalleryFilename(projectDir, ext);
-    const diskPath = path.join(projectDir, filename);
-    return { diskPath, publicPath: `/images/projects/${safeSlug}/${filename}` };
-  }
-
-  const generalDir = path.join(PUBLIC_IMAGES, "general");
-  fs.mkdirSync(generalDir, { recursive: true });
-  const safeName = originalFilename
-    .toLowerCase()
-    .replace(/[^a-z0-9.-]/g, "-")
-    .replace(/-+/g, "-");
-  const filename = safeName.endsWith(ext) ? safeName : `${safeName}${ext}`;
-  const diskPath = path.join(generalDir, filename);
-  return { diskPath, publicPath: `/images/general/${path.basename(filename)}` };
-}
-
-export function validateUploadFile(
-  file: File,
-  destination: UploadDestination,
-): string | null {
-  const ext = path.extname(file.name).toLowerCase();
-  if (!ALLOWED_UPLOAD_EXTENSIONS.has(ext) && ext !== ".jpeg") {
-    return "Unsupported file type. Use JPG, PNG, or WebP.";
-  }
-  if (file.type && !ALLOWED_UPLOAD_MIME.has(file.type)) {
-    return "Unsupported MIME type. Use JPG, PNG, or WebP.";
-  }
-  const limit = UPLOAD_SIZE_LIMITS[destination];
-  if (file.size > limit) {
-    return `File is too large (${formatBytes(file.size)}). Max ${formatBytes(limit)} for ${destination}.`;
-  }
-  return null;
+export async function canUploadMedia(): Promise<boolean> {
+  if (isDevelopmentMediaUpload()) return true;
+  return isBlobStorageAvailable();
 }
 
 export async function saveUploadedFile(
   file: File,
   destination: UploadDestination,
   projectSlug?: string,
-): Promise<{ publicPath: string; filename: string }> {
+  overwrite = false,
+): Promise<UploadResult> {
   const validationError = validateUploadFile(file, destination);
   if (validationError) throw new Error(validationError);
 
-  const { diskPath, publicPath } = resolveUploadTarget(
-    destination,
-    projectSlug,
-    file.name,
-  );
-
+  const existingFiles = await listMediaFiles();
+  const galleryNames = getExistingGalleryNames(destination, projectSlug, existingFiles);
+  const target = resolveUploadTarget(destination, projectSlug, file.name, galleryNames);
   const buffer = Buffer.from(await file.arrayBuffer());
-  fs.mkdirSync(path.dirname(diskPath), { recursive: true });
-  fs.writeFileSync(diskPath, buffer);
+  const contentType = resolveContentType(target.filename);
+
+  if (isDevelopmentMediaUpload()) {
+    if (!overwrite && uploadTargetExists(target, "local")) {
+      throw new Error(`File already exists at ${target.localPublicPath}. Confirm overwrite to replace it.`);
+    }
+
+    if (!target.localDiskPath) {
+      throw new Error("Local upload target is missing.");
+    }
+
+    fs.mkdirSync(path.dirname(target.localDiskPath), { recursive: true });
+    fs.writeFileSync(target.localDiskPath, buffer);
+
+    return {
+      publicPath: target.localPublicPath,
+      filename: target.filename,
+      source: "local",
+    };
+  }
+
+  const blobAvailable = await isBlobStorageAvailable(true);
+  if (!blobAvailable) {
+    throw new Error(
+      "Media upload is not available. Connect a Vercel Blob store to this project.",
+    );
+  }
+
+  const uploaded = await uploadBlobMedia(buffer, target, contentType, overwrite);
 
   return {
-    publicPath,
-    filename: path.basename(diskPath),
+    publicPath: uploaded.publicPath,
+    filename: target.filename,
+    blobPathname: uploaded.blobPathname,
+    source: "blob",
   };
 }
 
-export function listProjectSlugsFromMedia(): string[] {
-  const projectsDir = path.join(PUBLIC_IMAGES, "projects");
-  if (!fs.existsSync(projectsDir)) return [];
-  return fs
-    .readdirSync(projectsDir, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory())
-    .map((entry) => entry.name)
-    .sort();
+export async function deleteMediaFile(publicPath: string): Promise<void> {
+  if (publicPath.startsWith("/media/") || publicPath.startsWith("https://")) {
+    await deleteBlobMedia(publicPath);
+    return;
+  }
+
+  const normalized = publicPath.startsWith("/") ? publicPath : `/${publicPath}`;
+  const fullPath = path.join(process.cwd(), "public", normalized.replace(/^\//, ""));
+  if (!fs.existsSync(fullPath)) {
+    throw new Error("File not found.");
+  }
+  fs.unlinkSync(fullPath);
 }
+
+export async function listProjectSlugsFromMedia(): Promise<string[]> {
+  const files = await listMediaFiles();
+  const slugs = new Set<string>();
+
+  for (const file of files) {
+    if (file.projectSlug) slugs.add(file.projectSlug);
+  }
+
+  const projectsDir = path.join(PUBLIC_IMAGES, "projects");
+  if (fs.existsSync(projectsDir)) {
+    for (const entry of fs.readdirSync(projectsDir, { withFileTypes: true })) {
+      if (entry.isDirectory()) slugs.add(entry.name);
+    }
+  }
+
+  return [...slugs].sort();
+}
+
+export type { MediaFile, UploadResult };

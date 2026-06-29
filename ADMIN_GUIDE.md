@@ -78,7 +78,7 @@ Open **Media Library** in the admin sidebar to:
 
 ### Development upload
 
-When running `npm run dev`, you can upload directly in **Media Library**:
+When running `npm run dev`, upload in **Media Library**:
 
 | Destination | Saves as |
 |---|---|
@@ -88,7 +88,18 @@ When running `npm run dev`, you can upload directly in **Media Library**:
 | Project gallery | `/images/projects/[slug]/gallery-01.jpg` (auto-numbered) |
 | General | `/images/general/[filename]` |
 
-**Production:** uploads are disabled. Add files locally, commit `public/images/`, export JSON, and redeploy — or configure external storage later.
+Accepted formats: **JPG, PNG, WebP, AVIF**. Size limits apply per destination (portrait 2 MB, cover 3 MB, hero 4 MB, gallery/general 3 MB).
+
+### Production upload
+
+When a **Vercel Blob store** is connected:
+
+- Upload from **Media Library** or **Choose from Media Library** in image fields
+- Images upload to Blob under `media/...`
+- **`site-content.json` stays private**; portfolio images are served on the public site
+- If the Blob store is **private**, images are served via `/media/...` (server-side proxy)
+- If the store supports **public blobs**, images may use a direct `https://...vercel-storage.com/...` URL
+- After upload, click **Save changes** so the JSON path/URL is stored in content
 
 ### Manual paths (still supported)
 
@@ -227,9 +238,9 @@ Regenerate after changing static seed data in `src/data/`.
 
 ## Limitations
 
-- **Production media upload** disabled — use local dev upload + git commit
 - Nav labels and form validation messages remain in code dictionaries (UI chrome)
-- Export JSON remains the fallback when Blob is not configured
+- Export JSON remains the fallback when Blob access fails
+- Private Blob stores serve uploaded media through `/media/...`; public Blob stores may return direct URLs
 
 ## Related docs
 

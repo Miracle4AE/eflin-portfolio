@@ -35,7 +35,15 @@ See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)** for the JSON admin workflow. Content 
 4. **Redeploy**
 5. Test **`/admin` → Save changes** and verify `/en` / `/tr` update
 
-`site-content.json` is stored privately in Blob. Portfolio images remain in `public/images/`.
+`site-content.json` is stored privately in Blob. Uploaded portfolio images use Blob (`media/...`) and are served on the public site via `/media/...` or a public Blob URL.
+
+### Media uploads
+
+- **Development:** saves to `public/images/`
+- **Production:** uploads to Vercel Blob
+- **Content JSON:** private
+- **Portfolio images:** public via `/media/...` proxy or Blob URL
+- **Formats:** JPG, PNG, WebP, AVIF
 
 ### Local contact form
 

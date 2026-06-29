@@ -30,7 +30,17 @@ export function resolvePortraitImage(filename = "portrait.jpg"): string | null {
 
 export function resolvePublicImagePath(publicPath: string | undefined): string | null {
   if (!publicPath?.trim()) return null;
+
+  if (publicPath.startsWith("https://") || publicPath.startsWith("http://")) {
+    return publicPath;
+  }
+
   const normalized = publicPath.startsWith("/") ? publicPath : `/${publicPath}`;
+
+  if (normalized.startsWith("/media/")) {
+    return normalized;
+  }
+
   return imageFileExists(normalized) ? normalized : null;
 }
 

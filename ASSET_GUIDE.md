@@ -4,7 +4,7 @@ How to prepare, name, compress, and add portfolio images without breaking the si
 
 The portfolio resolves images at **build time**. Missing files never cause 404 errors — the site shows premium gradient placeholders instead. Adding real assets improves credibility; it does not change routes or architecture.
 
-**Admin workflow:** In development, use **Media Library** at `/admin` to upload and pick images. See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)**. In production, commit files under `public/images/` and redeploy.
+**Admin workflow:** Use **Media Library** at `/admin` to upload and pick images. In development, files save under `public/images/`. In production, files upload to Vercel Blob and appear on the public site via `/media/...` or a Blob URL. See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)**.
 
 ---
 
@@ -34,23 +34,25 @@ Project folder names **must match** the project `slug` in `content/site-content.
 
 ---
 
-## Adding images via admin (development)
+## Adding images via admin
 
-1. Run `npm run dev` and open `/admin` → **Media Library**.
-2. Choose destination (portrait, cover, hero, gallery, or general) and project slug.
-3. Drag & drop or choose a JPG, PNG, or WebP file.
-4. In **Projects** or **Homepage**, click **Choose from Media Library** on the image field.
-5. **Save** content JSON locally.
+1. Open `/admin` → **Media Library**
+2. Choose destination (portrait, cover, hero, gallery, or general) and project slug when needed
+3. Drag & drop or click **Upload image**
+4. Copy the path or click **Use this image** in picker mode
+5. Click **Save changes** in the admin header
 
-Upload limits (development):
+**Development:** files save to `public/images/...`
+
+**Production:** files upload to Vercel Blob (`media/...`). Private stores are served at `/media/...` on your domain.
+
+Upload limits:
 
 | Type | Max size |
 |---|---|
-| Portrait | 800 KB |
-| Cover / gallery / general | 1 MB |
-| Hero | 1.5 MB |
-
-**Production:** upload is disabled. Add files to `public/images/` locally, commit, push, and redeploy.
+| Portrait | 2 MB |
+| Cover / gallery / general | 3 MB |
+| Hero | 4 MB |
 
 ---
 

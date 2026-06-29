@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MediaUploadPanel } from "@/components/admin/media/MediaUploadPanel";
 import type { MediaFileType } from "@/lib/admin/media.constants";
 import type { MediaPickerFilter } from "@/components/admin/media/MediaPickerContext";
 import type { MediaFile } from "@/lib/admin/media.types";
@@ -35,12 +36,14 @@ export function MediaPickerModal({
   const [typeFilter, setTypeFilter] = useState<TypeFilter>(filter.type ?? "all");
   const [projectFilter, setProjectFilter] = useState(filter.projectSlug ?? "all");
   const [query, setQuery] = useState("");
+  const [showUpload, setShowUpload] = useState(false);
 
   useEffect(() => {
     if (open) {
       setTypeFilter(filter.type ?? "all");
       setProjectFilter(filter.projectSlug ?? "all");
       setQuery("");
+      setShowUpload(false);
     }
   }, [open, filter]);
 
@@ -70,10 +73,32 @@ export function MediaPickerModal({
             <h2 className="text-lg font-light text-foreground">{t.media.chooseFromLibrary}</h2>
             <p className="text-sm text-muted">{t.media.chooseFromLibraryDesc}</p>
           </div>
-          <button type="button" onClick={onClose} className="text-sm text-muted hover:text-foreground">
-            {t.common.close}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowUpload((value) => !value)}
+              className="rounded-lg border border-border px-3 py-1.5 text-sm text-accent"
+            >
+              {showUpload ? t.media.hideUpload : t.media.uploadImage}
+            </button>
+            <button type="button" onClick={onClose} className="text-sm text-muted hover:text-foreground">
+              {t.common.close}
+            </button>
+          </div>
         </div>
+
+        {showUpload ? (
+          <div className="border-b border-border-soft px-6 py-4">
+            <MediaUploadPanel
+              compact
+              projectSlugs={projectSlugs}
+              defaultProjectSlug={projectFilter !== "all" ? projectFilter : undefined}
+              onUploaded={(path) => {
+                onSelect(path);
+              }}
+            />
+          </div>
+        ) : null}
 
         <div className="flex flex-wrap gap-3 border-b border-border-soft px-6 py-4">
           <select

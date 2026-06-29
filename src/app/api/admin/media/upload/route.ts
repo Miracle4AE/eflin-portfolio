@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import {
-  canUploadMedia,
-  type UploadDestination,
-} from "@/lib/admin/media.constants";
-import { saveUploadedFile } from "@/lib/admin/media.server";
+import { type UploadDestination } from "@/lib/admin/media.constants";
+import { canUploadMedia, saveUploadedFile } from "@/lib/admin/media.server";
+import { formatBlobStorageError } from "@/lib/content/storage";
 import {
   isAdminAuthenticated,
   isAdminDisabled,
@@ -26,14 +24,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!canUploadMedia()) {
+  if (!(await canUploadMedia())) {
     return NextResponse.json(
       {
         error:
-          "Production uploads require external storage. Use Export JSON workflow or configure storage later.",
+          "Media upload is not available. Connect a Vercel Blob store to this project.",
         uploadEnabled: false,
       },
-      { status: 403 },
+      { status: 503 },
     );
   }
 
@@ -41,6 +39,7 @@ export async function POST(request: NextRequest) {
   const file = formData.get("file");
   const destination = formData.get("destination");
   const projectSlug = formData.get("projectSlug");
+  const overwrite = formData.get("overwrite") === "true";
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "Missing file" }, { status: 400 });
@@ -55,16 +54,18 @@ export async function POST(request: NextRequest) {
       file,
       destination as UploadDestination,
       typeof projectSlug === "string" ? projectSlug : undefined,
+      overwrite,
     );
 
     return NextResponse.json({
       ok: true,
       publicPath: result.publicPath,
       filename: result.filename,
+      source: result.source,
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Upload failed" },
+      { error: formatBlobStorageError(error) },
       { status: 400 },
     );
   }
