@@ -20,7 +20,7 @@ Pre-launch QA: **[LAUNCH_CHECKLIST.md](./LAUNCH_CHECKLIST.md)**
 - **Work** — `/en/work` and `/tr/work` with filters; localized case studies at `/[locale]/work/[slug]`
 - **Contact** — `/en/contact` and `/tr/contact` via Resend
 - **i18n** — English (`en`) and Turkish (`tr`); locale cookie, hreflang, language switcher
-- **Admin panel** — Portfolio editor at `/admin` with sidebar navigation, Media Library uploads, draft autosave, validation health panel, and bilingual EN/TR editing. See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)**.
+- **Admin panel** — Portfolio editor at `/admin` with **visual inline editing** (`/admin/visual`) and **structured forms** (`/admin/structured`), Media Library uploads, draft autosave, validation health panel, and bilingual EN/TR editing. See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)**.
 - **SEO** — sitemap, robots, JSON-LD, Open Graph (both locales)
 
 Missing images show gradient placeholders — no broken layouts or 404s on assets.

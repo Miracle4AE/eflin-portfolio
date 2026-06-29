@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import type { ResolvedProject } from "@/types";
 import { Container } from "@/components/ui/Container";
 import { useDictionary } from "@/i18n/locale-context";
+import { VisualField } from "@/components/admin/visual/EditableText";
+import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 import { fadeUp, staggerContainer, defaultViewport, lineReveal } from "@/lib/motion";
 
 interface CaseStudyVisualSystemProps {
@@ -12,6 +14,8 @@ interface CaseStudyVisualSystemProps {
 
 export function CaseStudyVisualSystem({ project }: CaseStudyVisualSystemProps) {
   const dict = useDictionary();
+  const visualEdit = useVisualEditOptional();
+  const base = `projects.${project.slug}`;
   return (
     <section
       className="border-t border-border-soft py-16 md:py-24 lg:py-32"
@@ -44,7 +48,16 @@ export function CaseStudyVisualSystem({ project }: CaseStudyVisualSystemProps) {
               {dict.caseStudy.typography}
             </h3>
             <p className="text-base leading-[1.85] text-foreground/85 md:text-lg">
-              {project.typography}
+              {visualEdit ? (
+                <VisualField
+                  fieldPath={`${base}.typography`}
+                  value={project.typography}
+                  label="Typography"
+                  multiline
+                />
+              ) : (
+                project.typography
+              )}
             </p>
 
             <motion.div
@@ -57,7 +70,16 @@ export function CaseStudyVisualSystem({ project }: CaseStudyVisualSystemProps) {
               {dict.caseStudy.visualDirection}
             </h3>
             <p className="text-base leading-[1.85] text-foreground/85 md:text-lg">
-              {project.visualDirection}
+              {visualEdit ? (
+                <VisualField
+                  fieldPath={`${base}.visualDirection`}
+                  value={project.visualDirection}
+                  label="Visual direction"
+                  multiline
+                />
+              ) : (
+                project.visualDirection
+              )}
             </p>
           </motion.div>
 

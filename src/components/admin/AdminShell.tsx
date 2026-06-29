@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useAdminContent } from "@/components/admin/AdminContentContext";
 import { AdminLanguageSwitcher } from "@/components/admin/AdminLanguageSwitcher";
 import { AdminToasts } from "@/components/admin/ui/AdminToasts";
@@ -93,11 +94,23 @@ export function AdminShell({
           ))}
         </nav>
         <div className="hidden border-t border-border-soft p-4 lg:block">
+          <Link
+            href="/admin/visual"
+            className="block rounded-lg px-3 py-2 text-sm text-accent hover:bg-surface"
+          >
+            {t.nav.visualEditor}
+          </Link>
+          <Link
+            href="/admin"
+            className="mt-1 block rounded-lg px-3 py-2 text-sm text-muted hover:bg-surface"
+          >
+            {t.nav.allEditors}
+          </Link>
           <a
             href="/en"
             target="_blank"
             rel="noreferrer"
-            className="block rounded-lg px-3 py-2 text-sm text-accent hover:bg-surface"
+            className="mt-1 block rounded-lg px-3 py-2 text-sm text-accent hover:bg-surface"
           >
             {t.nav.viewLiveSite}
           </a>

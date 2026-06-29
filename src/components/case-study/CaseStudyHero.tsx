@@ -4,6 +4,8 @@ import type { ResolvedProject } from "@/types";
 import { Container } from "@/components/ui/Container";
 import { TextRevealInstant } from "@/components/motion/TextReveal";
 import { MaskReveal } from "@/components/motion/MaskReveal";
+import { VisualField } from "@/components/admin/visual/EditableText";
+import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 import { easeOutExpo, DURATION } from "@/lib/motion";
 import { motion } from "framer-motion";
 
@@ -12,6 +14,9 @@ interface CaseStudyHeroProps {
 }
 
 export function CaseStudyHero({ project }: CaseStudyHeroProps) {
+  const visualEdit = useVisualEditOptional();
+  const base = `projects.${project.slug}`;
+
   return (
     <section
       className="border-b border-border-soft bg-background pt-28 md:pt-36"
@@ -25,22 +30,48 @@ export function CaseStudyHero({ project }: CaseStudyHeroProps) {
         >
           <MaskReveal>
             <span className="mb-4 block text-xs font-medium uppercase tracking-[0.3em] text-accent">
-              {project.category}
+              {visualEdit ? (
+                <VisualField
+                  fieldPath={`${base}.category`}
+                  value={project.category}
+                  label="Category"
+                />
+              ) : (
+                project.category
+              )}
             </span>
           </MaskReveal>
         </motion.div>
-        <TextRevealInstant
-          as="h1"
-          text={project.title}
-          delay={0.35}
-          className="max-w-4xl font-display text-5xl font-light leading-[0.95] tracking-tight text-foreground md:text-7xl lg:text-8xl"
-        />
-        <TextRevealInstant
-          as="p"
-          text={project.summary}
-          delay={0.5}
-          className="mt-6 max-w-2xl text-base leading-relaxed text-muted md:text-lg"
-        />
+        {visualEdit ? (
+          <>
+            <h1 className="max-w-4xl font-display text-5xl font-light leading-[0.95] tracking-tight text-foreground md:text-7xl lg:text-8xl">
+              <VisualField fieldPath={`${base}.title`} value={project.title} label="Project title" />
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
+              <VisualField
+                fieldPath={`${base}.summary`}
+                value={project.summary}
+                label="Project summary"
+                multiline
+              />
+            </p>
+          </>
+        ) : (
+          <>
+            <TextRevealInstant
+              as="h1"
+              text={project.title}
+              delay={0.35}
+              className="max-w-4xl font-display text-5xl font-light leading-[0.95] tracking-tight text-foreground md:text-7xl lg:text-8xl"
+            />
+            <TextRevealInstant
+              as="p"
+              text={project.summary}
+              delay={0.5}
+              className="mt-6 max-w-2xl text-base leading-relaxed text-muted md:text-lg"
+            />
+          </>
+        )}
       </Container>
     </section>
   );

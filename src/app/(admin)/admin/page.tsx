@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { AdminApp } from "@/components/admin/AdminApp";
+import { AdminModeSelector } from "@/components/admin/AdminModeSelector";
 
 export const metadata: Metadata = {
   title: "Admin — Eflin Studio",
   robots: { index: false, follow: false },
 };
 
-export default function AdminPage() {
-  return <AdminApp />;
+export default function AdminHomePage() {
+  return <AdminModeSelector />;
 }

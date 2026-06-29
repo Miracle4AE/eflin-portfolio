@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { useDictionary } from "@/i18n/locale-context";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { VisualField } from "@/components/admin/visual/EditableText";
+import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 import { fadeUp, staggerContainer, defaultViewport } from "@/lib/motion";
 
 const serviceOrder = [
@@ -16,10 +18,14 @@ const serviceOrder = [
 ] as const;
 
 function ServiceItem({
+  serviceId,
   service,
 }: {
+  serviceId: string;
   service: { index: string; title: string; description: string };
 }) {
+  const visualEdit = useVisualEditOptional();
+
   return (
     <motion.div
       variants={fadeUp}
@@ -31,11 +37,28 @@ function ServiceItem({
             {service.index}
           </span>
           <h3 className="font-display text-2xl font-light text-foreground transition-colors duration-300 group-hover:text-accent md:text-3xl">
-            {service.title}
+            {visualEdit ? (
+              <VisualField
+                fieldPath={`homepage.services.items.${serviceId}.title`}
+                value={service.title}
+                label={`Service title (${serviceId})`}
+              />
+            ) : (
+              service.title
+            )}
           </h3>
         </div>
         <p className="max-w-md text-sm leading-relaxed text-muted md:text-right md:text-base">
-          {service.description}
+          {visualEdit ? (
+            <VisualField
+              fieldPath={`homepage.services.items.${serviceId}.description`}
+              value={service.description}
+              label={`Service description (${serviceId})`}
+              multiline
+            />
+          ) : (
+            service.description
+          )}
         </p>
       </div>
     </motion.div>
@@ -44,6 +67,7 @@ function ServiceItem({
 
 export function Services() {
   const dict = useDictionary();
+  const visualEdit = useVisualEditOptional();
 
   return (
     <section
@@ -56,6 +80,15 @@ export function Services() {
           label={dict.services.label}
           title={dict.services.title}
           description={dict.services.description}
+          editPaths={
+            visualEdit
+              ? {
+                  label: "homepage.services.label",
+                  title: "homepage.services.title",
+                  description: "homepage.services.description",
+                }
+              : undefined
+          }
         />
 
         <motion.div
@@ -66,7 +99,7 @@ export function Services() {
           className="border-b border-foreground/10"
         >
           {serviceOrder.map((id) => (
-            <ServiceItem key={id} service={dict.services.items[id]} />
+            <ServiceItem key={id} serviceId={id} service={dict.services.items[id]} />
           ))}
         </motion.div>
       </Container>

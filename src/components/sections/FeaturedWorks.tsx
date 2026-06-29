@@ -9,6 +9,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useDictionary, useLocale } from "@/i18n/locale-context";
 import { localizedPath } from "@/i18n/navigation";
 import { fadeUp, staggerContainer, defaultViewport } from "@/lib/motion";
+import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 
 interface FeaturedWorksProps {
   projects: ResolvedProject[];
@@ -17,6 +18,7 @@ interface FeaturedWorksProps {
 export function FeaturedWorks({ projects }: FeaturedWorksProps) {
   const dict = useDictionary();
   const { locale } = useLocale();
+  const visualEdit = useVisualEditOptional();
 
   return (
     <section id="work" className="border-t border-border-soft bg-section py-24 md:py-32 lg:py-40" aria-labelledby="work-heading">
@@ -25,6 +27,15 @@ export function FeaturedWorks({ projects }: FeaturedWorksProps) {
           label={dict.work.featuredLabel}
           title={dict.work.featuredTitle}
           description={dict.work.featuredDescription}
+          editPaths={
+            visualEdit
+              ? {
+                  label: "homepage.work.featuredLabel",
+                  title: "homepage.work.featuredTitle",
+                  description: "homepage.work.featuredDescription",
+                }
+              : undefined
+          }
         />
 
         <motion.div

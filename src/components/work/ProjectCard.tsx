@@ -11,6 +11,9 @@ import { localizedPath } from "@/i18n/navigation";
 import { caseStudyAriaLabel } from "@/i18n/localize";
 import { IMAGE_SIZES } from "@/lib/images";
 import { pickPrimaryProjectImage } from "@/lib/images.utils";
+import { VisualField } from "@/components/admin/visual/EditableText";
+import { VisualImage } from "@/components/admin/visual/EditableImage";
+import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/lib/motion";
 
@@ -35,6 +38,8 @@ export function ProjectCard({
 }: ProjectCardProps) {
   const dict = useDictionary();
   const { locale } = useLocale();
+  const visualEdit = useVisualEditOptional();
+  const base = `projects.${project.slug}`;
 
   const isWide =
     layout === "editorial"
@@ -42,50 +47,63 @@ export function ProjectCard({
       : index === 1 || index === 3;
   const isTall = layout === "editorial" && index === 2;
   const imageSizes = isWide ? IMAGE_SIZES.cardWide : IMAGE_SIZES.card;
+  const coverSrc = pickPrimaryProjectImage(project.images);
 
-  return (
-    <motion.article
-      variants={variants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
-      layout
-      className={cn(
-        "group relative",
-        isWide && "md:col-span-2",
-        layout === "editorial" && isTall && "md:row-span-2",
-      )}
-    >
-      <Magnetic strength={0.12} className="block">
-        <Link
-          href={localizedPath(locale, `/work/${project.slug}`)}
-          data-cursor="view"
-          className="museum-card block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-          aria-label={caseStudyAriaLabel(project.title, dict.work.viewCaseStudyAria)}
-        >
+  const cardInner = (
+    <>
           <div className="relative overflow-hidden p-px">
             <MaskReveal>
               <ImageReveal>
-                <ProjectImage
-                  src={pickPrimaryProjectImage(project.images)}
-                  alt={project.images.imageAlt}
-                  gradient={project.gradient}
-                  blurDataURL={project.images.blurDataURL}
-                  aspectRatio={project.aspectRatio}
-                  mode="cover"
-                  sizes={imageSizes}
-                  framed={false}
-                  overlay
-                  className={cn(
-                    cardAspectClasses[project.aspectRatio],
-                    isWide && "md:aspect-[16/9]",
-                    isTall && "md:aspect-auto md:h-full md:min-h-[480px]",
-                    "group-hover:scale-[1.01] [&_img]:transition-transform [&_img]:duration-[900ms] [&_img]:ease-out group-hover:[&_img]:scale-[1.04]",
-                  )}
-                />
+                {visualEdit ? (
+                  <VisualImage
+                    fieldPath={`${base}.coverImagePath`}
+                    src={coverSrc}
+                    alt={project.images.imageAlt}
+                    label="Cover image"
+                    pickerType="cover"
+                    projectSlug={project.slug}
+                  >
+                    <ProjectImage
+                      src={coverSrc}
+                      alt={project.images.imageAlt}
+                      gradient={project.gradient}
+                      blurDataURL={project.images.blurDataURL}
+                      aspectRatio={project.aspectRatio}
+                      mode="cover"
+                      sizes={imageSizes}
+                      framed={false}
+                      overlay
+                      className={cn(
+                        cardAspectClasses[project.aspectRatio],
+                        isWide && "md:aspect-[16/9]",
+                        isTall && "md:aspect-auto md:h-full md:min-h-[480px]",
+                      )}
+                    />
+                  </VisualImage>
+                ) : (
+                  <ProjectImage
+                    src={coverSrc}
+                    alt={project.images.imageAlt}
+                    gradient={project.gradient}
+                    blurDataURL={project.images.blurDataURL}
+                    aspectRatio={project.aspectRatio}
+                    mode="cover"
+                    sizes={imageSizes}
+                    framed={false}
+                    overlay
+                    className={cn(
+                      cardAspectClasses[project.aspectRatio],
+                      isWide && "md:aspect-[16/9]",
+                      isTall && "md:aspect-auto md:h-full md:min-h-[480px]",
+                      "group-hover:scale-[1.01] [&_img]:transition-transform [&_img]:duration-[900ms] [&_img]:ease-out group-hover:[&_img]:scale-[1.04]",
+                    )}
+                  />
+                )}
               </ImageReveal>
             </MaskReveal>
 
+            {!visualEdit ? (
+              <>
             <div className="absolute inset-0 flex items-end p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:p-8">
               <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/35 to-transparent" aria-hidden="true" />
               <div className="relative translate-y-3 transition-transform duration-500 group-hover:translate-y-0">
@@ -103,16 +121,30 @@ export function ProjectCard({
                 →
               </span>
             </div>
+              </>
+            ) : null}
           </div>
 
           <div className="border-t border-border-soft px-5 py-5 md:px-6 md:py-6">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="font-display text-2xl font-light text-foreground transition-colors duration-300 group-hover:text-accent md:text-3xl">
-                  {project.title}
+                  {visualEdit ? (
+                    <VisualField fieldPath={`${base}.title`} value={project.title} label="Title" />
+                  ) : (
+                    project.title
+                  )}
                 </h3>
                 <p className="mt-1 text-xs uppercase tracking-[0.15em] text-muted">
-                  {project.category}
+                  {visualEdit ? (
+                    <VisualField
+                      fieldPath={`${base}.category`}
+                      value={project.category}
+                      label="Category"
+                    />
+                  ) : (
+                    project.category
+                  )}
                 </p>
               </div>
               <span
@@ -123,7 +155,35 @@ export function ProjectCard({
               </span>
             </div>
           </div>
-        </Link>
+    </>
+  );
+
+  return (
+    <motion.article
+      variants={variants}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
+      layout
+      className={cn(
+        "group relative",
+        isWide && "md:col-span-2",
+        layout === "editorial" && isTall && "md:row-span-2",
+      )}
+    >
+      <Magnetic strength={visualEdit ? 0 : 0.12} className="block">
+        {visualEdit ? (
+          <div className="museum-card block">{cardInner}</div>
+        ) : (
+          <Link
+            href={localizedPath(locale, `/work/${project.slug}`)}
+            data-cursor="view"
+            className="museum-card block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+            aria-label={caseStudyAriaLabel(project.title, dict.work.viewCaseStudyAria)}
+          >
+            {cardInner}
+          </Link>
+        )}
       </Magnetic>
     </motion.article>
   );

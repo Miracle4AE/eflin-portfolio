@@ -3,11 +3,14 @@
 import { motion } from "framer-motion";
 import { useDictionary } from "@/i18n/locale-context";
 import { Container } from "@/components/ui/Container";
+import { VisualField } from "@/components/admin/visual/EditableText";
+import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 import { fadeUp, staggerContainer, defaultViewport } from "@/lib/motion";
 
 interface NarrativeSection {
   label: string;
   content: string;
+  contentPath?: string;
 }
 
 interface CaseStudyNarrativeProps {
@@ -16,6 +19,8 @@ interface CaseStudyNarrativeProps {
 
 export function CaseStudyNarrative({ sections }: CaseStudyNarrativeProps) {
   const dict = useDictionary();
+  const visualEdit = useVisualEditOptional();
+
   return (
     <section className="border-t border-border-soft py-16 md:py-24 lg:py-32" aria-label="Process notes">
       <Container>
@@ -44,7 +49,16 @@ export function CaseStudyNarrative({ sections }: CaseStudyNarrativeProps) {
                 {section.label}
               </span>
               <p className="text-base leading-[1.85] text-foreground/85 md:text-lg md:leading-[1.9]">
-                {section.content}
+                {visualEdit && section.contentPath ? (
+                  <VisualField
+                    fieldPath={section.contentPath}
+                    value={section.content}
+                    label={section.label}
+                    multiline
+                  />
+                ) : (
+                  section.content
+                )}
               </p>
             </motion.article>
           ))}

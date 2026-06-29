@@ -47,6 +47,8 @@ export type AdminDictionary = {
     export: string;
     manageWithoutCode: string;
     viewLiveSite: string;
+    visualEditor: string;
+    allEditors: string;
     logout: string;
   };
   header: {
@@ -336,5 +338,31 @@ export type AdminDictionary = {
   app: {
     loadingEditor: string;
     failedToLoad: string;
+  };
+  modeSelector: {
+    title: string;
+    subtitle: string;
+    recommended: string;
+    advanced: string;
+    visualTitle: string;
+    visualDesc: string;
+    structuredTitle: string;
+    structuredDesc: string;
+  };
+  visualEditor: {
+    brand: string;
+    subtitle: string;
+    page: string;
+    pages: {
+      homepage: string;
+      work: string;
+      contact: string;
+      project: string;
+    };
+    structuredEditor: string;
+    exit: string;
+    mobileTitle: string;
+    mobileHint: string;
+    openStructured: string;
   };
 };

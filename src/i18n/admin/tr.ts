@@ -49,6 +49,8 @@ export const adminTr: AdminDictionary = {
     export: "Dışa aktar",
     manageWithoutCode: "Kodsuz içerik yönetimi",
     viewLiveSite: "Canlı siteyi gör ↗",
+    visualEditor: "Görsel editör",
+    allEditors: "Tüm editörler",
     logout: "Çıkış yap",
   },
   header: {
@@ -349,5 +351,34 @@ export const adminTr: AdminDictionary = {
   app: {
     loadingEditor: "Portfolyo editörü yükleniyor…",
     failedToLoad: "İçerik yüklenemedi",
+  },
+  modeSelector: {
+    title: "Editör seçin",
+    subtitle: "Canlı siteyi görsel olarak düzenleyin veya gelişmiş alanlar için yapılandırılmış editörü kullanın.",
+    recommended: "Önerilen",
+    advanced: "Gelişmiş",
+    visualTitle: "Görsel editör",
+    visualDesc:
+      "Gerçek site düzenini görün, metinlerde Düzenle'ye tıklayın, görselleri değiştirin, EN/TR geçiş yapın ve kaydedin.",
+    structuredTitle: "Yapılandırılmış editör",
+    structuredDesc:
+      "Tüm alanlar, medya kütüphanesi, doğrulama, dışa/içe aktarma için form tabanlı düzenleme.",
+  },
+  visualEditor: {
+    brand: "Eflin Studio Editör",
+    subtitle: "Görsel düzenleme modu",
+    page: "Sayfa",
+    pages: {
+      homepage: "Ana sayfa",
+      work: "İşler",
+      contact: "İletişim",
+      project: "Proje",
+    },
+    structuredEditor: "Yapılandırılmış editör",
+    exit: "Çık",
+    mobileTitle: "Görsel editör masaüstünde en iyi çalışır",
+    mobileHint:
+      "Satır içi düzenleme için daha büyük bir ekran kullanın veya mobilde yapılandırılmış editörü açın.",
+    openStructured: "Yapılandırılmış editörü aç",
   },
 };

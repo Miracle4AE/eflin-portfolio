@@ -48,6 +48,8 @@ export const adminEn: AdminDictionary = {
     export: "Export",
     manageWithoutCode: "Manage content without code",
     viewLiveSite: "View live site ↗",
+    visualEditor: "Visual editor",
+    allEditors: "All editors",
     logout: "Log out",
   },
   header: {
@@ -348,5 +350,34 @@ export const adminEn: AdminDictionary = {
   app: {
     loadingEditor: "Loading portfolio editor…",
     failedToLoad: "Failed to load content",
+  },
+  modeSelector: {
+    title: "Choose an editor",
+    subtitle: "Edit the live site visually, or use the structured form editor for advanced fields.",
+    recommended: "Recommended",
+    advanced: "Advanced",
+    visualTitle: "Visual editor",
+    visualDesc:
+      "See the real site layout, click Edit on text, change images inline, switch EN/TR, and save.",
+    structuredTitle: "Structured editor",
+    structuredDesc:
+      "Form-based editing for all fields, media library, validation, export, and import.",
+  },
+  visualEditor: {
+    brand: "Eflin Studio Editor",
+    subtitle: "Visual editing mode",
+    page: "Page",
+    pages: {
+      homepage: "Homepage",
+      work: "Work",
+      contact: "Contact",
+      project: "Project",
+    },
+    structuredEditor: "Structured editor",
+    exit: "Exit",
+    mobileTitle: "Visual editor works best on desktop",
+    mobileHint:
+      "Use a larger screen for inline editing, or open the structured editor on mobile.",
+    openStructured: "Open structured editor",
   },
 };

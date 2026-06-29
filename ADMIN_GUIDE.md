@@ -10,11 +10,36 @@ Content lives in **`content/site-content.json`** (development) or **Vercel Blob*
 
 1. Open **`/admin`** on your site (e.g. `http://localhost:3000/admin`).
 2. Sign in with your **username and password** (set in `.env.local` or your host environment).
-3. Edit **Homepage**, **Projects**, **Media Library**, **Health**, **Settings**, or **Export** from the sidebar.
+3. Choose an editor mode:
+   - **Visual editor** (`/admin/visual`) — edit the live site layout inline (recommended for designers).
+   - **Structured editor** (`/admin/structured`) — form-based sections for advanced fields, SEO, validation, and import/export.
 4. Use **Choose from Media Library** on image fields instead of typing paths by hand.
 5. Click **Save changes** — writes locally in development, or to Vercel Blob in production when configured. **Export JSON** remains available as a backup.
 
 You never edit TypeScript or React files for day-to-day content changes.
+
+---
+
+## Editor modes
+
+| Mode | Route | Best for |
+|---|---|---|
+| **Visual editor** | `/admin/visual` | Homepage, work, contact, and project pages — click **Edit** on text, change images in place, switch EN/TR preview |
+| **Structured editor** | `/admin/structured` | SEO fields, project metadata, gallery ordering, validation, JSON import/export, media library management |
+
+Both modes share the same content, draft autosave, backup, and **Save changes** API. Public visitors never see edit controls.
+
+### Visual editor — quick start
+
+1. Go to **`/admin/visual`** (or pick **Visual editor** from `/admin`).
+2. Use the top toolbar to switch **page** (Homepage, Work, Contact, or a project), **locale** (TR / EN), and **Save changes**.
+3. **Edit text** — hover any editable text and click the small **Edit** badge. Change copy in the modal; **Save** updates your draft immediately.
+4. **Change images** — hover an image and use **Change image**, **Upload new**, or **Remove image** (where allowed). The Media Library picker works the same as the structured editor.
+5. **EN / TR** — switch locale in the toolbar before editing. You edit one language at a time; empty Turkish fields fall back to English on the public site.
+6. **Backup / reset** — use **Backup** to download JSON; **Reset** discards unsaved draft changes.
+7. **Advanced fields** — open **Structured editor** from the toolbar for SEO, slug settings, featured flags, and import/export.
+
+On small screens (below `lg`), the visual editor shows a link to the structured editor instead of inline controls.
 
 ---
 

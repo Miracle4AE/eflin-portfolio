@@ -7,6 +7,9 @@ import { ProjectImage } from "@/components/work/ProjectImage";
 import { VideoHero } from "@/components/case-study/VideoHero";
 import { ImageReveal, MaskReveal } from "@/components/motion/MaskReveal";
 import { ParallaxBlock } from "@/components/motion/ParallaxBlock";
+import { VisualField } from "@/components/admin/visual/EditableText";
+import { VisualImage } from "@/components/admin/visual/EditableImage";
+import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 import { IMAGE_SIZES } from "@/lib/images";
 import { pickPrimaryProjectImage } from "@/lib/images.utils";
 import { useDictionary } from "@/i18n/locale-context";
@@ -16,25 +19,21 @@ interface CaseStudyMetaProps {
   project: ResolvedProject;
 }
 
-const metaItems = (
-  project: ResolvedProject,
-  labels: {
-    client: string;
-    year: string;
-    role: string;
-    category: string;
-  },
-) => [
-  { label: labels.client, value: project.client },
-  { label: labels.year, value: project.year },
-  { label: labels.role, value: project.role },
-  { label: labels.category, value: project.category },
-];
+const metaFieldKeys = ["client", "year", "role", "category"] as const;
 
 export function CaseStudyMeta({ project }: CaseStudyMetaProps) {
   const dict = useDictionary();
+  const visualEdit = useVisualEditOptional();
   const metaSrc = pickPrimaryProjectImage(project.images);
   const heroVideo = project.images.videoPlaceholder;
+  const base = `projects.${project.slug}`;
+
+  const metaItems = metaFieldKeys.map((key) => ({
+    key,
+    label: dict.caseStudy[key],
+    value: project[key],
+    path: `${base}.${key}`,
+  }));
 
   return (
     <section className="border-t border-border-soft py-16 md:py-24" aria-label="Project overview">
@@ -60,22 +59,30 @@ export function CaseStudyMeta({ project }: CaseStudyMetaProps) {
             className="lg:col-span-4"
           >
             <dl className="space-y-8">
-              {metaItems(project, dict.caseStudy).map((item) => (
-                <div key={item.label} className="border-b border-border-soft pb-6">
+              {metaItems.map((item) => (
+                <div key={item.key} className="border-b border-border-soft pb-6">
                   <dt className="mb-2 text-[10px] uppercase tracking-[0.25em] text-accent/80">
                     {item.label}
                   </dt>
                   <dd className="text-sm leading-relaxed text-foreground md:text-base">
-                    {item.value}
+                    {visualEdit ? (
+                      <VisualField
+                        fieldPath={item.path}
+                        value={item.value}
+                        label={item.label}
+                      />
+                    ) : (
+                      item.value
+                    )}
                   </dd>
                 </div>
               ))}
             </dl>
 
             <div className="mt-10 flex flex-wrap gap-2">
-              {project.tags.map((tag) => (
+              {project.tags.map((tag, index) => (
                 <span
-                  key={tag}
+                  key={`${tag}-${index}`}
                   className="border border-foreground/10 px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-muted"
                 >
                   {tag}
@@ -103,6 +110,27 @@ export function CaseStudyMeta({ project }: CaseStudyMetaProps) {
                         ariaLabel={project.images.imageAlt}
                       />
                     </div>
+                  ) : visualEdit ? (
+                    <VisualImage
+                      fieldPath={`${base}.heroImagePath`}
+                      src={metaSrc}
+                      alt={project.images.imageAlt}
+                      label="Project hero image"
+                      pickerType="hero"
+                      projectSlug={project.slug}
+                    >
+                      <ProjectImage
+                        src={metaSrc}
+                        alt={project.images.imageAlt}
+                        gradient={project.gradient}
+                        blurDataURL={project.images.blurDataURL}
+                        aspectRatio="wide"
+                        mode="editorial"
+                        sizes={IMAGE_SIZES.meta}
+                        interactive={false}
+                        className="w-full"
+                      />
+                    </VisualImage>
                   ) : (
                     <ProjectImage
                       src={metaSrc}

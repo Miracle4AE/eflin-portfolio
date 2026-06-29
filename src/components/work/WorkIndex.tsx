@@ -12,6 +12,8 @@ import { useDictionary } from "@/i18n/locale-context";
 import type { CategoryFilterKey } from "@/i18n/types";
 import { cn } from "@/lib/utils";
 import { filterItem, fadeUp, defaultViewport } from "@/lib/motion";
+import { VisualField } from "@/components/admin/visual/EditableText";
+import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 
 const categoryKeys: CategoryFilterKey[] = [
   "all",
@@ -28,6 +30,7 @@ interface WorkIndexProps {
 
 export function WorkIndex({ projects }: WorkIndexProps) {
   const dict = useDictionary();
+  const visualEdit = useVisualEditOptional();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
   const filtered = filterProjectsByCategory(projects, activeCategory);
 
@@ -46,17 +49,39 @@ export function WorkIndex({ projects }: WorkIndexProps) {
               {dict.work.portfolio}
             </span>
           </MaskReveal>
-          <TextReveal
-            as="h1"
-            text={dict.work.indexTitle}
-            className="font-display text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-6xl lg:text-7xl"
-          />
-          <TextReveal
-            as="p"
-            text={dict.work.indexDescription}
-            delay={0.12}
-            className="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg"
-          />
+          {visualEdit ? (
+            <>
+              <h1 className="font-display text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-6xl lg:text-7xl">
+                <VisualField
+                  fieldPath="homepage.work.indexTitle"
+                  value={dict.work.indexTitle}
+                  label="Work page title"
+                />
+              </h1>
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg">
+                <VisualField
+                  fieldPath="homepage.work.indexDescription"
+                  value={dict.work.indexDescription}
+                  label="Work page description"
+                  multiline
+                />
+              </p>
+            </>
+          ) : (
+            <>
+              <TextReveal
+                as="h1"
+                text={dict.work.indexTitle}
+                className="font-display text-5xl font-light leading-[1.05] tracking-tight text-foreground md:text-6xl lg:text-7xl"
+              />
+              <TextReveal
+                as="p"
+                text={dict.work.indexDescription}
+                delay={0.12}
+                className="mt-6 max-w-xl text-base leading-relaxed text-muted md:text-lg"
+              />
+            </>
+          )}
         </motion.div>
 
         <div className="editorial-divider mb-12 md:mb-16" aria-hidden="true" />

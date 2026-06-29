@@ -316,4 +316,79 @@
     opacity: 0.6;
     cursor: not-allowed;
   }
+
+  .visual-editor-toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid var(--color-border-soft);
+    background: color-mix(in srgb, var(--color-background) 92%, transparent);
+    padding: 0.85rem 1rem;
+    backdrop-filter: blur(12px);
+  }
+
+  .visual-editor-canvas {
+    min-height: 100vh;
+  }
+
+  .visual-edit-badge {
+    position: absolute;
+    top: -0.35rem;
+    right: -0.35rem;
+    z-index: 5;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+    background: color-mix(in srgb, var(--color-accent) 88%, white);
+    padding: 0.15rem 0.55rem;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-background);
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .group\/visual-edit:hover .visual-edit-badge,
+  .group\/visual-edit:focus-within .visual-edit-badge {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .visual-edit-image-trigger {
+    position: absolute;
+    left: 0.75rem;
+    top: 0.75rem;
+    z-index: 10;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 35%, transparent);
+    background: color-mix(in srgb, var(--color-accent) 88%, white);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-background);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .group\/visual-image:hover .visual-edit-image-trigger,
+  .group\/visual-image:focus-within .visual-edit-image-trigger {
+    opacity: 1;
+  }
+
+  .group\/visual-edit:hover,
+  .group\/visual-image:hover {
+    outline: 1px dashed color-mix(in srgb, var(--color-accent) 35%, transparent);
+    outline-offset: 4px;
+  }
 }

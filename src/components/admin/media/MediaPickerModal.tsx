@@ -1,5 +1,6 @@
 "use client";
 
+import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
 import { MediaUploadPanel } from "@/components/admin/media/MediaUploadPanel";
 import type { MediaFileType } from "@/lib/admin/media.constants";
@@ -37,6 +38,11 @@ export function MediaPickerModal({
   const [projectFilter, setProjectFilter] = useState(filter.projectSlug ?? "all");
   const [query, setQuery] = useState("");
   const [showUpload, setShowUpload] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (open) {
@@ -63,9 +69,9 @@ export function MediaPickerModal({
     return true;
   });
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
       <div className="flex max-h-[90vh] w-full max-w-5xl flex-col rounded-2xl border border-border-soft bg-surface">
         <div className="flex items-center justify-between border-b border-border-soft px-6 py-4">
@@ -164,6 +170,7 @@ export function MediaPickerModal({
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
