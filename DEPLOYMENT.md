@@ -20,20 +20,22 @@ Copy `.env.example` to `.env.local` for local development.
 | `CONTACT_FROM_EMAIL` | Production | Verified sender in Resend |
 | `NEXT_PUBLIC_ANALYTICS_ENABLED` | Optional | `true` to enable Vercel Analytics |
 | `ADMIN_PASSWORD` | Production | Protects `/admin` content panel |
-| `BLOB_READ_WRITE_TOKEN` | Production Save | Vercel Blob token for persistent content (see below) |
+| `BLOB_STORE_ID` | Production Save | Blob store id (auto-added when store is connected) |
+| `VERCEL_OIDC_TOKEN` | Production Save | Short-lived OIDC token on Vercel (auto-rotated) |
+| `BLOB_WEBHOOK_PUBLIC_KEY` | Production | Webhook verification for Blob uploads |
 | `ADMIN_ENABLE_FILE_WRITE` | Optional | Legacy disk write in production (prefer Blob) |
 
-See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)** for the JSON admin workflow. Content is stored in Vercel Blob in production (when configured) or `content/site-content.json` locally; static data in `src/data/` is fallback only.
+See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)** for the JSON admin workflow. Content is stored in Vercel Blob in production (when connected) or `content/site-content.json` locally; static data in `src/data/` is fallback only.
 
 ### Vercel Blob setup (production Save)
 
 1. **Vercel Dashboard → Storage → Create Blob store**
 2. **Connect** the store to this project
-3. Confirm **`BLOB_READ_WRITE_TOKEN`** appears under **Settings → Environment Variables**
+3. Confirm **`BLOB_STORE_ID`**, **`VERCEL_OIDC_TOKEN`**, and **`BLOB_WEBHOOK_PUBLIC_KEY`** under **Settings → Environment Variables**
 4. **Redeploy**
 5. Test **`/admin` → Save changes** and verify `/en` / `/tr` update
 
-Export JSON in the admin panel remains a backup if Blob is not configured.
+Export JSON in the admin panel remains a backup if Blob access fails.
 
 ### Local contact form
 

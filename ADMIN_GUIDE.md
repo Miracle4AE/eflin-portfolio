@@ -148,15 +148,15 @@ Recommended workflow before risky edits: **Backup → edit → Save or Import**.
 
 ### Production (Vercel)
 
-When **`BLOB_READ_WRITE_TOKEN`** is set (via a linked Vercel Blob store):
+When a **Vercel Blob store is connected** to the project (OIDC via `BLOB_STORE_ID` + `VERCEL_OIDC_TOKEN`):
 
 - **Save changes** writes `site-content.json` to Vercel Blob.
 - The public site reads from Blob on each request (with local/fallback backup).
 - Pages are revalidated automatically after save — no redeploy required for content edits.
 
-If Blob is **not** configured:
+If Blob access is **not available**:
 
-- The Save button is disabled with a clear message: storage is required.
+- The Save button is disabled with a clear message.
 - Use **Export → Download JSON** as a backup workflow:
   1. Edit in `/admin`
   2. **Export / Import → Download site-content.json**
@@ -168,7 +168,7 @@ If Blob is **not** configured:
 1. **Vercel Dashboard → Storage**
 2. **Create Blob store**
 3. **Connect** the store to this project
-4. Copy **`BLOB_READ_WRITE_TOKEN`** to **Project → Settings → Environment Variables** (Vercel adds it automatically when linked)
+4. Confirm **`BLOB_STORE_ID`**, **`VERCEL_OIDC_TOKEN`**, and **`BLOB_WEBHOOK_PUBLIC_KEY`** appear under **Settings → Environment Variables**
 5. **Redeploy**
 6. Open **`/admin`**, edit content, click **Save changes**, then verify `/en` and `/tr`
 
@@ -180,7 +180,9 @@ If Blob is **not** configured:
 |---|---|
 | `ADMIN_USERNAME` | Required — admin login username |
 | `ADMIN_PASSWORD` | Required — admin login password |
-| `BLOB_READ_WRITE_TOKEN` | Required for production Save — Vercel Blob read/write token |
+| `BLOB_STORE_ID` | Production Save — added when Blob store is connected |
+| `VERCEL_OIDC_TOKEN` | Production Save — short-lived token on Vercel deployments |
+| `BLOB_WEBHOOK_PUBLIC_KEY` | Blob webhook verification (added with connected store) |
 | `ADMIN_ENABLE_FILE_WRITE` | Legacy — allow POST save to disk in production (prefer Blob) |
 
 Add both credentials to **`.env.local`** for local development:

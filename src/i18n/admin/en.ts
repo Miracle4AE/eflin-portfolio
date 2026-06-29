@@ -62,9 +62,9 @@ export const adminEn: AdminDictionary = {
     saveChanges: "Save changes",
     exportToSave: "Export to save",
     storageRequiredForSaving: "Storage required for saving",
-    storageRequiredHint: "Add BLOB_READ_WRITE_TOKEN in Vercel to enable Save",
+    storageRequiredHint: "Connect a Vercel Blob store to this project to enable Save",
     storageNotConfigured:
-      "Persistent storage is not configured. Add BLOB_READ_WRITE_TOKEN in Vercel, or use Export JSON as a backup workflow.",
+      "Persistent storage is not available. Connect a Vercel Blob store to this project, or use Export JSON as a backup workflow.",
     draftFound: "A local draft from {date} was found. Restore it?",
     restoreDraft: "Restore draft",
     productionExportOnly:
@@ -273,7 +273,7 @@ export const adminEn: AdminDictionary = {
     exportDevHint:
       "Save writes locally in development. Export JSON remains available as a backup.",
     exportProdHint:
-      "Production saves to Vercel Blob when BLOB_READ_WRITE_TOKEN is set. Export JSON remains a backup workflow.",
+      "When a Vercel Blob store is connected, production saves go to Blob. Export JSON remains a backup workflow.",
     downloadJson: "Download site-content.json",
     downloadBackup: "Download timestamped backup",
     importSection: "Import",

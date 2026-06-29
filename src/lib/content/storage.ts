@@ -23,12 +23,19 @@ export type StorageStatus = {
   message?: string;
 };
 
+type BlobAccessProbe = {
+  available: boolean;
+  checkedAt: number;
+  error?: string;
+};
+
+const BLOB_PROBE_TTL_MS = 60_000;
+const STORAGE_UNAVAILABLE_MESSAGE =
+  "Persistent storage is not available. Connect a Vercel Blob store to this project, or use Export JSON.";
+
 let cachedContent: SiteContent | null = null;
 let cacheKey = "";
-
-function isBlobConfigured(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN?.trim());
-}
+let blobAccessProbe: BlobAccessProbe | null = null;
 
 function isDevelopment(): boolean {
   return process.env.NODE_ENV === "development";
@@ -60,9 +67,35 @@ function readLocalFile(): SiteContent | null {
   }
 }
 
-async function readBlobFile(): Promise<SiteContent | null> {
-  if (!isBlobConfigured()) return null;
+async function probeBlobAccess(force = false): Promise<BlobAccessProbe> {
+  if (
+    !force &&
+    blobAccessProbe &&
+    Date.now() - blobAccessProbe.checkedAt < BLOB_PROBE_TTL_MS
+  ) {
+    return blobAccessProbe;
+  }
 
+  try {
+    await list({ prefix: BLOB_PATHNAME, limit: 1 });
+    blobAccessProbe = { available: true, checkedAt: Date.now() };
+    return blobAccessProbe;
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : "Vercel Blob access failed";
+    if (process.env.VERCEL === "1") {
+      console.warn("[Content] Blob access probe failed:", message);
+    }
+    blobAccessProbe = {
+      available: false,
+      checkedAt: Date.now(),
+      error: message,
+    };
+    return blobAccessProbe;
+  }
+}
+
+async function readBlobFile(): Promise<SiteContent | null> {
   try {
     const { blobs } = await list({ prefix: BLOB_PATHNAME, limit: 1 });
     const blob = blobs.find((item) => item.pathname === BLOB_PATHNAME);
@@ -100,18 +133,17 @@ async function writeBlobFile(content: SiteContent): Promise<void> {
   });
 }
 
-function currentCacheKey(): string {
-  if (isBlobConfigured()) return "blob";
-  if (readLocalFile()) return "local";
-  return "fallback";
+function currentCacheKey(source: "blob" | "local" | "fallback"): string {
+  return source;
 }
 
 export function invalidateStorageCache(): void {
   cachedContent = null;
   cacheKey = "";
+  blobAccessProbe = null;
 }
 
-export function getStorageStatus(): StorageStatus {
+export async function getStorageStatus(): Promise<StorageStatus> {
   if (isDevelopment()) {
     return {
       configured: true,
@@ -121,7 +153,8 @@ export function getStorageStatus(): StorageStatus {
     };
   }
 
-  if (isBlobConfigured()) {
+  const probe = await probeBlobAccess();
+  if (probe.available) {
     return {
       configured: true,
       readSource: "blob",
@@ -135,22 +168,35 @@ export function getStorageStatus(): StorageStatus {
     readSource: readLocalFile() ? "local" : "fallback",
     canWrite: false,
     saveMode: "unconfigured",
-    message:
-      "Persistent storage is not configured. Add BLOB_READ_WRITE_TOKEN or use Export JSON.",
+    message: STORAGE_UNAVAILABLE_MESSAGE,
   };
 }
 
 export async function readContent(): Promise<SiteContent> {
-  const nextCacheKey = currentCacheKey();
-  if (cachedContent && cacheKey === nextCacheKey) {
-    return cachedContent;
+  if (isDevelopment()) {
+    const fromLocal = readLocalFile();
+    if (fromLocal) {
+      cachedContent = fromLocal;
+      cacheKey = currentCacheKey("local");
+      return fromLocal;
+    }
+
+    const fallback = buildFallbackSiteContent();
+    cachedContent = fallback;
+    cacheKey = currentCacheKey("fallback");
+    return fallback;
   }
 
-  if (isBlobConfigured()) {
+  const probe = await probeBlobAccess();
+  if (probe.available) {
+    if (cachedContent && cacheKey === "blob") {
+      return cachedContent;
+    }
+
     const fromBlob = await readBlobFile();
     if (fromBlob) {
       cachedContent = fromBlob;
-      cacheKey = "blob";
+      cacheKey = currentCacheKey("blob");
       return fromBlob;
     }
   }
@@ -158,13 +204,13 @@ export async function readContent(): Promise<SiteContent> {
   const fromLocal = readLocalFile();
   if (fromLocal) {
     cachedContent = fromLocal;
-    cacheKey = "local";
+    cacheKey = currentCacheKey("local");
     return fromLocal;
   }
 
   const fallback = buildFallbackSiteContent();
   cachedContent = fallback;
-  cacheKey = "fallback";
+  cacheKey = currentCacheKey("fallback");
   return fallback;
 }
 
@@ -172,18 +218,23 @@ export async function writeContent(content: SiteContent): Promise<"local" | "blo
   if (isDevelopment()) {
     writeLocalFile(content);
     cachedContent = content;
-    cacheKey = "local";
+    cacheKey = currentCacheKey("local");
     return "local";
   }
 
-  if (isBlobConfigured()) {
-    await writeBlobFile(content);
-    cachedContent = content;
-    cacheKey = "blob";
-    return "blob";
+  const probe = await probeBlobAccess(true);
+  if (!probe.available) {
+    throw new Error(STORAGE_UNAVAILABLE_MESSAGE);
   }
 
-  throw new Error(
-    "Persistent storage is not configured. Add BLOB_READ_WRITE_TOKEN or use Export JSON.",
-  );
+  try {
+    await writeBlobFile(content);
+    cachedContent = content;
+    cacheKey = currentCacheKey("blob");
+    blobAccessProbe = { available: true, checkedAt: Date.now() };
+    return "blob";
+  } catch (error) {
+    blobAccessProbe = null;
+    throw error instanceof Error ? error : new Error(STORAGE_UNAVAILABLE_MESSAGE);
+  }
 }

@@ -63,9 +63,9 @@ export const adminTr: AdminDictionary = {
     saveChanges: "Değişiklikleri kaydet",
     exportToSave: "Kaydetmek için dışa aktar",
     storageRequiredForSaving: "Kalıcı kayıt için storage gerekli",
-    storageRequiredHint: "Kaydetmek için Vercel'de BLOB_READ_WRITE_TOKEN ekleyin",
+    storageRequiredHint: "Kaydetmek için Vercel Blob store'u projeye bağlayın",
     storageNotConfigured:
-      "Kalıcı depolama yapılandırılmamış. Vercel'de BLOB_READ_WRITE_TOKEN ekleyin veya yedek olarak JSON dışa aktarın.",
+      "Kalıcı depolama kullanılamıyor. Vercel Blob store'u projeye bağlayın veya yedek olarak JSON dışa aktarın.",
     draftFound: "{date} tarihli yerel taslak bulundu. Geri yüklensin mi?",
     restoreDraft: "Taslağı geri yükle",
     productionExportOnly:
@@ -274,7 +274,7 @@ export const adminTr: AdminDictionary = {
     exportDevHint:
       "Geliştirmede kayıt yerel dosyaya yazılır. JSON dışa aktarma yedek olarak kullanılabilir.",
     exportProdHint:
-      "BLOB_READ_WRITE_TOKEN tanımlıysa üretimde kayıt Vercel Blob'a gider. JSON dışa aktarma yedek akış olarak kalır.",
+      "Vercel Blob store bağlıysa üretimde kayıt Blob'a gider. JSON dışa aktarma yedek akış olarak kalır.",
     downloadJson: "site-content.json indir",
     downloadBackup: "Zaman damgalı yedek indir",
     importSection: "İçe aktar",

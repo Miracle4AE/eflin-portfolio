@@ -23,7 +23,7 @@ export async function writeSiteContent(
   return saveMode;
 }
 
-export function getContentStorageStatus(): StorageStatus {
+export async function getContentStorageStatus(): Promise<StorageStatus> {
   return getStorageStatus();
 }
 
@@ -31,9 +31,4 @@ export type { SaveMode, StorageStatus };
 
 export function invalidateContentCache(): void {
   invalidateStorageCache();
-}
-
-/** @deprecated Use getContentStorageStatus().canWrite instead. */
-export function canWriteContentFile(): boolean {
-  return getStorageStatus().canWrite;
 }

@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
 
   const content = await loadSiteContent();
   const warnings = collectContentWarnings(content);
-  const storage = getContentStorageStatus();
+  const storage = await getContentStorageStatus();
 
   return NextResponse.json({
     content,
@@ -62,13 +62,11 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const storage = getContentStorageStatus();
+  const storage = await getContentStorageStatus();
   if (!storage.canWrite) {
     return NextResponse.json(
       {
-        error:
-          storage.message ??
-          "Persistent storage is not configured. Add BLOB_READ_WRITE_TOKEN or use Export JSON.",
+        error: storage.message ?? "Persistent storage is not available. Use Export JSON.",
       },
       { status: 503 },
     );
