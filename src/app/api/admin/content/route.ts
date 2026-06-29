@@ -5,6 +5,7 @@ import {
   writeSiteContent,
 } from "@/lib/content/loader";
 import { revalidateSiteContent } from "@/lib/content/revalidate";
+import { formatBlobStorageError } from "@/lib/content/storage";
 import { validateSiteContent } from "@/lib/content/validate";
 import { collectContentWarnings } from "@/lib/content/warnings";
 import {
@@ -88,10 +89,9 @@ export async function POST(request: NextRequest) {
       warnings: collectContentWarnings(validation.data),
     });
   } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Failed to save content. Export JSON as a backup.";
-    return NextResponse.json({ error: message }, { status: 503 });
+    return NextResponse.json(
+      { error: formatBlobStorageError(error) },
+      { status: 503 },
+    );
   }
 }

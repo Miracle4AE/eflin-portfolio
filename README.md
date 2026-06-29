@@ -72,7 +72,7 @@ cp .env.example .env.local
 npm run dev
 ```
 
-See [`.env.example`](./.env.example) for variables. Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `.env.local` to access `/admin`. For production Save, connect a **Vercel Blob** store to the project (see [ADMIN_GUIDE.md](./ADMIN_GUIDE.md)). Contact form works locally without `RESEND_API_KEY` — submissions log to the terminal.
+See [`.env.example`](./.env.example) for variables. Set `ADMIN_USERNAME` and `ADMIN_PASSWORD` in `.env.local` to access `/admin`. For production Save, connect a **private** Vercel Blob store to the project — `site-content.json` is read server-side only (see [ADMIN_GUIDE.md](./ADMIN_GUIDE.md)). Contact form works locally without `RESEND_API_KEY` — submissions log to the terminal.
 
 ---
 

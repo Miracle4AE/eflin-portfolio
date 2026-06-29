@@ -1,11 +1,12 @@
 import fs from "fs";
 import path from "path";
-import { list, put } from "@vercel/blob";
+import { get, list, put } from "@vercel/blob";
 import { buildFallbackSiteContent } from "@/lib/content/fallback";
 import type { SiteContent } from "@/lib/content/types";
 import { validateSiteContent } from "@/lib/content/validate";
 
 export const BLOB_PATHNAME = "site-content.json";
+export const BLOB_ACCESS = "private" as const;
 
 export const LOCAL_CONTENT_PATH = path.join(
   process.cwd(),
@@ -32,6 +33,8 @@ type BlobAccessProbe = {
 const BLOB_PROBE_TTL_MS = 60_000;
 const STORAGE_UNAVAILABLE_MESSAGE =
   "Persistent storage is not available. Connect a Vercel Blob store to this project, or use Export JSON.";
+export const BLOB_ACCESS_MISMATCH_MESSAGE =
+  "Blob store access mode mismatch. Content storage expects private Blob access.";
 
 let cachedContent: SiteContent | null = null;
 let cacheKey = "";
@@ -67,6 +70,23 @@ function readLocalFile(): SiteContent | null {
   }
 }
 
+export function formatBlobStorageError(error: unknown): string {
+  if (!(error instanceof Error)) {
+    return STORAGE_UNAVAILABLE_MESSAGE;
+  }
+
+  const message = error.message.toLowerCase();
+  if (
+    message.includes("public access on a private store") ||
+    message.includes("private access on a public store") ||
+    message.includes("access mode")
+  ) {
+    return BLOB_ACCESS_MISMATCH_MESSAGE;
+  }
+
+  return error.message;
+}
+
 async function probeBlobAccess(force = false): Promise<BlobAccessProbe> {
   if (
     !force &&
@@ -97,17 +117,13 @@ async function probeBlobAccess(force = false): Promise<BlobAccessProbe> {
 
 async function readBlobFile(): Promise<SiteContent | null> {
   try {
-    const { blobs } = await list({ prefix: BLOB_PATHNAME, limit: 1 });
-    const blob = blobs.find((item) => item.pathname === BLOB_PATHNAME);
-    if (!blob) return null;
-
-    const response = await fetch(blob.url, { cache: "no-store" });
-    if (!response.ok) {
-      console.warn("[Content] Failed to fetch blob content:", response.status);
+    const result = await get(BLOB_PATHNAME, { access: BLOB_ACCESS });
+    if (!result || result.statusCode !== 200 || !result.stream) {
       return null;
     }
 
-    return parseSiteContent(await response.text());
+    const raw = await new Response(result.stream).text();
+    return parseSiteContent(raw);
   } catch (error) {
     console.warn("[Content] Failed to read site content from Vercel Blob:", error);
     return null;
@@ -126,7 +142,7 @@ function writeLocalFile(content: SiteContent): void {
 
 async function writeBlobFile(content: SiteContent): Promise<void> {
   await put(BLOB_PATHNAME, JSON.stringify(content, null, 2), {
-    access: "public",
+    access: BLOB_ACCESS,
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
@@ -235,6 +251,6 @@ export async function writeContent(content: SiteContent): Promise<"local" | "blo
     return "blob";
   } catch (error) {
     blobAccessProbe = null;
-    throw error instanceof Error ? error : new Error(STORAGE_UNAVAILABLE_MESSAGE);
+    throw new Error(formatBlobStorageError(error));
   }
 }

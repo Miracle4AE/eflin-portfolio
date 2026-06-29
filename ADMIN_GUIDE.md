@@ -150,9 +150,11 @@ Recommended workflow before risky edits: **Backup → edit → Save or Import**.
 
 When a **Vercel Blob store is connected** to the project (OIDC via `BLOB_STORE_ID` + `VERCEL_OIDC_TOKEN`):
 
-- **Save changes** writes `site-content.json` to Vercel Blob.
-- The public site reads from Blob on each request (with local/fallback backup).
+- **Save changes** writes `site-content.json` to Vercel Blob as a **private** object.
+- The public site reads that JSON **server-side only** (never exposed to the browser).
 - Pages are revalidated automatically after save — no redeploy required for content edits.
+
+The Blob store can remain **private**. Portfolio images stay in `public/images/` as before.
 
 If Blob access is **not available**:
 

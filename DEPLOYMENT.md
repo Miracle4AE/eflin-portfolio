@@ -25,17 +25,17 @@ Copy `.env.example` to `.env.local` for local development.
 | `BLOB_WEBHOOK_PUBLIC_KEY` | Production | Webhook verification for Blob uploads |
 | `ADMIN_ENABLE_FILE_WRITE` | Optional | Legacy disk write in production (prefer Blob) |
 
-See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)** for the JSON admin workflow. Content is stored in Vercel Blob in production (when connected) or `content/site-content.json` locally; static data in `src/data/` is fallback only.
+See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)** for the JSON admin workflow. Content is stored as a **private** blob in production (when connected) or in `content/site-content.json` locally; the public site reads it server-side only. Static data in `src/data/` is fallback only.
 
 ### Vercel Blob setup (production Save)
 
-1. **Vercel Dashboard → Storage → Create Blob store**
+1. **Vercel Dashboard → Storage → Create Blob store** (private is supported)
 2. **Connect** the store to this project
 3. Confirm **`BLOB_STORE_ID`**, **`VERCEL_OIDC_TOKEN`**, and **`BLOB_WEBHOOK_PUBLIC_KEY`** under **Settings → Environment Variables**
 4. **Redeploy**
 5. Test **`/admin` → Save changes** and verify `/en` / `/tr` update
 
-Export JSON in the admin panel remains a backup if Blob access fails.
+`site-content.json` is stored privately in Blob. Portfolio images remain in `public/images/`.
 
 ### Local contact form
 
