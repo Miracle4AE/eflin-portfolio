@@ -10,11 +10,14 @@ const aspectClasses: Record<AspectRatio, string> = {
   wide: "aspect-[16/9]",
 };
 
+export type ProjectImageMode = "cover" | "contain" | "natural";
+
 interface ProjectImageProps {
   src?: string | null;
   alt: string;
   gradient: string;
   aspectRatio?: AspectRatio;
+  mode?: ProjectImageMode;
   className?: string;
   imageClassName?: string;
   overlay?: boolean;
@@ -30,6 +33,7 @@ export function ProjectImage({
   alt,
   gradient,
   aspectRatio = "landscape",
+  mode = "cover",
   className,
   imageClassName,
   overlay = false,
@@ -40,31 +44,53 @@ export function ProjectImage({
   framed = false,
 }: ProjectImageProps) {
   const hasImage = Boolean(src);
+  const objectFitClass = mode === "cover" ? "object-cover" : "object-contain";
+  const useFixedAspect = mode !== "natural";
 
   return (
     <div
       data-cursor={interactive ? "open" : undefined}
       className={cn(
         "editorial-visual relative w-full overflow-hidden bg-surface",
-        aspectClasses[aspectRatio],
+        useFixedAspect && aspectClasses[aspectRatio],
         framed && "editorial-frame",
         className,
       )}
     >
       {hasImage ? (
-        <Image
-          src={src!}
-          alt={alt}
-          fill
-          priority={priority}
-          sizes={sizes}
-          placeholder="blur"
-          blurDataURL={blurDataURL}
-          className={cn(
-            "object-cover transition-transform duration-[900ms] ease-out",
-            imageClassName,
-          )}
-        />
+        mode === "natural" ? (
+          <div className="flex w-full items-center justify-center p-4 md:p-8">
+            <Image
+              src={src!}
+              alt={alt}
+              width={1600}
+              height={1200}
+              priority={priority}
+              sizes={sizes}
+              placeholder="blur"
+              blurDataURL={blurDataURL}
+              className={cn(
+                "h-auto w-full max-h-[min(85vh,900px)] object-contain",
+                imageClassName,
+              )}
+            />
+          </div>
+        ) : (
+          <Image
+            src={src!}
+            alt={alt}
+            fill
+            priority={priority}
+            sizes={sizes}
+            placeholder="blur"
+            blurDataURL={blurDataURL}
+            className={cn(
+              objectFitClass,
+              "transition-transform duration-[900ms] ease-out",
+              imageClassName,
+            )}
+          />
+        )
       ) : (
         <div
           className={cn("absolute inset-0 bg-gradient-to-br", gradient)}
@@ -77,7 +103,6 @@ export function ProjectImage({
       {overlay && (
         <div
           className="pointer-events-none absolute inset-0 bg-gradient-to-t from-background/50 via-transparent to-background/10"
-          aria-hidden="true"
         />
       )}
     </div>

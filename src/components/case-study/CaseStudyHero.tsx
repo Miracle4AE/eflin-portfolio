@@ -9,6 +9,7 @@ import { VideoHero } from "@/components/case-study/VideoHero";
 import { TextRevealInstant } from "@/components/motion/TextReveal";
 import { MaskReveal } from "@/components/motion/MaskReveal";
 import { IMAGE_SIZES } from "@/lib/images";
+import { pickHeroProjectImage } from "@/lib/images.utils";
 import { easeOutExpo, DURATION } from "@/lib/motion";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -30,7 +31,7 @@ export function CaseStudyHero({ project }: CaseStudyHeroProps) {
   const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   const contentY = useTransform(scrollYProgress, [0, 0.6], [0, -40]);
 
-  const heroSrc = project.images.heroImage ?? project.images.coverImage;
+  const heroSrc = pickHeroProjectImage(project.images);
   const heroVideo = project.images.videoPlaceholder;
   const useVideo = Boolean(heroVideo) && !reducedMotion;
 
@@ -65,12 +66,12 @@ export function CaseStudyHero({ project }: CaseStudyHeroProps) {
             gradient={project.gradient}
             blurDataURL={project.images.blurDataURL}
             aspectRatio="wide"
+            mode="contain"
             sizes={IMAGE_SIZES.hero}
             priority
             framed={false}
             overlay
-            className="!aspect-auto h-full min-h-[90vh] md:min-h-screen"
-            imageClassName="scale-105"
+            className="!aspect-auto h-full min-h-[70vh] max-h-[100vh] md:min-h-[80vh]"
           />
         )}
       </motion.div>

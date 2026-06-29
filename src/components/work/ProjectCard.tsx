@@ -10,6 +10,7 @@ import { useDictionary, useLocale } from "@/i18n/locale-context";
 import { localizedPath } from "@/i18n/navigation";
 import { caseStudyAriaLabel } from "@/i18n/localize";
 import { IMAGE_SIZES } from "@/lib/images";
+import { pickPrimaryProjectImage } from "@/lib/images.utils";
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/lib/motion";
 
@@ -66,11 +67,12 @@ export function ProjectCard({
             <MaskReveal>
               <ImageReveal>
                 <ProjectImage
-                  src={project.images.coverImage}
+                  src={pickPrimaryProjectImage(project.images)}
                   alt={project.images.imageAlt}
                   gradient={project.gradient}
                   blurDataURL={project.images.blurDataURL}
                   aspectRatio={project.aspectRatio}
+                  mode="cover"
                   sizes={imageSizes}
                   framed={false}
                   overlay

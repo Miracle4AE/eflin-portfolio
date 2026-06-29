@@ -1,11 +1,20 @@
 import fs from "fs";
 import path from "path";
-import type { GalleryItem, Project, ProjectImages, ResolvedGalleryItem, ResolvedProject } from "@/types";
+import type {
+  GalleryItem,
+  Project,
+  ProjectImages,
+  ResolvedGalleryItem,
+  ResolvedProject,
+} from "@/types";
 import {
   DEFAULT_BLUR_DATA_URL,
   portraitImagePath,
   projectImagePath,
 } from "@/lib/images.constants";
+import {
+  pickHeroProjectImage,
+} from "@/lib/images.utils";
 
 const PUBLIC_ROOT = path.join(process.cwd(), "public");
 
@@ -44,18 +53,40 @@ export function resolvePublicImagePath(publicPath: string | undefined): string |
   return imageFileExists(normalized) ? normalized : null;
 }
 
+function resolveFirstGalleryImage(
+  slug: string,
+  galleryItems: GalleryItem[] = [],
+): string | null {
+  for (const item of galleryItems) {
+    const fromPath = resolvePublicImagePath(item.imagePath);
+    if (fromPath) return fromPath;
+    if (item.file) {
+      const fromFile = resolveProjectImage(slug, item.file);
+      if (fromFile) return fromFile;
+    }
+  }
+  return null;
+}
+
+export { pickHeroProjectImage, pickPrimaryProjectImage } from "@/lib/images.utils";
+
 export function resolveProjectImages(
   project: Project,
   overrides?: { coverImagePath?: string; heroImagePath?: string },
+  galleryItems: GalleryItem[] = project.galleryItems,
 ): ProjectImages {
   const coverFromPath = resolvePublicImagePath(overrides?.coverImagePath);
   const heroFromPath = resolvePublicImagePath(overrides?.heroImagePath);
+  const defaultCover = resolveProjectImage(project.slug, "cover.jpg");
+  const defaultHero = resolveProjectImage(project.slug, "hero.jpg");
+  const firstGallery = resolveFirstGalleryImage(project.slug, galleryItems);
+
+  const coverImage = coverFromPath ?? defaultCover ?? heroFromPath ?? defaultHero ?? firstGallery;
+  const heroImage = heroFromPath ?? defaultHero ?? coverFromPath ?? defaultCover ?? firstGallery;
 
   return {
-    coverImage:
-      coverFromPath ?? resolveProjectImage(project.slug, "cover.jpg"),
-    heroImage:
-      heroFromPath ?? resolveProjectImage(project.slug, "hero.jpg"),
+    coverImage,
+    heroImage,
     imageAlt: project.images.imageAlt,
     blurDataURL: project.images.blurDataURL ?? DEFAULT_BLUR_DATA_URL,
     videoPlaceholder: resolveProjectImage(project.slug, "hero.mp4"),
@@ -65,10 +96,11 @@ export function resolveProjectImages(
 export function resolveProject(
   project: Project,
   overrides?: { coverImagePath?: string; heroImagePath?: string },
+  galleryItems?: GalleryItem[],
 ): ResolvedProject {
   return {
     ...project,
-    images: resolveProjectImages(project, overrides),
+    images: resolveProjectImages(project, overrides, galleryItems ?? project.galleryItems),
   };
 }
 
@@ -90,5 +122,5 @@ export function resolveGalleryItems(
 }
 
 export function getProjectOgImage(project: ResolvedProject): string | null {
-  return project.images.heroImage ?? project.images.coverImage;
+  return pickHeroProjectImage(project.images);
 }

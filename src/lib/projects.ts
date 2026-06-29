@@ -82,6 +82,13 @@ function resolveContentProject(
   });
 }
 
+export function resolveContentProjectWithSource(
+  project: Project,
+  source: ContentProject,
+): ResolvedProject {
+  return resolveContentProject(project, source);
+}
+
 async function getProjectsFromContent(locale: Locale): Promise<ResolvedProject[]> {
   try {
     const content = await loadSiteContent();

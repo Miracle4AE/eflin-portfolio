@@ -51,6 +51,7 @@ export function GalleryItem({
                 gradient={item.gradient}
                 blurDataURL={blurDataURL}
                 aspectRatio={item.aspectRatio}
+                mode="contain"
                 sizes={sizes}
                 framed
                 overlay

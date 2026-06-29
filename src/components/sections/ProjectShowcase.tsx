@@ -11,6 +11,7 @@ import { useDictionary, useLocale } from "@/i18n/locale-context";
 import { localizedPath } from "@/i18n/navigation";
 import { caseStudyAriaLabel } from "@/i18n/localize";
 import { IMAGE_SIZES } from "@/lib/images";
+import { pickHeroProjectImage } from "@/lib/images.utils";
 import { fadeUp, defaultViewport } from "@/lib/motion";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
@@ -32,7 +33,7 @@ export function ProjectShowcase({ project }: ProjectShowcaseProps) {
   const textOpacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0.6]);
   const textY = useTransform(scrollYProgress, [0, 0.4, 1], [60, 0, -30]);
 
-  const heroSrc = project.images.heroImage ?? project.images.coverImage;
+  const heroSrc = pickHeroProjectImage(project.images);
   const projectHref = localizedPath(locale, `/work/${project.slug}`);
 
   return (
@@ -84,10 +85,11 @@ export function ProjectShowcase({ project }: ProjectShowcaseProps) {
                 gradient={project.gradient}
                 blurDataURL={project.images.blurDataURL}
                 aspectRatio="wide"
+                mode="contain"
                 sizes={IMAGE_SIZES.hero}
                 overlay
                 framed={false}
-                className="md:aspect-[16/9] group-hover:[&_img]:scale-[1.02] [&_img]:transition-transform [&_img]:duration-700"
+                className="max-h-[min(72vh,820px)] md:aspect-[16/9] group-hover:[&_img]:scale-[1.01] [&_img]:transition-transform [&_img]:duration-700"
               />
 
               <motion.div

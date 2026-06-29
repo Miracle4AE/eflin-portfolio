@@ -5,8 +5,11 @@ import {
   resolveContentPortrait,
 } from "@/lib/content/resolve";
 import { loadSiteContent } from "@/lib/content/loader";
-import { resolveProject } from "@/lib/images.server";
-import { getFeaturedProjects, getProjectBySlug } from "@/lib/projects";
+import {
+  getFeaturedProjects,
+  getProjectBySlug,
+  resolveContentProjectWithSource,
+} from "@/lib/projects";
 
 export async function getHomepagePortrait(): Promise<string | null> {
   return resolveContentPortrait();
@@ -23,10 +26,17 @@ export async function getHomepageFeaturedProjects(
   }
 
   const projects = (
-    await Promise.all(slugs.map((slug) => getContentProjectBySlug(slug, locale)))
-  )
-    .filter(Boolean)
-    .map((project) => resolveProject(project!));
+    await Promise.all(
+      slugs.map(async (slug) => {
+        const source = content.projects.find((project) => project.slug === slug);
+        const project = await getContentProjectBySlug(slug, locale);
+        if (project && source) {
+          return resolveContentProjectWithSource(project, source);
+        }
+        return getProjectBySlug(slug, locale);
+      }),
+    )
+  ).filter((project): project is ResolvedProject => Boolean(project));
 
   return projects.length > 0 ? projects : getFeaturedProjects(locale);
 }
@@ -36,10 +46,11 @@ export async function getHomepageShowcaseProject(
 ): Promise<ResolvedProject | undefined> {
   const content = await loadSiteContent();
   const slug = content.homepage.showcaseProjectSlug;
+  const source = content.projects.find((project) => project.slug === slug);
   const project = await getContentProjectBySlug(slug, locale);
 
-  if (project) {
-    return resolveProject(project);
+  if (project && source) {
+    return resolveContentProjectWithSource(project, source);
   }
 
   return getProjectBySlug(slug, locale);
