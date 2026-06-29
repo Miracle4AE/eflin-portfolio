@@ -4,6 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 import type { SiteContent } from "@/lib/content/types";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
 
+export type AdminSaveResult = {
+  ok: boolean;
+  message?: string;
+  error?: string;
+  revisionId?: string;
+  updatedAt?: string;
+  verified?: boolean;
+  saveMode?: "local" | "blob";
+  content?: SiteContent;
+};
+
 export function useAdminContentLoader() {
   const t = useAdminT();
   const [initialContent, setInitialContent] = useState<SiteContent | null>(null);
@@ -15,7 +26,7 @@ export function useAdminContentLoader() {
   const loadContent = useCallback(async () => {
     setLoading(true);
     setLoadError("");
-    const contentRes = await fetch("/api/admin/content");
+    const contentRes = await fetch("/api/admin/content?fresh=1");
 
     if (!contentRes.ok) {
       setLoadError(t.toasts.loadFailed);
@@ -35,22 +46,58 @@ export function useAdminContentLoader() {
   }, [loadContent]);
 
   const handleSave = useCallback(
-    async (content: SiteContent) => {
+    async (content: SiteContent, onPhase?: (phase: "saving" | "verifying") => void): Promise<AdminSaveResult> => {
+      onPhase?.("saving");
       const response = await fetch("/api/admin/content", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ content }),
       });
       const data = await response.json();
+
       if (!response.ok) {
         return {
           ok: false,
           error: data.error || data.details?.join(", ") || t.toasts.saveFailed,
         };
       }
-      return { ok: true, message: data.message || t.toasts.saved };
+
+      if (!data.verified) {
+        return {
+          ok: false,
+          error: data.error || t.toasts.verificationFailed,
+        };
+      }
+
+      onPhase?.("verifying");
+      const verifyRes = await fetch("/api/admin/content?fresh=1");
+      const verifyData = await verifyRes.json();
+
+      if (!verifyRes.ok) {
+        return {
+          ok: false,
+          error: t.toasts.verifyReadFailed,
+        };
+      }
+
+      if (verifyData.content?.meta?.revisionId !== data.revisionId) {
+        return {
+          ok: false,
+          error: t.toasts.verificationFailed,
+        };
+      }
+
+      return {
+        ok: true,
+        message: data.message || t.toasts.savedVerified,
+        revisionId: data.revisionId,
+        updatedAt: data.updatedAt,
+        verified: true,
+        saveMode: data.saveMode,
+        content: verifyData.content,
+      };
     },
-    [t.toasts.saveFailed, t.toasts.saved],
+    [t.toasts.saveFailed, t.toasts.savedVerified, t.toasts.verificationFailed, t.toasts.verifyReadFailed],
   );
 
   async function handleLogout() {

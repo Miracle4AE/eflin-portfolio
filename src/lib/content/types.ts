@@ -53,8 +53,15 @@ export type ContentServiceItem = {
   description: LocaleField;
 };
 
+export type ContentMeta = {
+  revisionId: string;
+  updatedAt: string;
+  updatedBy: string;
+};
+
 export type SiteContent = {
   version: 1;
+  meta?: ContentMeta;
   site: {
     name: string;
     email: string;

@@ -63,6 +63,7 @@ export const adminTr: AdminDictionary = {
     reset: "Sıfırla",
     backup: "Yedekle",
     saving: "Kaydediliyor…",
+    verifying: "Doğrulanıyor…",
     saveChanges: "Değişiklikleri kaydet",
     exportToSave: "Kaydetmek için dışa aktar",
     storageRequiredForSaving: "Kalıcı kayıt için storage gerekli",
@@ -73,6 +74,9 @@ export const adminTr: AdminDictionary = {
     restoreDraft: "Taslağı geri yükle",
     productionExportOnly:
       "Üretimde kayıt yalnızca dışa aktarma ile yapılır. Düzenlemeyi bitirince Dışa Aktar bölümünden JSON indirin.",
+    lastRevision: "Revizyon",
+    verifiedSave: "Doğrulandı",
+    unverifiedSave: "Doğrulanmadı",
   },
   dashboard: {
     title: "Kontrol paneli",
@@ -300,7 +304,10 @@ export const adminTr: AdminDictionary = {
   },
   toasts: {
     saved: "Başarıyla kaydedildi",
+    savedVerified: "Değişiklikler kaydedildi ve depoda doğrulandı",
     saveFailed: "Kayıt başarısız",
+    verificationFailed: "Kayıt doğrulanamadı. Site güncellenmedi.",
+    verifyReadFailed: "Kaydedilen içerik depodan doğrulanamadı.",
     changesReset: "Değişiklikler son kaydedilen sürüme sıfırlandı",
     draftRestored: "Taslak tarayıcı depolamasından geri yüklendi",
     draftDiscarded: "Taslak silindi",

@@ -37,6 +37,8 @@ export function AdminShell({
     canWrite,
     saveMode,
     saving,
+    savePhase,
+    saveMeta,
     save,
     resetChanges,
     toasts,
@@ -143,6 +145,13 @@ export function AdminShell({
                   : saveMode === "blob"
                     ? t.header.blobSaveEnabled
                     : t.header.storageRequiredHint}
+                {saveMeta ? (
+                  <>
+                    {" · "}
+                    {t.header.lastRevision}: {saveMeta.revisionId.slice(0, 8)} ·{" "}
+                    {saveMeta.verified ? t.header.verifiedSave : t.header.unverifiedSave}
+                  </>
+                ) : null}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -171,7 +180,9 @@ export function AdminShell({
                 className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving
-                  ? t.header.saving
+                  ? savePhase === "verifying"
+                    ? t.header.verifying
+                    : t.header.saving
                   : canWrite
                     ? t.header.saveChanges
                     : t.header.storageRequiredForSaving}

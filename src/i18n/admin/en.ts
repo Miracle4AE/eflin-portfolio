@@ -62,6 +62,7 @@ export const adminEn: AdminDictionary = {
     reset: "Reset",
     backup: "Backup",
     saving: "Saving…",
+    verifying: "Verifying…",
     saveChanges: "Save changes",
     exportToSave: "Export to save",
     storageRequiredForSaving: "Storage required for saving",
@@ -72,6 +73,9 @@ export const adminEn: AdminDictionary = {
     restoreDraft: "Restore draft",
     productionExportOnly:
       "Production save is export-only. Download JSON from Export when finished editing.",
+    lastRevision: "Revision",
+    verifiedSave: "Verified",
+    unverifiedSave: "Not verified",
   },
   dashboard: {
     title: "Dashboard",
@@ -299,7 +303,10 @@ export const adminEn: AdminDictionary = {
   },
   toasts: {
     saved: "Changes saved successfully",
+    savedVerified: "Changes saved and verified on storage",
     saveFailed: "Save failed",
+    verificationFailed: "Save failed verification. The site was not updated.",
+    verifyReadFailed: "Could not verify saved content from storage.",
     changesReset: "Changes reset to last saved version",
     draftRestored: "Draft restored from browser storage",
     draftDiscarded: "Draft discarded",

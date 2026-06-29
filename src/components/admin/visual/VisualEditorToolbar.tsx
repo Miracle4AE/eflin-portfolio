@@ -32,6 +32,8 @@ export function VisualEditorToolbar({
     isDirty,
     canWrite,
     saving,
+    savePhase,
+    saveMeta,
     save,
     resetChanges,
     toasts,
@@ -100,6 +102,12 @@ export function VisualEditorToolbar({
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-muted">
             {isDirty ? t.header.unsavedChanges : t.header.allChangesSaved}
+            {saveMeta ? (
+              <>
+                {" · "}
+                {t.header.lastRevision}: {saveMeta.revisionId.slice(0, 8)}
+              </>
+            ) : null}
           </span>
           {isDirty ? (
             <button
@@ -123,7 +131,11 @@ export function VisualEditorToolbar({
             disabled={saving || !canWrite || !isDirty}
             className="rounded-lg bg-accent px-4 py-1.5 text-xs font-medium text-background disabled:opacity-50"
           >
-            {saving ? t.header.saving : t.header.saveChanges}
+            {saving
+              ? savePhase === "verifying"
+                ? t.header.verifying
+                : t.header.saving
+              : t.header.saveChanges}
           </button>
           <Link
             href="/admin/structured"

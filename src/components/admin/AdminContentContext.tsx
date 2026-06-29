@@ -21,12 +21,19 @@ import {
   saveDraft,
   type DraftMeta,
 } from "@/lib/admin/draft";
+import type { AdminSaveResult } from "@/components/admin/useAdminContentLoader";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
 
 export type Toast = {
   id: string;
   type: "success" | "error" | "info";
   message: string;
+};
+
+type SaveMeta = {
+  revisionId: string;
+  updatedAt: string;
+  verified: boolean;
 };
 
 type AdminContentContextValue = {
@@ -38,6 +45,8 @@ type AdminContentContextValue = {
   canWrite: boolean;
   saveMode: "local" | "blob" | "unconfigured";
   saving: boolean;
+  savePhase: "idle" | "saving" | "verifying";
+  saveMeta: SaveMeta | null;
   save: () => Promise<void>;
   resetChanges: () => void;
   validation: ValidationReport;
@@ -64,13 +73,28 @@ export function AdminContentProvider({
   initialContent: SiteContent;
   canWrite: boolean;
   saveMode: "local" | "blob" | "unconfigured";
-  onSave: (content: SiteContent) => Promise<{ ok: boolean; message?: string; error?: string }>;
+  onSave: (
+    content: SiteContent,
+    onPhase?: (phase: "saving" | "verifying") => void,
+  ) => Promise<AdminSaveResult>;
 }) {
   const t = useAdminT();
   const [content, setContent] = useState(initialContent);
   const [savedContent, setSavedContent] = useState(initialContent);
-  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(new Date());
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(
+    initialContent.meta?.updatedAt ? new Date(initialContent.meta.updatedAt) : new Date(),
+  );
+  const [saveMeta, setSaveMeta] = useState<SaveMeta | null>(
+    initialContent.meta?.revisionId && initialContent.meta.updatedAt
+      ? {
+          revisionId: initialContent.meta.revisionId,
+          updatedAt: initialContent.meta.updatedAt,
+          verified: true,
+        }
+      : null,
+  );
   const [saving, setSaving] = useState(false);
+  const [savePhase, setSavePhase] = useState<"idle" | "saving" | "verifying">("idle");
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [draftMeta, setDraftMeta] = useState<DraftMeta | null>(null);
@@ -124,17 +148,34 @@ export function AdminContentProvider({
 
   const save = useCallback(async () => {
     setSaving(true);
-    const result = await onSave(content);
+    setSavePhase("saving");
+    const result = await onSave(content, (phase) => setSavePhase(phase));
     setSaving(false);
-    if (result.ok) {
-      setSavedContent(content);
-      setLastSavedAt(new Date());
+    setSavePhase("idle");
+
+    if (result.ok && result.verified && result.content) {
+      setContent(result.content);
+      setSavedContent(result.content);
+      setLastSavedAt(result.updatedAt ? new Date(result.updatedAt) : new Date());
+      if (result.revisionId && result.updatedAt) {
+        setSaveMeta({
+          revisionId: result.revisionId,
+          updatedAt: result.updatedAt,
+          verified: true,
+        });
+      }
       clearDraft();
-      addToast("success", result.message ?? t.toasts.saved);
-    } else {
-      addToast("error", result.error ?? t.toasts.saveFailed);
+      addToast("success", result.message ?? t.toasts.savedVerified);
+      return;
     }
-  }, [content, onSave, addToast, t.toasts.saved, t.toasts.saveFailed]);
+
+    if (result.ok && !result.verified) {
+      addToast("error", t.toasts.verificationFailed);
+      return;
+    }
+
+    addToast("error", result.error ?? t.toasts.saveFailed);
+  }, [content, onSave, addToast, t.toasts.savedVerified, t.toasts.verificationFailed, t.toasts.saveFailed]);
 
   const resetChanges = useCallback(() => {
     setContent(savedContent);
@@ -167,6 +208,8 @@ export function AdminContentProvider({
       canWrite,
       saveMode,
       saving,
+      savePhase,
+      saveMeta,
       save,
       resetChanges,
       validation,
@@ -185,6 +228,8 @@ export function AdminContentProvider({
       canWrite,
       saveMode,
       saving,
+      savePhase,
+      saveMeta,
       save,
       resetChanges,
       validation,

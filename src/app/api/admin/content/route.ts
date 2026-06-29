@@ -2,10 +2,10 @@ import { NextResponse } from "next/server";
 import {
   getContentStorageStatus,
   loadSiteContent,
+  readSiteContentFresh,
   writeSiteContent,
 } from "@/lib/content/loader";
 import { revalidateSiteContent } from "@/lib/content/revalidate";
-import { formatBlobStorageError } from "@/lib/content/storage";
 import { validateSiteContent } from "@/lib/content/validate";
 import { collectContentWarnings } from "@/lib/content/warnings";
 import {
@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
   if (isAdminDisabled()) return blocked();
   if (!(await isAdminAuthenticated(request))) return unauthorized();
 
-  const content = await loadSiteContent();
+  const fresh = request.nextUrl.searchParams.get("fresh") === "1";
+  const content = fresh ? await readSiteContentFresh() : await loadSiteContent();
   const warnings = collectContentWarnings(content);
   const storage = await getContentStorageStatus();
 
@@ -39,6 +40,12 @@ export async function GET(request: NextRequest) {
     canWrite: storage.canWrite,
     storageMessage: storage.message,
     warnings,
+    revisionId: content.meta?.revisionId ?? null,
+    updatedAt: content.meta?.updatedAt ?? null,
+    readSource: storage.readSource,
+    blobKey: storage.blobKey,
+    fallbackActive: storage.fallbackActive ?? false,
+    fresh,
   });
 }
 
@@ -74,24 +81,28 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const saveMode = await writeSiteContent(validation.data);
-    await revalidateSiteContent(validation.data);
+    const result = await writeSiteContent(validation.data);
+    await revalidateSiteContent(result.content);
 
     const message =
-      saveMode === "local"
+      result.saveMode === "local"
         ? "Content saved to content/site-content.json"
         : "Content saved to Vercel Blob";
 
     return NextResponse.json({
       ok: true,
-      saveMode,
+      verified: result.verified,
+      revisionId: result.revisionId,
+      updatedAt: result.updatedAt,
+      saveMode: result.saveMode,
       message,
-      warnings: collectContentWarnings(validation.data),
+      warnings: collectContentWarnings(result.content),
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: formatBlobStorageError(error) },
-      { status: 503 },
-    );
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Save failed verification. The site was not updated.";
+    return NextResponse.json({ error: message, verified: false }, { status: 500 });
   }
 }

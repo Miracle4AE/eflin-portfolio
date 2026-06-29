@@ -89,6 +89,23 @@ export function validateSiteContent(payload: unknown): ValidationResult {
     errors.push("version must be 1");
   }
 
+  if (data.meta !== undefined) {
+    if (!data.meta || typeof data.meta !== "object") {
+      errors.push("meta must be an object when provided");
+    } else {
+      const meta = data.meta as Record<string, unknown>;
+      if (typeof meta.revisionId !== "string" || !meta.revisionId.trim()) {
+        errors.push("meta.revisionId must be a non-empty string when meta is provided");
+      }
+      if (typeof meta.updatedAt !== "string" || !meta.updatedAt.trim()) {
+        errors.push("meta.updatedAt must be a non-empty string when meta is provided");
+      }
+      if (typeof meta.updatedBy !== "string" || !meta.updatedBy.trim()) {
+        errors.push("meta.updatedBy must be a non-empty string when meta is provided");
+      }
+    }
+  }
+
   if (!data.site || typeof data.site !== "object") {
     errors.push("site settings are required");
   } else {

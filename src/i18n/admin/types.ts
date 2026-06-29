@@ -61,6 +61,7 @@ export type AdminDictionary = {
     reset: string;
     backup: string;
     saving: string;
+    verifying: string;
     saveChanges: string;
     exportToSave: string;
     storageRequiredForSaving: string;
@@ -69,6 +70,9 @@ export type AdminDictionary = {
     draftFound: string;
     restoreDraft: string;
     productionExportOnly: string;
+    lastRevision: string;
+    verifiedSave: string;
+    unverifiedSave: string;
   };
   dashboard: {
     title: string;
@@ -290,7 +294,10 @@ export type AdminDictionary = {
   };
   toasts: {
     saved: string;
+    savedVerified: string;
     saveFailed: string;
+    verificationFailed: string;
+    verifyReadFailed: string;
     changesReset: string;
     draftRestored: string;
     draftDiscarded: string;
