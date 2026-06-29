@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import {
-  canWriteContentFile,
+  getContentStorageStatus,
   loadSiteContent,
   writeSiteContent,
 } from "@/lib/content/loader";
+import { revalidateSiteContent } from "@/lib/content/revalidate";
 import { validateSiteContent } from "@/lib/content/validate";
 import { collectContentWarnings } from "@/lib/content/warnings";
 import {
@@ -27,12 +28,15 @@ export async function GET(request: NextRequest) {
   if (isAdminDisabled()) return blocked();
   if (!(await isAdminAuthenticated(request))) return unauthorized();
 
-  const content = loadSiteContent();
+  const content = await loadSiteContent();
   const warnings = collectContentWarnings(content);
+  const storage = getContentStorageStatus();
+
   return NextResponse.json({
     content,
-    saveMode: canWriteContentFile() ? "file-write" : "export-only",
-    canWrite: canWriteContentFile(),
+    saveMode: storage.saveMode,
+    canWrite: storage.canWrite,
+    storageMessage: storage.message,
     warnings,
   });
 }
@@ -58,22 +62,38 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  if (!canWriteContentFile()) {
-    return NextResponse.json({
-      ok: true,
-      saveMode: "export-only",
-      message:
-        "Production save requires a storage provider. Export JSON is always available.",
-      content: validation.data,
-      warnings: collectContentWarnings(validation.data),
-    });
+  const storage = getContentStorageStatus();
+  if (!storage.canWrite) {
+    return NextResponse.json(
+      {
+        error:
+          storage.message ??
+          "Persistent storage is not configured. Add BLOB_READ_WRITE_TOKEN or use Export JSON.",
+      },
+      { status: 503 },
+    );
   }
 
-  writeSiteContent(validation.data);
-  return NextResponse.json({
-    ok: true,
-    saveMode: "file-write",
-    message: "Content saved to content/site-content.json",
-    warnings: collectContentWarnings(validation.data),
-  });
+  try {
+    const saveMode = await writeSiteContent(validation.data);
+    await revalidateSiteContent(validation.data);
+
+    const message =
+      saveMode === "local"
+        ? "Content saved to content/site-content.json"
+        : "Content saved to Vercel Blob";
+
+    return NextResponse.json({
+      ok: true,
+      saveMode,
+      message,
+      warnings: collectContentWarnings(validation.data),
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Failed to save content. Export JSON as a backup.";
+    return NextResponse.json({ error: message }, { status: 503 });
+  }
 }

@@ -18,7 +18,7 @@ export function AdminApp() {
   const t = useAdminT();
   const [initialContent, setInitialContent] = useState<SiteContent | null>(null);
   const [canWrite, setCanWrite] = useState(false);
-  const [saveMode, setSaveMode] = useState<"file-write" | "export-only">("export-only");
+  const [saveMode, setSaveMode] = useState<"local" | "blob" | "unconfigured">("unconfigured");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
   const [section, setSection] = useState<AdminSectionId>("dashboard");
@@ -57,7 +57,7 @@ export function AdminApp() {
       if (!response.ok) {
         return {
           ok: false,
-          error: data.details?.join(", ") || data.error || t.toasts.saveFailed,
+          error: data.error || data.details?.join(", ") || t.toasts.saveFailed,
         };
       }
       return { ok: true, message: data.message || t.toasts.saved };

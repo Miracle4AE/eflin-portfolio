@@ -25,7 +25,12 @@ export function AdminDashboard({
     { label: t.dashboard.issues, value: validation.total, section: "validation" as const },
     {
       label: t.dashboard.saveMode,
-      value: saveMode === "file-write" ? t.dashboard.local : t.dashboard.export,
+      value:
+        saveMode === "local"
+          ? t.dashboard.local
+          : saveMode === "blob"
+            ? t.dashboard.blob
+            : t.dashboard.unconfigured,
       section: "data" as const,
     },
   ];

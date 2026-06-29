@@ -82,9 +82,9 @@ function resolveContentProject(
   });
 }
 
-function getProjectsFromContent(locale: Locale): ResolvedProject[] {
+async function getProjectsFromContent(locale: Locale): Promise<ResolvedProject[]> {
   try {
-    const content = loadSiteContent();
+    const content = await loadSiteContent();
     return content.projects.map((source) =>
       resolveContentProject(contentProjectToProject(source, locale), source),
     );
@@ -103,9 +103,9 @@ export async function getProjectBySlug(
   locale: Locale = "en",
 ): Promise<ResolvedProject | undefined> {
   try {
-    const content = loadSiteContent();
+    const content = await loadSiteContent();
     const source = content.projects.find((p) => p.slug === slug);
-    const project = getContentProjectBySlug(slug, locale);
+    const project = await getContentProjectBySlug(slug, locale);
     if (project && source) return resolveContentProject(project, source);
     return getProjectBySlugStatic(slug, locale);
   } catch (error) {
@@ -116,7 +116,7 @@ export async function getProjectBySlug(
 
 export async function getAllSlugs(): Promise<string[]> {
   try {
-    const slugs = getContentProjectSlugs();
+    const slugs = await getContentProjectSlugs();
     return slugs.length > 0 ? slugs : getStaticSlugs();
   } catch {
     return getStaticSlugs();
@@ -145,7 +145,7 @@ export async function getProjectGallery(
   slug: string,
   locale: Locale = "en",
 ): Promise<ResolvedGalleryItem[]> {
-  const project = getContentProjectBySlug(slug, locale);
+  const project = await getContentProjectBySlug(slug, locale);
   if (project) {
     return resolveGalleryItems(slug, project.galleryItems);
   }
@@ -157,16 +157,18 @@ export async function getProjectGallery(
   return resolveGalleryItems(slug, localized.galleryItems);
 }
 
-export function getAllProjectsSync(locale: Locale = "en"): ResolvedProject[] {
+export async function getAllProjectsSync(
+  locale: Locale = "en",
+): Promise<ResolvedProject[]> {
   return getProjectsFromContent(locale);
 }
 
 export { filterProjectsByCategory } from "@/lib/projects.utils";
 export type { ProjectCategory, GalleryItem, PaletteColor };
 
-export function isContentLoaded(): boolean {
+export async function isContentLoaded(): Promise<boolean> {
   try {
-    loadSiteContent();
+    await loadSiteContent();
     return true;
   } catch {
     return false;

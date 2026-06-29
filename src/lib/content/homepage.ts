@@ -15,15 +15,16 @@ export async function getHomepagePortrait(): Promise<string | null> {
 export async function getHomepageFeaturedProjects(
   locale: Locale,
 ): Promise<ResolvedProject[]> {
-  const content = loadSiteContent();
+  const content = await loadSiteContent();
   const slugs = content.homepage.featuredProjectSlugs;
 
   if (slugs.length === 0) {
     return getFeaturedProjects(locale);
   }
 
-  const projects = slugs
-    .map((slug) => getContentProjectBySlug(slug, locale))
+  const projects = (
+    await Promise.all(slugs.map((slug) => getContentProjectBySlug(slug, locale)))
+  )
     .filter(Boolean)
     .map((project) => resolveProject(project!));
 
@@ -33,9 +34,9 @@ export async function getHomepageFeaturedProjects(
 export async function getHomepageShowcaseProject(
   locale: Locale,
 ): Promise<ResolvedProject | undefined> {
-  const content = loadSiteContent();
+  const content = await loadSiteContent();
   const slug = content.homepage.showcaseProjectSlug;
-  const project = getContentProjectBySlug(slug, locale);
+  const project = await getContentProjectBySlug(slug, locale);
 
   if (project) {
     return resolveProject(project);

@@ -1,57 +1,39 @@
-import fs from "fs";
-import path from "path";
-import { buildFallbackSiteContent } from "@/lib/content/fallback";
+import { cache } from "react";
+import {
+  getStorageStatus,
+  invalidateStorageCache,
+  readContent,
+  writeContent,
+  type SaveMode,
+  type StorageStatus,
+} from "@/lib/content/storage";
 import type { SiteContent } from "@/lib/content/types";
 
-export const CONTENT_FILE_PATH = path.join(
-  process.cwd(),
-  "content",
-  "site-content.json",
-);
+export { LOCAL_CONTENT_PATH as CONTENT_FILE_PATH } from "@/lib/content/storage";
 
-let cachedContent: SiteContent | null = null;
-let cacheMtime = 0;
+export const loadSiteContent = cache(async (): Promise<SiteContent> => {
+  return readContent();
+});
 
-function readJsonFile(): SiteContent | null {
-  try {
-    if (!fs.existsSync(CONTENT_FILE_PATH)) return null;
-    const stat = fs.statSync(CONTENT_FILE_PATH);
-    if (cachedContent && stat.mtimeMs === cacheMtime) {
-      return cachedContent;
-    }
-    const raw = fs.readFileSync(CONTENT_FILE_PATH, "utf8");
-    const parsed = JSON.parse(raw) as SiteContent;
-    cachedContent = parsed;
-    cacheMtime = stat.mtimeMs;
-    return parsed;
-  } catch (error) {
-    console.warn("[Content] Failed to read site-content.json:", error);
-    return null;
-  }
+export async function writeSiteContent(
+  content: SiteContent,
+): Promise<"local" | "blob"> {
+  const saveMode = await writeContent(content);
+  invalidateStorageCache();
+  return saveMode;
 }
 
-export function loadSiteContent(): SiteContent {
-  const fromFile = readJsonFile();
-  if (fromFile) return fromFile;
-  return buildFallbackSiteContent();
+export function getContentStorageStatus(): StorageStatus {
+  return getStorageStatus();
 }
 
-export function writeSiteContent(content: SiteContent): void {
-  const dir = path.dirname(CONTENT_FILE_PATH);
-  fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(CONTENT_FILE_PATH, `${JSON.stringify(content, null, 2)}\n`, "utf8");
-  cachedContent = content;
-  cacheMtime = fs.statSync(CONTENT_FILE_PATH).mtimeMs;
-}
-
-export function canWriteContentFile(): boolean {
-  return (
-    process.env.NODE_ENV === "development" ||
-    process.env.ADMIN_ENABLE_FILE_WRITE === "true"
-  );
-}
+export type { SaveMode, StorageStatus };
 
 export function invalidateContentCache(): void {
-  cachedContent = null;
-  cacheMtime = 0;
+  invalidateStorageCache();
+}
+
+/** @deprecated Use getContentStorageStatus().canWrite instead. */
+export function canWriteContentFile(): boolean {
+  return getStorageStatus().canWrite;
 }

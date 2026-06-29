@@ -53,12 +53,16 @@ export type AdminDictionary = {
     unsavedChanges: string;
     lastSaved: string;
     localSaveEnabled: string;
+    blobSaveEnabled: string;
     exportJsonToDeploy: string;
     reset: string;
     backup: string;
     saving: string;
     saveChanges: string;
     exportToSave: string;
+    storageRequiredForSaving: string;
+    storageRequiredHint: string;
+    storageNotConfigured: string;
     draftFound: string;
     restoreDraft: string;
     productionExportOnly: string;
@@ -72,7 +76,9 @@ export type AdminDictionary = {
     issues: string;
     saveMode: string;
     local: string;
+    blob: string;
     export: string;
+    unconfigured: string;
     quickActions: string;
     editHomepage: string;
     manageProjects: string;

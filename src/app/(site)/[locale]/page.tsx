@@ -23,10 +23,11 @@ export default async function HomePage({ params }: HomePageProps) {
   if (!isLocale(localeParam)) notFound();
   const locale = localeParam as Locale;
 
-  const [featured, showcase, portraitSrc] = await Promise.all([
+  const [featured, showcase, portraitSrc, websiteSchema] = await Promise.all([
     getHomepageFeaturedProjects(locale),
     getHomepageShowcaseProject(locale),
     getHomepagePortrait(),
+    buildWebsiteSchema(locale),
   ]);
 
   if (!showcase) {
@@ -35,7 +36,7 @@ export default async function HomePage({ params }: HomePageProps) {
 
   return (
     <>
-      <JsonLd data={buildWebsiteSchema(locale)} />
+      <JsonLd data={websiteSchema} />
       <Hero portraitSrc={portraitSrc} />
       <FeaturedWorks projects={featured} />
       <About />

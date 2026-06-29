@@ -20,9 +20,20 @@ Copy `.env.example` to `.env.local` for local development.
 | `CONTACT_FROM_EMAIL` | Production | Verified sender in Resend |
 | `NEXT_PUBLIC_ANALYTICS_ENABLED` | Optional | `true` to enable Vercel Analytics |
 | `ADMIN_PASSWORD` | Production | Protects `/admin` content panel |
-| `ADMIN_ENABLE_FILE_WRITE` | Optional | Allow saving JSON on production hosts (default: dev only) |
+| `BLOB_READ_WRITE_TOKEN` | Production Save | Vercel Blob token for persistent content (see below) |
+| `ADMIN_ENABLE_FILE_WRITE` | Optional | Legacy disk write in production (prefer Blob) |
 
-See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)** for the JSON admin workflow. Content lives in `content/site-content.json`; static data in `src/data/` is fallback only.
+See **[ADMIN_GUIDE.md](./ADMIN_GUIDE.md)** for the JSON admin workflow. Content is stored in Vercel Blob in production (when configured) or `content/site-content.json` locally; static data in `src/data/` is fallback only.
+
+### Vercel Blob setup (production Save)
+
+1. **Vercel Dashboard → Storage → Create Blob store**
+2. **Connect** the store to this project
+3. Confirm **`BLOB_READ_WRITE_TOKEN`** appears under **Settings → Environment Variables**
+4. **Redeploy**
+5. Test **`/admin` → Save changes** and verify `/en` / `/tr` update
+
+Export JSON in the admin panel remains a backup if Blob is not configured.
 
 ### Local contact form
 

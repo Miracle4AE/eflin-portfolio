@@ -11,9 +11,9 @@ import { getSiteUrl } from "@/lib/seo";
 
 type JsonLd = Record<string, unknown>;
 
-export function buildWebsiteSchema(locale: Locale): JsonLd {
+export async function buildWebsiteSchema(locale: Locale): Promise<JsonLd> {
   const siteUrl = getSiteUrl();
-  const content = loadSiteContent();
+  const content = await loadSiteContent();
   const dict = mergeContentIntoDictionary(getDictionary(locale), content, locale);
   const siteConfig = contentToSiteConfig(content, locale);
 
@@ -46,12 +46,12 @@ export function buildWebsiteSchema(locale: Locale): JsonLd {
   };
 }
 
-export function buildCollectionPageSchema(
+export async function buildCollectionPageSchema(
   projects: ResolvedProject[],
   locale: Locale,
-): JsonLd {
+): Promise<JsonLd> {
   const siteUrl = getSiteUrl();
-  const content = loadSiteContent();
+  const content = await loadSiteContent();
   const dict = mergeContentIntoDictionary(getDictionary(locale), content, locale);
   const workPath = localizedPath(locale, "/work");
 
@@ -78,12 +78,12 @@ export function buildCollectionPageSchema(
   };
 }
 
-export function buildCreativeWorkSchema(
+export async function buildCreativeWorkSchema(
   project: ResolvedProject,
   locale: Locale,
-): JsonLd {
+): Promise<JsonLd> {
   const siteUrl = getSiteUrl();
-  const content = loadSiteContent();
+  const content = await loadSiteContent();
   const siteConfig = contentToSiteConfig(content, locale);
   const path = localizedPath(locale, `/work/${project.slug}`);
   const image =
@@ -123,9 +123,9 @@ export function buildCreativeWorkSchema(
   };
 }
 
-export function buildContactPageSchema(locale: Locale): JsonLd {
+export async function buildContactPageSchema(locale: Locale): Promise<JsonLd> {
   const siteUrl = getSiteUrl();
-  const content = loadSiteContent();
+  const content = await loadSiteContent();
   const dict = mergeContentIntoDictionary(getDictionary(locale), content, locale);
   const siteConfig = contentToSiteConfig(content, locale);
   const contactPath = localizedPath(locale, "/contact");

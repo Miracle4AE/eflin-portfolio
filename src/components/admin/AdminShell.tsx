@@ -125,9 +125,11 @@ export function AdminShell({
                 {t.header.lastSaved} {formatSavedAt(lastSavedAt)}
               </p>
               <p className="text-xs text-muted">
-                {saveMode === "file-write"
+                {saveMode === "local"
                   ? t.header.localSaveEnabled
-                  : t.header.exportJsonToDeploy}
+                  : saveMode === "blob"
+                    ? t.header.blobSaveEnabled
+                    : t.header.storageRequiredHint}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
@@ -152,13 +154,14 @@ export function AdminShell({
                 type="button"
                 onClick={() => void save()}
                 disabled={saving || !canWrite || !isDirty}
+                title={!canWrite ? t.header.storageRequiredForSaving : undefined}
                 className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {saving
                   ? t.header.saving
                   : canWrite
                     ? t.header.saveChanges
-                    : t.header.exportToSave}
+                    : t.header.storageRequiredForSaving}
               </button>
             </div>
           </div>
@@ -195,7 +198,7 @@ export function AdminShell({
 
           {!canWrite ? (
             <div className="rounded-xl border border-border-soft bg-surface px-4 py-3 text-sm text-muted">
-              {t.header.productionExportOnly}
+              {t.header.storageNotConfigured}
             </div>
           ) : null}
 

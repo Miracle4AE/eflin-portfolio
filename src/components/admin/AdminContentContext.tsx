@@ -36,7 +36,7 @@ type AdminContentContextValue = {
   isDirty: boolean;
   lastSavedAt: Date | null;
   canWrite: boolean;
-  saveMode: "file-write" | "export-only";
+  saveMode: "local" | "blob" | "unconfigured";
   saving: boolean;
   save: () => Promise<void>;
   resetChanges: () => void;
@@ -63,7 +63,7 @@ export function AdminContentProvider({
   children: React.ReactNode;
   initialContent: SiteContent;
   canWrite: boolean;
-  saveMode: "file-write" | "export-only";
+  saveMode: "local" | "blob" | "unconfigured";
   onSave: (content: SiteContent) => Promise<{ ok: boolean; message?: string; error?: string }>;
 }) {
   const t = useAdminT();

@@ -24,9 +24,11 @@ export default async function ContactPage({ params }: ContactPageProps) {
   if (!isLocale(localeParam)) notFound();
   const locale = localeParam as Locale;
 
+  const contactSchema = await buildContactPageSchema(locale);
+
   return (
     <div className="pt-24 md:pt-32">
-      <JsonLd data={buildContactPageSchema(locale)} />
+      <JsonLd data={contactSchema} />
       <ContactSection
         sourcePage={localizedPath(locale, "/contact")}
         showSocial

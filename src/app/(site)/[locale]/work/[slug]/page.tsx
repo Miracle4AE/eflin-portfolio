@@ -67,9 +67,11 @@ export default async function CaseStudyPage({ params }: CaseStudyPageProps) {
     { label: dict.caseStudy.processResponse, content: project.solution },
   ];
 
+  const creativeWorkSchema = await buildCreativeWorkSchema(project, locale);
+
   return (
     <article>
-      <JsonLd data={buildCreativeWorkSchema(project, locale)} />
+      <JsonLd data={creativeWorkSchema} />
       <CaseStudyHero project={project} />
       <CaseStudyMeta project={project} />
       <CaseStudyNarrative sections={narrativeSections} />

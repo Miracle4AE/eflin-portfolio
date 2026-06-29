@@ -25,10 +25,11 @@ export default async function WorkPage({ params }: WorkPageProps) {
   const locale = localeParam as Locale;
 
   const projects = await getAllProjects(locale);
+  const collectionSchema = await buildCollectionPageSchema(projects, locale);
 
   return (
     <>
-      <JsonLd data={buildCollectionPageSchema(projects, locale)} />
+      <JsonLd data={collectionSchema} />
       <WorkIndex projects={projects} />
     </>
   );

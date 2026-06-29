@@ -178,37 +178,38 @@ export function contentToSiteConfig(
   };
 }
 
-export function getSiteContent(): SiteContent {
+export async function getSiteContent(): Promise<SiteContent> {
   return loadSiteContent();
 }
 
 export async function getMergedDictionary(locale: Locale): Promise<Dictionary> {
   const base = getDictionary(locale);
-  const content = loadSiteContent();
+  const content = await loadSiteContent();
   return mergeContentIntoDictionary(base, content, locale);
 }
 
 export async function getMergedSiteConfig(locale: Locale): Promise<SiteConfig> {
-  const content = loadSiteContent();
+  const content = await loadSiteContent();
   return contentToSiteConfig(content, locale);
 }
 
-export function getContentProjects(locale: Locale): Project[] {
-  const content = loadSiteContent();
+export async function getContentProjects(locale: Locale): Promise<Project[]> {
+  const content = await loadSiteContent();
   return content.projects.map((project) => contentProjectToProject(project, locale));
 }
 
-export function getContentProjectBySlug(
+export async function getContentProjectBySlug(
   slug: string,
   locale: Locale,
-): Project | undefined {
-  const content = loadSiteContent();
+): Promise<Project | undefined> {
+  const content = await loadSiteContent();
   const project = content.projects.find((p) => p.slug === slug);
   return project ? contentProjectToProject(project, locale) : undefined;
 }
 
-export function getContentProjectSlugs(): string[] {
-  return loadSiteContent().projects.map((p) => p.slug);
+export async function getContentProjectSlugs(): Promise<string[]> {
+  const content = await loadSiteContent();
+  return content.projects.map((p) => p.slug);
 }
 
 export function resolveContentImagePath(
@@ -219,12 +220,12 @@ export function resolveContentImagePath(
   return normalized;
 }
 
-export function resolveContentPortrait(): string | null {
-  const content = loadSiteContent();
+export async function resolveContentPortrait(): Promise<string | null> {
+  const content = await loadSiteContent();
   return resolveContentImagePath(content.homepage.portraitImagePath);
 }
 
-export function getContentSeoOgImage(): string | null {
-  const content = loadSiteContent();
+export async function getContentSeoOgImage(): Promise<string | null> {
+  const content = await loadSiteContent();
   return resolveContentImagePath(content.seo.ogImagePath);
 }

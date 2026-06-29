@@ -2,7 +2,7 @@
 
 This portfolio uses a **self-contained JSON admin** at `/admin`. No external CMS, no Sanity, no third-party content API.
 
-Content lives in **`content/site-content.json`**. The public site reads this file at build/runtime. If the file is missing or invalid, static TypeScript fallback data in `src/data/` is used instead.
+Content lives in **`content/site-content.json`** (development) or **Vercel Blob** (production when configured). The public site reads the latest stored JSON at runtime. If storage is missing or invalid, static TypeScript fallback data in `src/data/` is used instead.
 
 ---
 
@@ -12,7 +12,7 @@ Content lives in **`content/site-content.json`**. The public site reads this fil
 2. Sign in with your **username and password** (set in `.env.local` or your host environment).
 3. Edit **Homepage**, **Projects**, **Media Library**, **Health**, **Settings**, or **Export** from the sidebar.
 4. Use **Choose from Media Library** on image fields instead of typing paths by hand.
-5. Click **Save** in development, or **Export JSON** for production deploys.
+5. Click **Save changes** — writes locally in development, or to Vercel Blob in production when configured. **Export JSON** remains available as a backup.
 
 You never edit TypeScript or React files for day-to-day content changes.
 
@@ -143,20 +143,34 @@ Recommended workflow before risky edits: **Backup → edit → Save or Import**.
 
 ### Development (`npm run dev`)
 
-- **Save** writes directly to `content/site-content.json` on your machine.
+- **Save changes** writes directly to `content/site-content.json` on your machine.
 - Restart is not required; refresh the public site to see changes.
 
-### Production (Vercel / static host)
+### Production (Vercel)
 
-- The server **cannot persist** file writes on most hosts.
-- Admin shows: *“Production save requires a storage provider. Export JSON is always available.”*
-- Workflow:
+When **`BLOB_READ_WRITE_TOKEN`** is set (via a linked Vercel Blob store):
+
+- **Save changes** writes `site-content.json` to Vercel Blob.
+- The public site reads from Blob on each request (with local/fallback backup).
+- Pages are revalidated automatically after save — no redeploy required for content edits.
+
+If Blob is **not** configured:
+
+- The Save button is disabled with a clear message: storage is required.
+- Use **Export → Download JSON** as a backup workflow:
   1. Edit in `/admin`
   2. **Export / Import → Download site-content.json**
   3. Replace `content/site-content.json` in the repo
   4. Commit, push — Vercel rebuilds with new content
 
-Optional: set `ADMIN_ENABLE_FILE_WRITE=true` only if your host supports persistent filesystem writes (uncommon on Vercel).
+#### Set up Vercel Blob (one-time)
+
+1. **Vercel Dashboard → Storage**
+2. **Create Blob store**
+3. **Connect** the store to this project
+4. Copy **`BLOB_READ_WRITE_TOKEN`** to **Project → Settings → Environment Variables** (Vercel adds it automatically when linked)
+5. **Redeploy**
+6. Open **`/admin`**, edit content, click **Save changes**, then verify `/en` and `/tr`
 
 ---
 
@@ -166,7 +180,8 @@ Optional: set `ADMIN_ENABLE_FILE_WRITE=true` only if your host supports persiste
 |---|---|
 | `ADMIN_USERNAME` | Required — admin login username |
 | `ADMIN_PASSWORD` | Required — admin login password |
-| `ADMIN_ENABLE_FILE_WRITE` | Allow POST save to disk in production (default: off) |
+| `BLOB_READ_WRITE_TOKEN` | Required for production Save — Vercel Blob read/write token |
+| `ADMIN_ENABLE_FILE_WRITE` | Legacy — allow POST save to disk in production (prefer Blob) |
 
 Add both credentials to **`.env.local`** for local development:
 
@@ -208,9 +223,9 @@ Regenerate after changing static seed data in `src/data/`.
 
 ## Limitations
 
-- **Production upload** disabled — use local dev upload + git commit, or external storage later
+- **Production media upload** disabled — use local dev upload + git commit
 - Nav labels and form validation messages remain in code dictionaries (UI chrome)
-- External storage (S3, database) can be added later if you need true production save/upload
+- Export JSON remains the fallback when Blob is not configured
 
 ## Related docs
 
