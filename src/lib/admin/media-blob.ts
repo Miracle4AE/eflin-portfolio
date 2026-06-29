@@ -6,6 +6,7 @@ import {
 } from "@/lib/admin/media.constants";
 import {
   blobPathnameFromPublicPath,
+  type UploadTarget,
 } from "@/lib/admin/media-paths";
 import type { MediaFile } from "@/lib/admin/media.types";
 import {
