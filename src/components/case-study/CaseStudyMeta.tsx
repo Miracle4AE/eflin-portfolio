@@ -95,7 +95,7 @@ export function CaseStudyMeta({ project }: CaseStudyMetaProps) {
               <MaskReveal>
                 <ImageReveal>
                   {heroVideo ? (
-                    <div className="editorial-frame relative mx-auto aspect-[16/9] max-h-[680px] min-h-[240px] w-full max-w-[1100px] overflow-hidden bg-surface">
+                    <div className="relative mx-auto aspect-[16/9] max-h-[680px] min-h-[240px] w-full max-w-[1100px] overflow-hidden">
                       <VideoHero
                         src={heroVideo}
                         poster={metaSrc}
@@ -112,7 +112,6 @@ export function CaseStudyMeta({ project }: CaseStudyMetaProps) {
                       aspectRatio="wide"
                       mode="editorial"
                       sizes={IMAGE_SIZES.meta}
-                      framed
                       interactive={false}
                       className="w-full"
                     />

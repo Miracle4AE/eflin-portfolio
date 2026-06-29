@@ -52,8 +52,8 @@ export function ProjectImage({
       <div
         data-cursor={interactive ? "open" : undefined}
         className={cn(
-          "editorial-visual relative mx-auto aspect-[16/9] max-h-[680px] min-h-[240px] w-full max-w-[1100px] overflow-hidden bg-surface",
-          framed && "editorial-frame",
+          "editorial-visual relative mx-auto aspect-[16/9] max-h-[680px] min-h-[240px] w-full max-w-[1100px] overflow-hidden",
+          framed ? "bg-surface editorial-frame" : "bg-transparent",
           className,
         )}
       >
@@ -75,7 +75,9 @@ export function ProjectImage({
             aria-label={alt}
           />
         )}
-        <div className="grain-overlay pointer-events-none" aria-hidden="true" />
+        {framed && (
+          <div className="grain-overlay pointer-events-none" aria-hidden="true" />
+        )}
       </div>
     );
   }
