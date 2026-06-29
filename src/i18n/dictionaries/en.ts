@@ -1,0 +1,202 @@
+import type { Dictionary } from "@/i18n/types";
+
+export const dictionaryEn: Dictionary = {
+  meta: {
+    siteTitle: "Eflin — Graphic Designer & Visual Artist",
+    siteDescription:
+      "Graphic designer working across brand identity, editorial design, and art direction — for clients who care about how things read, not just how they look.",
+    portfolioTitle: "Eflin — Portfolio",
+    workTitle: "Selected Works",
+    workDescription:
+      "Brand identity, editorial design, and art direction — a curated index of studio projects by Eflin.",
+    contactTitle: "Contact",
+    contactDescription:
+      "Start a conversation about brand identity, editorial design, art direction, and studio collaborations.",
+    notFound: "Project Not Found",
+  },
+  nav: {
+    work: "Work",
+    about: "About",
+    services: "Services",
+    contact: "Contact",
+    home: "Home",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+  },
+  hero: {
+    role: "Graphic Designer & Visual Artist",
+    headline: "",
+    subtitle: "",
+    description: "",
+    viewWork: "View Work",
+    contact: "Contact",
+    scroll: "Scroll",
+  },
+  work: {
+    indexLabel: "Portfolio",
+    indexTitle: "Selected Works",
+    indexDescription:
+      "Brand, editorial, identity, and digital work for studios, publishers, and cultural clients.",
+    featuredLabel: "Selected Works",
+    featuredTitle: "Recent Projects",
+    featuredDescription:
+      "Four commissions across branding, editorial, and identity — representative of current studio practice.",
+    viewAll: "View All Work",
+    viewCaseStudy: "View Case Study",
+    viewCaseStudyAria: "View case study: {title}",
+    inFocus: "In Focus",
+    portfolio: "Portfolio",
+    emptyCategory: "No projects in this category yet.",
+  },
+  caseStudy: {
+    projectOverview: "Project Overview",
+    processNotes: "Process Notes",
+    processBrief: "Brief",
+    processContext: "Context",
+    processResponse: "Response",
+    designSystem: "Design System",
+    designSystemTitle: "Type & Colour",
+    typography: "Typography",
+    visualDirection: "Art Direction",
+    colorPalette: "Colour Palette",
+    gallery: "Gallery",
+    galleryTitle: "Project Images",
+    nextProject: "Next Project",
+    allWorks: "Selected Works",
+    client: "Client",
+    year: "Year",
+    role: "Role",
+    category: "Category",
+    viewGalleryImage: "View gallery image",
+    closeGallery: "Close gallery",
+    previousImage: "Previous image",
+    nextImage: "Next image",
+  },
+  about: {
+    label: "About",
+    title: "Studio Practice",
+    bio: "I design visual systems for studios, publishers, cultural institutions, and independent brands. My work sits at the intersection of typography, layout, and image — usually print-first, always built to scale into digital. Based in Istanbul; collaborating remotely with teams across Europe and beyond.",
+    philosophy:
+      "Clarity is a form of respect. I strip projects back until the idea is visible — then stop. The best outcome feels obvious in hindsight.",
+    location: "Istanbul · Available Worldwide",
+    portraitAlt: "Eflin — graphic designer and visual artist",
+  },
+  services: {
+    label: "Expertise",
+    title: "Services",
+    description:
+      "Commissioned work spans identity, print, digital, and art direction — usually in combination.",
+    items: {
+      branding: {
+        index: "01",
+        title: "Branding",
+        description:
+          "Identity systems from mark to guidelines — built for retail, press, and digital without losing coherence.",
+      },
+      editorial: {
+        index: "02",
+        title: "Editorial Design",
+        description:
+          "Books, magazines, and annual reports with typographic structure that holds across hundreds of pages.",
+      },
+      "visual-identity": {
+        index: "03",
+        title: "Visual Identity",
+        description:
+          "Programme identities for exhibitions, festivals, and institutions — flexible enough to update weekly.",
+      },
+      "art-direction": {
+        index: "04",
+        title: "Art Direction",
+        description:
+          "Photography direction, layout systems, and visual consistency for editorial and campaign work.",
+      },
+      digital: {
+        index: "05",
+        title: "Digital Design",
+        description:
+          "UI language, responsive identity, and interaction design for platforms and cultural products.",
+      },
+      illustration: {
+        index: "06",
+        title: "Illustration / Graphic Arts",
+        description:
+          "Commissioned illustration for packaging, editorial, and print — drawn to spec, not stock.",
+      },
+    },
+  },
+  contact: {
+    label: "Contact",
+    title: "Start a Conversation",
+    description:
+      "New commissions, studio collaborations, and speaking enquiries. I read every message personally.",
+    formSubmit: "Send Message",
+    formSubmitting: "Sending…",
+    successLabel: "Message Sent",
+    successTitle: "Message received.",
+    successBody:
+      "Thank you for writing. I aim to respond within two working days.",
+    sendAnother: "Send another message",
+    formName: "Name",
+    formEmail: "Email",
+    formCompany: "Company / Studio",
+    formProjectType: "Project Type",
+    formMessage: "Message",
+    formSelectType: "Select type",
+    languageLabel: "Language",
+  },
+  projectTypes: {
+    branding: "Branding",
+    editorial: "Editorial Design",
+    identity: "Visual Identity",
+    digital: "Digital Design",
+    "art-direction": "Art Direction",
+    other: "Other",
+  },
+  categories: {
+    all: "All",
+    branding: "Branding",
+    editorial: "Editorial",
+    identity: "Identity",
+    digital: "Digital",
+    "art-direction": "Art Direction",
+  },
+  validation: {
+    nameRequired: "Please enter your name.",
+    nameTooLong: "Name is too long.",
+    emailInvalid: "Please enter a valid email address.",
+    emailTooLong: "Email is too long.",
+    companyTooLong: "Company name is too long.",
+    projectTypeRequired: "Please select a project type.",
+    projectTypeInvalid: "Please select a valid project type.",
+    messageTooShort: "Message must be at least 20 characters.",
+    messageTooLong: "Message is too long.",
+    submitFailed: "Something went wrong. Please try again.",
+    networkError: "Network error. Please check your connection and try again.",
+    honeypot: "Unable to submit form.",
+    rateLimited: "Too many requests. Please try again later.",
+    unavailable: "Contact form is temporarily unavailable.",
+  },
+  footer: {
+    headline: "Let's shape something thoughtful.",
+    intro:
+      "Available for selected identity, editorial and digital design collaborations.",
+    contactLabel: "Contact",
+    navigationLabel: "Navigation",
+    socialLabel: "Social",
+    emailAria: "Send an email to",
+    visitSocial: "Visit on",
+    backToTop: "Back to top",
+    tagline: "Built with care",
+    copyright: "",
+  },
+  language: {
+    switchTo: "Switch language to",
+    current: "Current language",
+  },
+  cursor: {
+    view: "View",
+    open: "Open",
+    contact: "Contact",
+  },
+};

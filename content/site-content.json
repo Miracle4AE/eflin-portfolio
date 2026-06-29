@@ -1,0 +1,1205 @@
+{
+  "version": 1,
+  "site": {
+    "name": "Eflin",
+    "email": "hello@eflin.studio",
+    "location": {
+      "en": "Istanbul · Available Worldwide",
+      "tr": "İstanbul · Dünya Genelinde"
+    },
+    "availability": {
+      "en": "Istanbul · Available Worldwide",
+      "tr": "İstanbul · Dünya Genelinde"
+    },
+    "social": [
+      {
+        "label": "Instagram",
+        "href": "https://instagram.com"
+      },
+      {
+        "label": "Behance",
+        "href": "https://behance.net"
+      },
+      {
+        "label": "LinkedIn",
+        "href": "https://linkedin.com"
+      },
+      {
+        "label": "Dribbble",
+        "href": "https://dribbble.com"
+      }
+    ]
+  },
+  "homepage": {
+    "designerName": "Eflin",
+    "portraitImagePath": "/images/portrait.jpg",
+    "featuredProjectSlugs": [
+      "nocturne",
+      "meridian",
+      "solstice",
+      "atlas"
+    ],
+    "showcaseProjectSlug": "nocturne",
+    "hero": {
+      "role": {
+        "en": "Graphic Designer & Visual Artist",
+        "tr": "Grafik Tasarımcı & Görsel Sanatçı"
+      },
+      "headline": {
+        "en": "",
+        "tr": ""
+      },
+      "subtitle": {
+        "en": "",
+        "tr": ""
+      },
+      "description": {
+        "en": "",
+        "tr": ""
+      },
+      "viewWork": {
+        "en": "View Work",
+        "tr": "İşleri Gör"
+      },
+      "contact": {
+        "en": "Contact",
+        "tr": "İletişim"
+      }
+    },
+    "about": {
+      "label": {
+        "en": "About",
+        "tr": "Hakkında"
+      },
+      "title": {
+        "en": "Studio Practice",
+        "tr": "Stüdyo Pratiği"
+      },
+      "bio": {
+        "en": "I design visual systems for studios, publishers, cultural institutions, and independent brands. My work sits at the intersection of typography, layout, and image — usually print-first, always built to scale into digital. Based in Istanbul; collaborating remotely with teams across Europe and beyond.",
+        "tr": "Stüdyolar, yayınevleri, kültür kurumları ve bağımsız markalar için görsel sistemler tasarlıyorum. Tipografi, yerleşim ve görüntünün kesişiminde çalışıyorum — genelde baskı öncelikli, her zaman dijitale ölçeklenebilir. İstanbul merkezli; Avrupa ve ötesindeki ekiplerle uzaktan iş birliği yapıyorum."
+      },
+      "philosophy": {
+        "en": "Clarity is a form of respect. I strip projects back until the idea is visible — then stop. The best outcome feels obvious in hindsight.",
+        "tr": "Netlik bir saygı biçimidir. Fikir görünür olana kadar sadeleştirir, orada dururum. İyi sonuç, geriye dönüp bakınca kaçınılmaz hissettirmelidir."
+      },
+      "portraitAlt": {
+        "en": "Eflin — graphic designer and visual artist",
+        "tr": "Eflin — grafik tasarımcı ve görsel sanatçı"
+      }
+    },
+    "services": {
+      "label": {
+        "en": "Expertise",
+        "tr": "Uzmanlık"
+      },
+      "title": {
+        "en": "Services",
+        "tr": "Hizmetler"
+      },
+      "description": {
+        "en": "Commissioned work spans identity, print, digital, and art direction — usually in combination.",
+        "tr": "Kimlik, baskı, dijital ve art direction — genelde bir arada, proje ihtiyacına göre."
+      },
+      "items": [
+        {
+          "id": "branding",
+          "index": "01",
+          "title": {
+            "en": "Branding",
+            "tr": "Marka"
+          },
+          "description": {
+            "en": "Identity systems from mark to guidelines — built for retail, press, and digital without losing coherence.",
+            "tr": "Logodan kılavuza kimlik sistemleri — perakende, basın ve dijitalde tutarlılığı koruyarak."
+          }
+        },
+        {
+          "id": "editorial",
+          "index": "02",
+          "title": {
+            "en": "Editorial Design",
+            "tr": "Editoryal Tasarım"
+          },
+          "description": {
+            "en": "Books, magazines, and annual reports with typographic structure that holds across hundreds of pages.",
+            "tr": "Yüzlerce sayfayı taşıyan tipografik yapıya sahip kitap, dergi ve raporlar."
+          }
+        },
+        {
+          "id": "visual-identity",
+          "index": "03",
+          "title": {
+            "en": "Visual Identity",
+            "tr": "Görsel Kimlik"
+          },
+          "description": {
+            "en": "Programme identities for exhibitions, festivals, and institutions — flexible enough to update weekly.",
+            "tr": "Sergi, festival ve kurum programları için haftalık güncellenebilir kimlik sistemleri."
+          }
+        },
+        {
+          "id": "art-direction",
+          "index": "04",
+          "title": {
+            "en": "Art Direction",
+            "tr": "Art Direction"
+          },
+          "description": {
+            "en": "Photography direction, layout systems, and visual consistency for editorial and campaign work.",
+            "tr": "Editoryal ve kampanya işleri için fotoğraf yönetimi, yerleşim ve görsel tutarlılık."
+          }
+        },
+        {
+          "id": "digital",
+          "index": "05",
+          "title": {
+            "en": "Digital Design",
+            "tr": "Dijital Tasarım"
+          },
+          "description": {
+            "en": "UI language, responsive identity, and interaction design for platforms and cultural products.",
+            "tr": "Platformlar ve kültür projeleri için arayüz dili, responsive kimlik ve etkileşim tasarımı."
+          }
+        },
+        {
+          "id": "illustration",
+          "index": "06",
+          "title": {
+            "en": "Illustration / Graphic Arts",
+            "tr": "İllüstrasyon / Grafik Sanatlar"
+          },
+          "description": {
+            "en": "Commissioned illustration for packaging, editorial, and print — drawn to spec, not stock.",
+            "tr": "Ambalaj, editoryal ve baskı için özel illüstrasyon — stok değil, projeye göre çizim."
+          }
+        }
+      ]
+    },
+    "work": {
+      "featuredLabel": {
+        "en": "Selected Works",
+        "tr": "Seçili İşler"
+      },
+      "featuredTitle": {
+        "en": "Recent Projects",
+        "tr": "Son Projeler"
+      },
+      "featuredDescription": {
+        "en": "Four commissions across branding, editorial, and identity — representative of current studio practice.",
+        "tr": "Marka, editoryal ve kimlik alanlarından dört proje — güncel stüdyo pratiğinin özeti."
+      },
+      "indexLabel": {
+        "en": "Portfolio",
+        "tr": "Portfolyo"
+      },
+      "indexTitle": {
+        "en": "Selected Works",
+        "tr": "Seçili İşler"
+      },
+      "indexDescription": {
+        "en": "Brand, editorial, identity, and digital work for studios, publishers, and cultural clients.",
+        "tr": "Stüdyolar, yayınevleri ve kültür kurumları için marka, editoryal, kimlik ve dijital işler."
+      }
+    }
+  },
+  "contact": {
+    "label": {
+      "en": "Contact",
+      "tr": "İletişim"
+    },
+    "title": {
+      "en": "Start a Conversation",
+      "tr": "İletişime Geçin"
+    },
+    "description": {
+      "en": "New commissions, studio collaborations, and speaking enquiries. I read every message personally.",
+      "tr": "Yeni projeler, stüdyo iş birlikleri ve konuşma davetleri. Her mesajı bizzat okuyorum."
+    }
+  },
+  "footer": {
+    "headline": {
+      "en": "Let's shape something thoughtful.",
+      "tr": "Özenle düşünülmüş bir şey tasarlayalım."
+    },
+    "intro": {
+      "en": "Available for selected identity, editorial and digital design collaborations.",
+      "tr": "Seçili kimlik, editöryal ve dijital tasarım iş birlikleri için müsait."
+    },
+    "tagline": {
+      "en": "Built with care",
+      "tr": "Özenle tasarlandı"
+    },
+    "copyright": {
+      "en": "",
+      "tr": ""
+    }
+  },
+  "seo": {
+    "siteTitle": {
+      "en": "Eflin — Graphic Designer & Visual Artist",
+      "tr": "Eflin — Grafik Tasarımcı & Görsel Sanatçı"
+    },
+    "siteDescription": {
+      "en": "Graphic designer working across brand identity, editorial design, and art direction — for clients who care about how things read, not just how they look.",
+      "tr": "Marka kimliği, editoryal tasarım ve art direction alanlarında çalışan bir grafik tasarımcı — işin sadece iyi görünmek değil, doğru okunması gerektiğine inanan müşteriler için."
+    },
+    "portfolioTitle": {
+      "en": "Eflin — Portfolio",
+      "tr": "Eflin — Portfolyo"
+    },
+    "workTitle": {
+      "en": "Selected Works",
+      "tr": "Seçili İşler"
+    },
+    "workDescription": {
+      "en": "Brand identity, editorial design, and art direction — a curated index of studio projects by Eflin.",
+      "tr": "Marka kimliği, editoryal tasarım ve art direction — Eflin stüdyo projelerinden seçkiler."
+    },
+    "contactTitle": {
+      "en": "Contact",
+      "tr": "İletişim"
+    },
+    "contactDescription": {
+      "en": "Start a conversation about brand identity, editorial design, art direction, and studio collaborations.",
+      "tr": "Marka kimliği, editoryal tasarım, art direction ve stüdyo iş birlikleri hakkında iletişime geçin."
+    },
+    "ogImagePath": "/images/portrait.jpg"
+  },
+  "projects": [
+    {
+      "slug": "nocturne",
+      "title": {
+        "en": "Nocturne",
+        "tr": "Nocturne"
+      },
+      "category": {
+        "en": "Brand Identity",
+        "tr": "Marka Kimliği"
+      },
+      "filterCategory": "branding",
+      "year": "2025",
+      "role": {
+        "en": "Lead Designer",
+        "tr": "Baş Tasarımcı"
+      },
+      "client": {
+        "en": "Nocturne Parfums · Paris",
+        "tr": "Nocturne Parfums · Paris"
+      },
+      "summary": {
+        "en": "Identity for an independent fragrance house — quiet typography, dark surfaces, and a system that lets the product speak first.",
+        "tr": "Bağımsız bir parfüm evi için kimlik — sakin tipografi, koyu yüzeyler ve ürünün önce konuşmasına izin veren bir sistem."
+      },
+      "description": {
+        "en": "Identity for an independent fragrance house — quiet typography, dark surfaces, and a system that lets the product speak first.",
+        "tr": "Bağımsız bir parfüm evi için kimlik — sakin tipografi, koyu yüzeyler ve ürünün önce konuşmasına izin veren bir sistem."
+      },
+      "concept": {
+        "en": "Nocturne builds a brand around what is withheld. The mark is minimal; the palette stays near-black; copy is sparse. The goal was an identity that feels like the pause before a scent settles on skin.",
+        "tr": "Nocturne, markayı saklananla kurar. İşaret minimal; palet neredeyse siyah; metin seyrek. Amaç, kokunun ten üzerinde oturmadan hemen önceki o anı hissettiren bir kimlik yaratmaktı."
+      },
+      "challenge": {
+        "en": "The client sells through selective retail and private appointments — not mass e-commerce. The identity needed to feel considered at counter scale and confident in press, without the visual noise typical of the category.",
+        "tr": "Müşteri kitlesi seçkin perakende ve özel randevular üzerinden alışveriş yapıyor — kitlesel e-ticaret değil. Kimliğin tezgah ölçeğinde düşünülmüş, basında kendinden emin; kategorinin tipik görsel gürültüsünden uzak hissettirmesi gerekiyordu."
+      },
+      "solution": {
+        "en": "We developed a wordmark with extended tracking and a single accent rule used across boxes, letterhead, and digital. Photography direction favours shadow over product hero shots. Guidelines fit twelve pages because restraint was the point.",
+        "tr": "Geniş aralıklı bir wordmark ve kutular, antetli kağıt ile dijital mecralarda kullanılan tek bir vurgu çizgisi geliştirdik. Fotoğraf yönetimi, ürün hero çekimlerinden çok gölgeyi tercih ediyor. Kısıtlama noktaydı; kılavuz on iki sayfaya sığıyor."
+      },
+      "visualDirection": {
+        "en": "Near-monochrome. Soft contrast. Glass, matte paper, and skin tones as the only warmth. No ornament.",
+        "tr": "Neredeyse monokrom. Yumuşak kontrast. Sıcaklığı yalnızca cam, mat kağıt ve ten tonları taşıyor. Süs yok."
+      },
+      "typography": {
+        "en": "Didot for product names and campaign lines. Suisse Int'l for specifications, legal, and UI. The serif carries desire; the sans carries fact.",
+        "tr": "Didot, ürün adları ve kampanya satırları için. Suisse Int'l, teknik bilgiler, yasal metinler ve arayüz için. Serif arzu taşır; sans gerçeği."
+      },
+      "tags": {
+        "en": [
+          "Brand Identity",
+          "Packaging",
+          "Art Direction"
+        ],
+        "tr": [
+          "Marka Kimliği",
+          "Ambalaj",
+          "Sanat Yönetimi"
+        ]
+      },
+      "palette": [
+        {
+          "hex": "#0a0a0a",
+          "name": {
+            "en": "Void",
+            "tr": "Boşluk"
+          }
+        },
+        {
+          "hex": "#1a1a2e",
+          "name": {
+            "en": "Ink",
+            "tr": "Mürekkep"
+          }
+        },
+        {
+          "hex": "#3d3d3d",
+          "name": {
+            "en": "Smoke",
+            "tr": "Duman"
+          }
+        },
+        {
+          "hex": "#e8e0d4",
+          "name": {
+            "en": "Skin",
+            "tr": "Ten"
+          }
+        },
+        {
+          "hex": "#a68b5b",
+          "name": {
+            "en": "Brass",
+            "tr": "Pirinç"
+          }
+        }
+      ],
+      "galleryItems": [
+        {
+          "id": "n1",
+          "imagePath": "/images/projects/nocturne/gallery-01.jpg",
+          "gradient": "from-[#1a1a2e] via-[#16213e] to-[#0f3460]",
+          "aspectRatio": "wide",
+          "caption": {
+            "en": "Logotype and primary mark",
+            "tr": "Logotype ve birincil işaret"
+          },
+          "alt": {
+            "en": "Nocturne Parfums wordmark on black packaging",
+            "tr": "Siyah ambalaj üzerinde Nocturne Parfums wordmark"
+          }
+        },
+        {
+          "id": "n2",
+          "imagePath": "/images/projects/nocturne/gallery-02.jpg",
+          "gradient": "from-[#0f3460] via-[#1a1a2e] to-[#16213e]",
+          "aspectRatio": "portrait",
+          "caption": {
+            "en": "Carton and bottle label",
+            "tr": "Karton ve şişe etiketi"
+          },
+          "alt": {
+            "en": "Nocturne fragrance packaging detail",
+            "tr": "Nocturne parfüm ambalaj detayı"
+          }
+        },
+        {
+          "id": "n3",
+          "imagePath": "/images/projects/nocturne/gallery-03.jpg",
+          "gradient": "from-[#16213e] to-[#1a1a2e]",
+          "aspectRatio": "landscape",
+          "caption": {
+            "en": "Stationery suite",
+            "tr": "Kırtasiye seti"
+          },
+          "alt": {
+            "en": "Nocturne letterhead and business cards",
+            "tr": "Nocturne antetli kağıt ve kartvizitler"
+          }
+        },
+        {
+          "id": "n4",
+          "imagePath": "/images/projects/nocturne/gallery-04.jpg",
+          "gradient": "from-[#1a1a2e] via-[#0f3460] to-[#16213e]",
+          "aspectRatio": "square",
+          "caption": {
+            "en": "Campaign still life",
+            "tr": "Kampanya still life"
+          },
+          "alt": {
+            "en": "Nocturne art-directed product photography",
+            "tr": "Nocturne sanat yönetimli ürün fotoğrafçılığı"
+          }
+        }
+      ],
+      "gradient": "from-[#1a1a2e] via-[#16213e] to-[#0f3460]",
+      "aspectRatio": "portrait",
+      "featured": true,
+      "coverImagePath": "/images/projects/nocturne/cover.jpg",
+      "heroImagePath": "/images/projects/nocturne/hero.jpg",
+      "imageAlt": {
+        "en": "Nocturne Parfums brand identity — logotype, packaging, and stationery",
+        "tr": "Nocturne Parfums marka kimliği — logotype, ambalaj ve kırtasiye"
+      }
+    },
+    {
+      "slug": "meridian",
+      "title": {
+        "en": "Meridian",
+        "tr": "Meridian"
+      },
+      "category": {
+        "en": "Editorial Design",
+        "tr": "Editoryal Tasarım"
+      },
+      "filterCategory": "editorial",
+      "year": "2025",
+      "role": {
+        "en": "Editorial Designer",
+        "tr": "Editoryal Tasarımcı"
+      },
+      "client": {
+        "en": "Meridian Press · London",
+        "tr": "Meridian Press · London"
+      },
+      "summary": {
+        "en": "Design system for an art book series — grid, pacing, and typographic hierarchy built to survive 200+ pages per volume.",
+        "tr": "Bir sanat kitabı serisi için tasarım sistemi — cilt başına 200+ sayfaya dayanacak ızgara, ritim ve tipografik hiyerarşi."
+      },
+      "description": {
+        "en": "Design system for an art book series — grid, pacing, and typographic hierarchy built to survive 200+ pages per volume.",
+        "tr": "Bir sanat kitabı serisi için tasarım sistemi — cilt başına 200+ sayfaya dayanacak ızgara, ritim ve tipografik hiyerarşi."
+      },
+      "concept": {
+        "en": "Meridian treats each book as a sequence of rooms. Margins are generous; images breathe; text enters only when it adds context. The series should feel consistent on a shelf yet distinct inside each cover.",
+        "tr": "Meridian, her kitabı bir oda dizisi olarak ele alır. Kenar boşlukları cömert; görseller nefes alır; metin yalnızca bağlam kattığında devreye girer. Seri rafta tutarlı, her kapak altında kendine özgü hissettirmeli."
+      },
+      "challenge": {
+        "en": "Three titles per year, different artists, different paper stocks, one printer. The system had to accommodate varied image ratios and essay lengths without redesigning from scratch each time.",
+        "tr": "Yılda üç başlık, farklı sanatçılar, farklı kağıt türleri, tek matbaa. Sistem; değişken görsel oranları ve makale uzunluklarını her seferinde sıfırdan tasarım yapmadan karşılamalıydı."
+      },
+      "solution": {
+        "en": "A modular grid with fixed typographic roles: display, body, caption, colophon. Chapter openers use a single horizontal rule as a recurring motif. Colour is limited to black, warm grey, and one accent chosen per artist.",
+        "tr": "Sabit tipografik roller taşıyan modüler bir ızgara: display, gövde, açıklama, kolofon. Bölüm açılışlarında tekrarlayan motif olarak tek bir yatay çizgi. Renk siyah, sıcak gri ve sanatçıya göre seçilen tek bir vurgu ile sınırlı."
+      },
+      "visualDirection": {
+        "en": "Swiss restraint with room for photography. Uncoated stock. No full-bleed text. Captions always separated from images.",
+        "tr": "Fotoğraf için alan bırakan İsviçre disiplini. Kuşe olmayan kağıt. Tam sayfa metin yok. Açıklamalar her zaman görsellerden ayrı."
+      },
+      "typography": {
+        "en": "Neue Haas Grotesk Display for titles. Lyon Text for essays at 10/15. Letter Gothic for metadata and imprints.",
+        "tr": "Neue Haas Grotesk Display, başlıklar için. Lyon Text, makaleler için 10/15. Letter Gothic, metadata ve künye bilgileri için."
+      },
+      "tags": {
+        "en": [
+          "Editorial",
+          "Typography",
+          "Print"
+        ],
+        "tr": [
+          "Editoryal",
+          "Tipografi",
+          "Baskı"
+        ]
+      },
+      "palette": [
+        {
+          "hex": "#0a0a0a",
+          "name": {
+            "en": "Black",
+            "tr": "Siyah"
+          }
+        },
+        {
+          "hex": "#6b6560",
+          "name": {
+            "en": "Warm Grey",
+            "tr": "Sıcak Gri"
+          }
+        },
+        {
+          "hex": "#f0ebe3",
+          "name": {
+            "en": "Paper",
+            "tr": "Kağıt"
+          }
+        },
+        {
+          "hex": "#c4a574",
+          "name": {
+            "en": "Rule",
+            "tr": "Çizgi"
+          }
+        },
+        {
+          "hex": "#faf9f7",
+          "name": {
+            "en": "White",
+            "tr": "Beyaz"
+          }
+        }
+      ],
+      "galleryItems": [
+        {
+          "id": "m1",
+          "imagePath": "/images/projects/meridian/gallery-01.jpg",
+          "gradient": "from-[#2c2c2c] via-[#3d3d3d] to-[#1a1a1a]",
+          "aspectRatio": "wide",
+          "caption": {
+            "en": "Series cover grid",
+            "tr": "Seri kapak ızgarası"
+          },
+          "alt": {
+            "en": "Meridian Press art book series covers",
+            "tr": "Meridian Press sanat kitabı serisi kapakları"
+          }
+        },
+        {
+          "id": "m2",
+          "imagePath": "/images/projects/meridian/gallery-02.jpg",
+          "gradient": "from-[#1a1a1a] via-[#2c2c2c] to-[#3d3d3d]",
+          "aspectRatio": "landscape",
+          "caption": {
+            "en": "Interior spread",
+            "tr": "İç sayfa açılımı"
+          },
+          "alt": {
+            "en": "Meridian book interior photography spread",
+            "tr": "Meridian kitap içi fotoğraf açılımı"
+          }
+        },
+        {
+          "id": "m3",
+          "imagePath": "/images/projects/meridian/gallery-03.jpg",
+          "gradient": "from-[#3d3d3d] to-[#2c2c2c]",
+          "aspectRatio": "portrait",
+          "caption": {
+            "en": "Typographic chapter opener",
+            "tr": "Tipografik bölüm açılışı"
+          },
+          "alt": {
+            "en": "Meridian editorial typography layout",
+            "tr": "Meridian editoryal tipografi yerleşimi"
+          }
+        }
+      ],
+      "gradient": "from-[#2c2c2c] via-[#3d3d3d] to-[#1a1a1a]",
+      "aspectRatio": "landscape",
+      "featured": true,
+      "coverImagePath": "/images/projects/meridian/cover.jpg",
+      "heroImagePath": "/images/projects/meridian/hero.jpg",
+      "imageAlt": {
+        "en": "Meridian Press editorial design — art book series",
+        "tr": "Meridian Press editoryal tasarım — sanat kitabı serisi"
+      }
+    },
+    {
+      "slug": "solstice",
+      "title": {
+        "en": "Solstice",
+        "tr": "Solstice"
+      },
+      "category": {
+        "en": "Visual Identity",
+        "tr": "Görsel Kimlik"
+      },
+      "filterCategory": "identity",
+      "year": "2024",
+      "role": {
+        "en": "Identity Designer",
+        "tr": "Kimlik Tasarımcısı"
+      },
+      "client": {
+        "en": "Solstice Pavilion · Oslo",
+        "tr": "Solstice Pavilion · Oslo"
+      },
+      "summary": {
+        "en": "Seasonal identity for a contemporary exhibition programme — one structure, shifting palette, twelve shows a year.",
+        "tr": "Çağdaş bir sergi programı için mevsimsel kimlik — tek yapı, değişen palet, yılda on iki sergi."
+      },
+      "description": {
+        "en": "Seasonal identity for a contemporary exhibition programme — one structure, shifting palette, twelve shows a year.",
+        "tr": "Çağdaş bir sergi programı için mevsimsel kimlik — tek yapı, değişen palet, yılda on iki sergi."
+      },
+      "concept": {
+        "en": "Solstice marks time through colour temperature. Summer editions lean warm; winter editions cool down — but the logotype, grid, and poster format never change. Visitors learn to read season through hue, not layout.",
+        "tr": "Solstice, zamanı renk sıcaklığıyla işaretler. Yaz baskıları sıcak tonlara yönelir; kış baskıları soğur — ama logotype, ızgara ve afiş formatı asla değişmez. Ziyaretçiler mevsimi yerleşimden değil, tondan okumayı öğrenir."
+      },
+      "challenge": {
+        "en": "The pavilion programmes performance, installation, and talks under one roof. Signage, tickets, and social assets had to update weekly without looking improvised.",
+        "tr": "Pavyon; performans, enstalasyon ve söyleşileri aynı çatı altında programlıyor. Tabelalar, biletler ve sosyal medya varlıkları haftalık güncellenmeli; yine de doğaçlama görünmemeliydi."
+      },
+      "solution": {
+        "en": "We built a fixed poster architecture: title top, date block bottom, accent band indicating season. Digital templates lock type sizes; only the band colour and hero image swap. Wayfinding uses the same band system on walls.",
+        "tr": "Sabit bir afiş mimarisi kurduk: başlık üstte, tarih bloğu altta, mevsimi gösteren vurgu bandı. Dijital şablonlar punto boyutlarını kilitler; yalnızca bant rengi ve hero görseli değişir. Yönlendirme, duvarlarda aynı bant sistemini kullanır."
+      },
+      "visualDirection": {
+        "en": "Institutional clarity with seasonal warmth. Large type, small metadata. Photography cropped hard; never decorative.",
+        "tr": "Mevsimsel sıcaklık taşıyan kurumsal netlik. Büyük tipografi, küçük metadata. Fotoğraflar sert kırpılır; asla dekoratif değil."
+      },
+      "typography": {
+        "en": "FK Grotesk for all operational type. Portrait for exhibition titles when the artist name is the headline.",
+        "tr": "FK Grotesk, tüm operasyonel tipografi için. Sanatçı adı başlık olduğunda sergi başlıkları için Portrait."
+      },
+      "tags": {
+        "en": [
+          "Identity",
+          "Signage",
+          "Print"
+        ],
+        "tr": [
+          "Kimlik",
+          "Yönlendirme",
+          "Baskı"
+        ]
+      },
+      "palette": [
+        {
+          "hex": "#1b263b",
+          "name": {
+            "en": "Winter",
+            "tr": "Kış"
+          }
+        },
+        {
+          "hex": "#5a7a6a",
+          "name": {
+            "en": "Spring",
+            "tr": "İlkbahar"
+          }
+        },
+        {
+          "hex": "#c4a574",
+          "name": {
+            "en": "Summer",
+            "tr": "Yaz"
+          }
+        },
+        {
+          "hex": "#6b4a3a",
+          "name": {
+            "en": "Autumn",
+            "tr": "Sonbahar"
+          }
+        },
+        {
+          "hex": "#f5f2eb",
+          "name": {
+            "en": "Paper",
+            "tr": "Kağıt"
+          }
+        }
+      ],
+      "galleryItems": [
+        {
+          "id": "s1",
+          "imagePath": "/images/projects/solstice/gallery-01.jpg",
+          "gradient": "from-[#4a3728] via-[#8b6914] to-[#2c1810]",
+          "aspectRatio": "wide",
+          "caption": {
+            "en": "Poster system — four seasons",
+            "tr": "Afiş sistemi — dört mevsim"
+          },
+          "alt": {
+            "en": "Solstice Pavilion seasonal poster series",
+            "tr": "Solstice Pavilion mevsimsel afiş serisi"
+          }
+        },
+        {
+          "id": "s2",
+          "imagePath": "/images/projects/solstice/gallery-02.jpg",
+          "gradient": "from-[#8b6914] via-[#4a3728] to-[#2c1810]",
+          "aspectRatio": "portrait",
+          "caption": {
+            "en": "Exhibition announcement",
+            "tr": "Sergi duyurusu"
+          },
+          "alt": {
+            "en": "Solstice Pavilion exhibition poster",
+            "tr": "Solstice Pavilion sergi afişi"
+          }
+        },
+        {
+          "id": "s3",
+          "imagePath": "/images/projects/solstice/gallery-03.jpg",
+          "gradient": "from-[#2c1810] via-[#8b6914] to-[#4a3728]",
+          "aspectRatio": "square",
+          "caption": {
+            "en": "Wayfinding band detail",
+            "tr": "Yönlendirme bant detayı"
+          },
+          "alt": {
+            "en": "Solstice Pavilion environmental graphics",
+            "tr": "Solstice Pavilion çevresel grafikler"
+          }
+        },
+        {
+          "id": "s4",
+          "imagePath": "/images/projects/solstice/gallery-04.jpg",
+          "gradient": "from-[#4a3728] to-[#8b6914]",
+          "aspectRatio": "landscape",
+          "caption": {
+            "en": "Programme booklet",
+            "tr": "Program kitapçığı"
+          },
+          "alt": {
+            "en": "Solstice Pavilion printed programme",
+            "tr": "Solstice Pavilion basılı program"
+          }
+        }
+      ],
+      "gradient": "from-[#4a3728] via-[#8b6914] to-[#2c1810]",
+      "aspectRatio": "square",
+      "featured": true,
+      "coverImagePath": "/images/projects/solstice/cover.jpg",
+      "heroImagePath": "/images/projects/solstice/hero.jpg",
+      "imageAlt": {
+        "en": "Solstice Pavilion visual identity — posters and signage",
+        "tr": "Solstice Pavilion görsel kimlik — afişler ve tabelalar"
+      }
+    },
+    {
+      "slug": "atlas",
+      "title": {
+        "en": "Atlas",
+        "tr": "Atlas"
+      },
+      "category": {
+        "en": "Art Direction",
+        "tr": "Sanat Yönetimi"
+      },
+      "filterCategory": "art-direction",
+      "year": "2024",
+      "role": {
+        "en": "Art Director",
+        "tr": "Sanat Yönetmeni"
+      },
+      "client": {
+        "en": "Atlas Journal · Remote / Field",
+        "tr": "Atlas Journal · Remote / Field"
+      },
+      "summary": {
+        "en": "Art direction for a travel publication — cartographic thinking, field photography, and layouts that carry distance on the page.",
+        "tr": "Bir seyahat yayını için sanat yönetimi — haritacı düşünce, saha fotoğrafçılığı ve sayfada mesafeyi taşıyan yerleşimler."
+      },
+      "description": {
+        "en": "Art direction for a travel publication — cartographic thinking, field photography, and layouts that carry distance on the page.",
+        "tr": "Bir seyahat yayını için sanat yönetimi — haritacı düşünce, saha fotoğrafçılığı ve sayfada mesafeyi taşıyan yerleşimler."
+      },
+      "concept": {
+        "en": "Atlas maps journeys as lines, not landmarks. Routes cross spreads; captions sit like coordinates; empty space suggests distance travelled. The reader should feel the gap between places.",
+        "tr": "Atlas, yolculukları simge yapılar değil çizgilerle haritalar. Rotalar sayfa açılımlarını keser; açıklamalar koordinat gibi durur; boş alan kat edilen mesafeyi fısıldar. Okuyucu yerler arasındaki boşluğu hissetmeli."
+      },
+      "challenge": {
+        "en": "Contributors shoot on different formats across six continents. The art direction had to unify phone footage, 35mm scans, and medium-format work without over-retouching.",
+        "tr": "Katkıda bulunanlar altı kıtada farklı formatlarda çekim yapıyor. Sanat yönetimi; telefon görüntüleri, 35mm taramalar ve orta format çalışmaları aşırı rötuş yapmadan birleştirmeliydi."
+      },
+      "solution": {
+        "en": "A desaturated grade and consistent margin treatment tie disparate sources together. Maps drawn in-house become chapter dividers. Pull quotes use a single size and position — a visual anchor through variable content.",
+        "tr": "Soluk bir renk derecelendirmesi ve tutarlı kenar boşluğu işlemi farklı kaynakları bir araya getirir. Ofis içi çizilen haritalar bölüm ayırıcıları olur. Alıntılar tek boyut ve konumda — değişken içerik boyunca görsel bir sabitleyici."
+      },
+      "visualDirection": {
+        "en": "Documentary tone. Muted colour. Maps as graphic elements, not decoration. Type small and precise; images large.",
+        "tr": "Belgesel ton. Soluk renk. Haritalar dekor değil, grafik öğe. Tipografi küçük ve keskin; görseller büyük."
+      },
+      "typography": {
+        "en": "Graphik for navigation and captions. Tiempos Headline for feature titles. Monospace for coordinates and page metadata.",
+        "tr": "Graphik, navigasyon ve açıklamalar için. Tiempos Headline, öne çıkan başlıklar için. Koordinatlar ve sayfa metadata'sı için monospace."
+      },
+      "tags": {
+        "en": [
+          "Art Direction",
+          "Editorial",
+          "Photography"
+        ],
+        "tr": [
+          "Sanat Yönetimi",
+          "Editoryal",
+          "Fotoğrafçılık"
+        ]
+      },
+      "palette": [
+        {
+          "hex": "#0d1b2a",
+          "name": {
+            "en": "Ocean",
+            "tr": "Okyanus"
+          }
+        },
+        {
+          "hex": "#415a77",
+          "name": {
+            "en": "Trail",
+            "tr": "Patika"
+          }
+        },
+        {
+          "hex": "#c4b8a8",
+          "name": {
+            "en": "Sand",
+            "tr": "Kum"
+          }
+        },
+        {
+          "hex": "#f5f0e8",
+          "name": {
+            "en": "Paper",
+            "tr": "Kağıt"
+          }
+        },
+        {
+          "hex": "#c4a574",
+          "name": {
+            "en": "Route",
+            "tr": "Rota"
+          }
+        }
+      ],
+      "galleryItems": [
+        {
+          "id": "a1",
+          "imagePath": "/images/projects/atlas/gallery-01.jpg",
+          "gradient": "from-[#0d1b2a] via-[#1b263b] to-[#415a77]",
+          "aspectRatio": "wide",
+          "caption": {
+            "en": "Feature spread with route map",
+            "tr": "Rota haritalı öne çıkan açılım"
+          },
+          "alt": {
+            "en": "Atlas Journal editorial spread with map",
+            "tr": "Haritalı Atlas Journal editoryal açılımı"
+          }
+        },
+        {
+          "id": "a2",
+          "imagePath": "/images/projects/atlas/gallery-02.jpg",
+          "gradient": "from-[#415a77] via-[#0d1b2a] to-[#1b263b]",
+          "aspectRatio": "square",
+          "caption": {
+            "en": "Cover treatment",
+            "tr": "Kapak uygulaması"
+          },
+          "alt": {
+            "en": "Atlas Journal magazine cover",
+            "tr": "Atlas Journal dergi kapağı"
+          }
+        },
+        {
+          "id": "a3",
+          "imagePath": "/images/projects/atlas/gallery-03.jpg",
+          "gradient": "from-[#1b263b] to-[#415a77]",
+          "aspectRatio": "landscape",
+          "caption": {
+            "en": "Field photography grid",
+            "tr": "Saha fotoğrafçılığı ızgarası"
+          },
+          "alt": {
+            "en": "Atlas Journal photo essay layout",
+            "tr": "Atlas Journal fotoğraf essay yerleşimi"
+          }
+        }
+      ],
+      "gradient": "from-[#0d1b2a] via-[#1b263b] to-[#415a77]",
+      "aspectRatio": "landscape",
+      "featured": true,
+      "coverImagePath": "/images/projects/atlas/cover.jpg",
+      "heroImagePath": "/images/projects/atlas/hero.jpg",
+      "imageAlt": {
+        "en": "Atlas Journal art direction — editorial spreads and maps",
+        "tr": "Atlas Journal sanat yönetimi — editoryal açılımlar ve haritalar"
+      }
+    },
+    {
+      "slug": "verdant",
+      "title": {
+        "en": "Verdant",
+        "tr": "Verdant"
+      },
+      "category": {
+        "en": "Packaging & Illustration",
+        "tr": "Ambalaj ve İllüstrasyon"
+      },
+      "filterCategory": "branding",
+      "year": "2024",
+      "role": {
+        "en": "Illustrator & Designer",
+        "tr": "İllüstratör ve Tasarımcı"
+      },
+      "client": {
+        "en": "Verdant Apothecary · Portland",
+        "tr": "Verdant Apothecary · Portland"
+      },
+      "summary": {
+        "en": "Botanical illustration and packaging for a small-batch apothecary — drawn from specimen, printed on uncoated stock.",
+        "tr": "Küçük partili bir eczanede botanik illüstrasyon ve ambalaj — spesimenden çizildi, kuşe olmayan kağıda basıldı."
+      },
+      "description": {
+        "en": "Botanical illustration and packaging for a small-batch apothecary — drawn from specimen, printed on uncoated stock.",
+        "tr": "Küçük partili bir eczanede botanik illüstrasyon ve ambalaj — spesimenden çizildi, kuşe olmayan kağıda basıldı."
+      },
+      "concept": {
+        "en": "Each product line is tied to one plant, drawn life-size from dried samples. Illustration is documentation, not decoration — the label tells you what is inside before you read the copy.",
+        "tr": "Her ürün hattı, kurutulmuş numunelerden gerçek boyutta çizilen tek bir bitkiye bağlı. İllüstrasyon dekor değil belgeleme — etiket, metni okumadan önce içinde ne olduğunu söyler."
+      },
+      "challenge": {
+        "en": "Shelf space is limited; labels must read at arm's length. Regulatory text competes with brand expression on a 60mm wide tube.",
+        "tr": "Raf alanı sınırlı; etiketler kol mesafesinde okunmalı. 60 mm genişliğindeki bir tüpte düzenleyici metin, marka ifadesiyle yarışıyor."
+      },
+      "solution": {
+        "en": "Hierarchy is strict: plant name largest, illustration centre, ingredients smallest. Two greens and cream only — no third accent. Tubes and boxes share one template; only the illustration swaps.",
+        "tr": "Hiyerarşi katı: bitki adı en büyük, illüstrasyon ortada, içerik en küçük. Yalnızca iki yeşil ve krem — üçüncü vurgu yok. Tüpler ve kutular aynı şablonu paylaşır; yalnızca illüstrasyon değişir."
+      },
+      "visualDirection": {
+        "en": "Apothecary quiet. Visible paper grain. Ink line work, no fills. Photography limited to ingredient still lifes.",
+        "tr": "Eczane sessizliği. Görünür kağıt dokusu. Dolgu yok, mürekkep çizgisi. Fotoğraf yalnızca içerik still life'larıyla sınırlı."
+      },
+      "typography": {
+        "en": "Satisfy for product names — hand-feel without script cliché. IBM Plex Sans for ingredients and barcodes.",
+        "tr": "Satisfy, ürün adları için — el yazısı klişesi olmadan el hissi. IBM Plex Sans, içerik listesi ve barkodlar için."
+      },
+      "tags": {
+        "en": [
+          "Illustration",
+          "Packaging",
+          "Print"
+        ],
+        "tr": [
+          "İllüstrasyon",
+          "Ambalaj",
+          "Baskı"
+        ]
+      },
+      "palette": [
+        {
+          "hex": "#1b4332",
+          "name": {
+            "en": "Deep Green",
+            "tr": "Koyu Yeşil"
+          }
+        },
+        {
+          "hex": "#40916c",
+          "name": {
+            "en": "Leaf",
+            "tr": "Yaprak"
+          }
+        },
+        {
+          "hex": "#95d5b2",
+          "name": {
+            "en": "Mist",
+            "tr": "Sis"
+          }
+        },
+        {
+          "hex": "#f5f0e8",
+          "name": {
+            "en": "Cream",
+            "tr": "Krem"
+          }
+        },
+        {
+          "hex": "#1a1a1a",
+          "name": {
+            "en": "Ink",
+            "tr": "Mürekkep"
+          }
+        }
+      ],
+      "galleryItems": [
+        {
+          "id": "v1",
+          "imagePath": "/images/projects/verdant/gallery-01.jpg",
+          "gradient": "from-[#1b4332] via-[#2d6a4f] to-[#40916c]",
+          "aspectRatio": "portrait",
+          "caption": {
+            "en": "Original botanical drawings",
+            "tr": "Orijinal botanik çizimler"
+          },
+          "alt": {
+            "en": "Verdant Apothecary botanical illustration series",
+            "tr": "Verdant Apothecary botanik illüstrasyon serisi"
+          }
+        },
+        {
+          "id": "v2",
+          "imagePath": "/images/projects/verdant/gallery-02.jpg",
+          "gradient": "from-[#40916c] via-[#1b4332] to-[#2d6a4f]",
+          "aspectRatio": "landscape",
+          "caption": {
+            "en": "Packaging family",
+            "tr": "Ambalaj ailesi"
+          },
+          "alt": {
+            "en": "Verdant product packaging line",
+            "tr": "Verdant ürün ambalaj serisi"
+          }
+        },
+        {
+          "id": "v3",
+          "imagePath": "/images/projects/verdant/gallery-03.jpg",
+          "gradient": "from-[#2d6a4f] to-[#40916c]",
+          "aspectRatio": "square",
+          "caption": {
+            "en": "Tube label detail",
+            "tr": "Tüp etiket detayı"
+          },
+          "alt": {
+            "en": "Verdant tube label typography close-up",
+            "tr": "Verdant tüp etiket tipografi yakın plan"
+          }
+        }
+      ],
+      "gradient": "from-[#1b4332] via-[#2d6a4f] to-[#40916c]",
+      "aspectRatio": "portrait",
+      "featured": false,
+      "coverImagePath": "/images/projects/verdant/cover.jpg",
+      "heroImagePath": "/images/projects/verdant/hero.jpg",
+      "imageAlt": {
+        "en": "Verdant Apothecary illustration and packaging system",
+        "tr": "Verdant Apothecary illüstrasyon ve ambalaj sistemi"
+      }
+    },
+    {
+      "slug": "echo",
+      "title": {
+        "en": "Echo",
+        "tr": "Echo"
+      },
+      "category": {
+        "en": "Digital Design",
+        "tr": "Dijital Tasarım"
+      },
+      "filterCategory": "digital",
+      "year": "2023",
+      "role": {
+        "en": "Digital Designer",
+        "tr": "Dijital Tasarımcı"
+      },
+      "client": {
+        "en": "Echo Platform · Berlin",
+        "tr": "Echo Platform · Berlin"
+      },
+      "summary": {
+        "en": "Interactive identity for a cultural streaming platform — motion logic, responsive mark, and a UI language that scales from mobile to cinema.",
+        "tr": "Kültürel bir yayın platformu için interaktif kimlik — hareket mantığı, duyarlı işaret ve mobilde sinemaya ölçeklenen bir arayüz dili."
+      },
+      "description": {
+        "en": "Interactive identity for a cultural streaming platform — motion logic, responsive mark, and a UI language that scales from mobile to cinema.",
+        "tr": "Kültürel bir yayın platformu için interaktif kimlik — hareket mantığı, duyarlı işaret ve mobilde sinemaya ölçeklenen bir arayüz dili."
+      },
+      "concept": {
+        "en": "Echo's mark responds to sound — expanding and contracting with audio amplitude in digital contexts, static in print. The idea: identity that listens. UI components inherit the same pulse logic at micro-interaction scale.",
+        "tr": "Echo'nun işareti sese yanıt verir — dijital bağlamlarda ses genliğiyle genişler ve daralır, baskıda statiktir. Fikir: dinleyen bir kimlik. Arayüz bileşenleri aynı nabız mantığını mikro etkileşim ölçeğinde devralır."
+      },
+      "challenge": {
+        "en": "The platform aggregates theatre, dance, and artist talks. Categories differ in tone; the interface could not feel like Netflix or a museum site — it needed a third register.",
+        "tr": "Platform tiyatro, dans ve sanatçı söyleşilerini bir araya getiriyor. Kategoriler ton olarak farklı; arayüz ne Netflix ne de bir müze sitesi gibi hissettiremezdi — üçüncü bir register gerekiyordu."
+      },
+      "solution": {
+        "en": "We defined three layout modes: performance (full-bleed video), conversation (split text/video), and archive (grid). The mark animation runs only on hover and load — never loops distractingly. Dark mode is default; light mode for institutional partners.",
+        "tr": "Üç yerleşim modu tanımladık: performans (tam sayfa video), sohbet (bölünmüş metin/video) ve arşiv (ızgara). İşaret animasyonu yalnızca hover ve yüklemede çalışır — asla dikkat dağıtıcı döngüde değil. Karanlık mod varsayılan; kurumsal ortaklar için açık mod."
+      },
+      "visualDirection": {
+        "en": "Dark interface, soft white type, one violet accent. Thumbnails cropped to 3:2. Motion under 400ms everywhere.",
+        "tr": "Karanlık arayüz, yumuşak beyaz tipografi, tek mor vurgu. Küçük resimler 3:2 kırpılır. Hareket her yerde 400 ms altında."
+      },
+      "typography": {
+        "en": "Inter for UI. Instrument Serif for programme titles and artist names. Tabular figures for duration metadata.",
+        "tr": "Inter, arayüz için. Instrument Serif, program başlıkları ve sanatçı adları için. Süre metadata'sı için tabular figures."
+      },
+      "tags": {
+        "en": [
+          "Digital",
+          "Motion",
+          "Identity"
+        ],
+        "tr": [
+          "Dijital",
+          "Hareket",
+          "Kimlik"
+        ]
+      },
+      "palette": [
+        {
+          "hex": "#0a0a0a",
+          "name": {
+            "en": "Background",
+            "tr": "Arka Plan"
+          }
+        },
+        {
+          "hex": "#141414",
+          "name": {
+            "en": "Surface",
+            "tr": "Yüzey"
+          }
+        },
+        {
+          "hex": "#5a189a",
+          "name": {
+            "en": "Violet",
+            "tr": "Mor"
+          }
+        },
+        {
+          "hex": "#f5f2eb",
+          "name": {
+            "en": "Text",
+            "tr": "Metin"
+          }
+        },
+        {
+          "hex": "#7a7670",
+          "name": {
+            "en": "Muted",
+            "tr": "Soluk"
+          }
+        }
+      ],
+      "galleryItems": [
+        {
+          "id": "e1",
+          "imagePath": "/images/projects/echo/gallery-01.jpg",
+          "gradient": "from-[#3c096c] via-[#5a189a] to-[#240046]",
+          "aspectRatio": "wide",
+          "caption": {
+            "en": "Home screen — performance mode",
+            "tr": "Ana ekran — performans modu"
+          },
+          "alt": {
+            "en": "Echo Platform digital interface home screen",
+            "tr": "Echo Platform dijital arayüz ana ekranı"
+          }
+        },
+        {
+          "id": "e2",
+          "imagePath": "/images/projects/echo/gallery-02.jpg",
+          "gradient": "from-[#240046] via-[#3c096c] to-[#5a189a]",
+          "aspectRatio": "wide",
+          "caption": {
+            "en": "Responsive mark behaviour",
+            "tr": "Duyarlı işaret davranışı"
+          },
+          "alt": {
+            "en": "Echo Platform animated logo states",
+            "tr": "Echo Platform animasyonlu logo durumları"
+          }
+        },
+        {
+          "id": "e3",
+          "imagePath": "/images/projects/echo/gallery-03.jpg",
+          "gradient": "from-[#5a189a] to-[#3c096c]",
+          "aspectRatio": "portrait",
+          "caption": {
+            "en": "Mobile programme view",
+            "tr": "Mobil program görünümü"
+          },
+          "alt": {
+            "en": "Echo Platform mobile app screens",
+            "tr": "Echo Platform mobil uygulama ekranları"
+          }
+        }
+      ],
+      "gradient": "from-[#3c096c] via-[#5a189a] to-[#240046]",
+      "aspectRatio": "portrait",
+      "featured": false,
+      "coverImagePath": "/images/projects/echo/cover.jpg",
+      "heroImagePath": "/images/projects/echo/hero.jpg",
+      "imageAlt": {
+        "en": "Echo Platform interactive identity and UI design",
+        "tr": "Echo Platform interaktif kimlik ve arayüz tasarımı"
+      }
+    }
+  ]
+}
