@@ -12,6 +12,7 @@ import {
 } from "@/lib/validation";
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/lib/motion";
+import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 type FormStatus = "idle" | "submitting" | "success" | "error";
 
@@ -30,6 +31,7 @@ export function ContactForm({ sourcePage = "/", className }: ContactFormProps) {
   const dict = useDictionary();
   const { locale } = useLocale();
   const projectTypeOptions = getProjectTypeOptions(locale);
+  const contactCursor = useMountedCursor("contact");
 
   const [status, setStatus] = useState<FormStatus>("idle");
   const [errors, setErrors] = useState<ContactFieldErrors>({});
@@ -253,7 +255,7 @@ export function ContactForm({ sourcePage = "/", className }: ContactFormProps) {
           <button
             type="submit"
             disabled={status === "submitting"}
-            data-cursor="contact"
+            {...contactCursor}
             className="inline-flex min-w-[200px] items-center justify-center border border-accent bg-accent px-8 py-3.5 text-xs font-medium uppercase tracking-[0.2em] text-background transition-colors hover:bg-accent-hover hover:border-accent-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-50"
           >
             {status === "submitting"
@@ -263,7 +265,7 @@ export function ContactForm({ sourcePage = "/", className }: ContactFormProps) {
         </Magnetic>
         <a
           href={`mailto:${siteConfig.email}`}
-          data-cursor="contact"
+          {...contactCursor}
           className="text-xs uppercase tracking-[0.2em] text-muted transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {siteConfig.email}

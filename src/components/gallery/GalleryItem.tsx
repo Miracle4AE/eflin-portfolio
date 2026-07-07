@@ -9,6 +9,7 @@ import { VisualField } from "@/components/admin/visual/EditableText";
 import { VisualImage } from "@/components/admin/visual/EditableImage";
 import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 import { cn } from "@/lib/utils";
+import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 interface GalleryItemProps {
   item: ResolvedGalleryItem;
@@ -35,6 +36,7 @@ export function GalleryItem({
   const slug = visualEdit?.projectSlug ?? "";
   const imagePath = `projects.${slug}.gallery.${item.id}.imagePath`;
   const captionPath = `projects.${slug}.gallery.${item.id}.caption`;
+  const openCursor = useMountedCursor(visualEdit ? undefined : "open");
 
   const imageNode = (
     <ProjectImage
@@ -57,7 +59,7 @@ export function GalleryItem({
       <button
         type="button"
         onClick={() => !visualEdit && onOpen(index)}
-        data-cursor={visualEdit ? undefined : "open"}
+        {...openCursor}
         aria-label={
           item.caption
             ? `${dict.caseStudy.viewGalleryImage}: ${item.caption}`

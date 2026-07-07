@@ -37,7 +37,6 @@ export function ProjectImage({
   className,
   imageClassName,
   overlay = false,
-  interactive = true,
   priority = false,
   sizes = "100vw",
   blurDataURL = DEFAULT_BLUR_DATA_URL,
@@ -50,7 +49,6 @@ export function ProjectImage({
   if (mode === "editorial") {
     return (
       <div
-        data-cursor={interactive ? "open" : undefined}
         className={cn(
           "editorial-visual relative mx-auto aspect-[16/9] max-h-[680px] min-h-[240px] w-full max-w-[1100px] overflow-hidden",
           framed ? "bg-surface editorial-frame" : "bg-transparent",
@@ -84,7 +82,6 @@ export function ProjectImage({
 
   return (
     <div
-      data-cursor={interactive ? "open" : undefined}
       className={cn(
         "editorial-visual relative w-full overflow-hidden bg-surface",
         useFixedAspect && aspectClasses[aspectRatio],

@@ -7,6 +7,7 @@ import { Container } from "@/components/ui/Container";
 import { useDictionary, useLocale } from "@/i18n/locale-context";
 import { localizedPath } from "@/i18n/navigation";
 import { fadeUp, defaultViewport } from "@/lib/motion";
+import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 interface CaseStudyNavigationProps {
   nextProject: ResolvedProject;
@@ -15,6 +16,7 @@ interface CaseStudyNavigationProps {
 export function CaseStudyNavigation({ nextProject }: CaseStudyNavigationProps) {
   const dict = useDictionary();
   const { locale } = useLocale();
+  const viewCursor = useMountedCursor("view");
   return (
     <section className="border-t border-border-soft py-16 md:py-24" aria-label="Project navigation">
       <Container>
@@ -27,7 +29,7 @@ export function CaseStudyNavigation({ nextProject }: CaseStudyNavigationProps) {
         >
           <Link
             href={localizedPath(locale, "/work")}
-            data-cursor="view"
+            {...viewCursor}
             className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-muted transition-colors duration-300 hover:text-foreground"
           >
             <span
@@ -41,7 +43,7 @@ export function CaseStudyNavigation({ nextProject }: CaseStudyNavigationProps) {
 
           <Link
             href={localizedPath(locale, `/work/${nextProject.slug}`)}
-            data-cursor="view"
+            {...viewCursor}
             className="group block text-right focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <span className="mb-2 block text-[10px] uppercase tracking-[0.25em] text-muted">

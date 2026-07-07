@@ -10,6 +10,7 @@ import { useDictionary, useLocale } from "@/i18n/locale-context";
 import { localizedPath } from "@/i18n/navigation";
 import { fadeUp, staggerContainer, defaultViewport } from "@/lib/motion";
 import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
+import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 interface FeaturedWorksProps {
   projects: ResolvedProject[];
@@ -19,6 +20,7 @@ export function FeaturedWorks({ projects }: FeaturedWorksProps) {
   const dict = useDictionary();
   const { locale } = useLocale();
   const visualEdit = useVisualEditOptional();
+  const viewCursor = useMountedCursor("view");
 
   return (
     <section id="work" className="border-t border-border-soft bg-section py-24 md:py-32 lg:py-40" aria-labelledby="work-heading">
@@ -63,7 +65,7 @@ export function FeaturedWorks({ projects }: FeaturedWorksProps) {
         >
           <Link
             href={localizedPath(locale, "/work")}
-            data-cursor="view"
+            {...viewCursor}
             className="group inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-muted transition-colors duration-300 hover:text-foreground"
           >
             {dict.work.viewAll}

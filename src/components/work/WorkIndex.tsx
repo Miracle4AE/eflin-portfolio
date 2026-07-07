@@ -1,19 +1,19 @@
 "use client";
 
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import type { CategoryFilter, ResolvedProject } from "@/types";
 import { filterProjectsByCategory } from "@/lib/projects.utils";
 import { ProjectCard } from "@/components/work/ProjectCard";
-import { Container } from "@/components/ui/Container";
 import { TextReveal } from "@/components/motion/TextReveal";
 import { MaskReveal } from "@/components/motion/MaskReveal";
 import { useDictionary } from "@/i18n/locale-context";
 import type { CategoryFilterKey } from "@/i18n/types";
 import { cn } from "@/lib/utils";
-import { filterItem, fadeUp, defaultViewport } from "@/lib/motion";
+import { fadeUp, defaultViewport } from "@/lib/motion";
 import { VisualField } from "@/components/admin/visual/EditableText";
 import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
+import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 const categoryKeys: CategoryFilterKey[] = [
   "all",
@@ -33,16 +33,17 @@ export function WorkIndex({ projects }: WorkIndexProps) {
   const visualEdit = useVisualEditOptional();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
   const filtered = filterProjectsByCategory(projects, activeCategory);
+  const defaultCursor = useMountedCursor("default");
 
   return (
     <section className="pb-24 pt-32 md:pb-32 md:pt-40 lg:pb-40 lg:pt-48">
-      <Container>
+      <div className="mx-auto w-full max-w-[1760px] px-5 sm:px-8 lg:px-10 2xl:px-14">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={defaultViewport}
           variants={fadeUp}
-          className="mx-auto mb-14 max-w-4xl text-center md:mb-20"
+          className="mx-auto mb-14 max-w-5xl text-center md:mb-20 lg:mb-24"
         >
           <MaskReveal className="mb-5">
             <span className="block text-xs font-medium uppercase tracking-[0.3em] text-accent">
@@ -84,21 +85,21 @@ export function WorkIndex({ projects }: WorkIndexProps) {
           )}
         </motion.div>
 
-        <div className="editorial-divider mb-8 md:mb-10" aria-hidden="true" />
+        <div className="editorial-divider mb-8 md:mb-10 lg:mb-12" aria-hidden="true" />
 
         <motion.nav
           initial="hidden"
           whileInView="visible"
           viewport={defaultViewport}
           variants={fadeUp}
-          className="mb-14 flex gap-3 overflow-x-auto pb-2 md:mb-16 md:justify-center md:overflow-visible md:pb-0"
+          className="mb-16 flex gap-3 overflow-x-auto pb-2 md:mb-20 md:justify-center md:overflow-visible md:pb-0 lg:mb-24"
           aria-label="Project categories"
         >
           {categoryKeys.map((cat) => (
             <button
               key={cat}
               type="button"
-              data-cursor="default"
+              {...defaultCursor}
               onClick={() => setActiveCategory(cat as CategoryFilter)}
               className={cn(
                 "relative shrink-0 rounded-full border px-4 py-2 text-[10px] font-medium uppercase tracking-[0.18em] transition-all duration-300",
@@ -120,19 +121,15 @@ export function WorkIndex({ projects }: WorkIndexProps) {
         </motion.nav>
 
         <motion.div
-          layout
-          className="grid grid-cols-1 gap-x-7 gap-y-12 md:grid-cols-2 md:gap-y-14 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16"
+          className="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 md:gap-x-7 md:gap-y-14 lg:grid-cols-3 lg:gap-x-8 lg:gap-y-16 2xl:grid-cols-4 2xl:gap-x-9 2xl:gap-y-20"
         >
-          <AnimatePresence mode="popLayout">
-            {filtered.map((project, index) => (
-              <ProjectCard
-                key={project.slug}
-                project={project}
-                index={index}
-                variants={filterItem}
-              />
-            ))}
-          </AnimatePresence>
+          {filtered.map((project, index) => (
+            <ProjectCard
+              key={project.slug}
+              project={project}
+              index={index}
+            />
+          ))}
         </motion.div>
 
         {filtered.length === 0 && (
@@ -144,7 +141,7 @@ export function WorkIndex({ projects }: WorkIndexProps) {
             {dict.work.emptyCategory}
           </motion.p>
         )}
-      </Container>
+      </div>
     </section>
   );
 }

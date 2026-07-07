@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 import { DURATION, easeOutExpo } from "@/lib/motion";
+import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 
 
@@ -75,6 +76,7 @@ export function Button({
   const reducedMotion = useReducedMotion();
 
   const cursorVariant = resolveCursor(href, cursor);
+  const cursorProps = useMountedCursor(cursorVariant ?? (href ? undefined : "default"));
 
 
 
@@ -138,7 +140,7 @@ export function Button({
 
       aria-label={ariaLabel}
 
-      data-cursor={cursorVariant}
+      {...cursorProps}
 
       className={cn(baseStyles, variants[variant], className)}
 
@@ -158,7 +160,7 @@ export function Button({
 
       aria-label={ariaLabel}
 
-      data-cursor={cursorVariant ?? "default"}
+      {...cursorProps}
 
       className={cn(baseStyles, variants[variant], className)}
 

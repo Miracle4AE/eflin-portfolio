@@ -10,6 +10,7 @@ import { localizedPath, isHomePath } from "@/i18n/navigation";
 import { LanguageSwitcher } from "@/components/i18n/LanguageSwitcher";
 import { VisualField } from "@/components/admin/visual/EditableText";
 import { cn, scrollToSection } from "@/lib/utils";
+import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 interface HeaderProps {
   locale: Locale;
@@ -23,6 +24,9 @@ export function Header({ locale, previewMode = false }: HeaderProps) {
   const isHome = isHomePath(pathname);
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const defaultCursor = useMountedCursor("default");
+  const viewCursor = useMountedCursor("view");
+  const contactCursor = useMountedCursor("contact");
 
   const navLinks = useMemo(
     () => [
@@ -104,7 +108,7 @@ export function Header({ locale, previewMode = false }: HeaderProps) {
           key={link.href}
           href={link.href}
           onClick={() => setMenuOpen(false)}
-          data-cursor={link.match === "/contact" ? "contact" : "view"}
+          {...(link.match === "/contact" ? contactCursor : viewCursor)}
           className={cn(
             mobile
               ? "py-4 font-display text-3xl font-light text-foreground"
@@ -187,7 +191,7 @@ export function Header({ locale, previewMode = false }: HeaderProps) {
       <div className="mx-auto flex max-w-[1400px] items-center justify-between px-6 md:px-10 lg:px-16">
         <Link
           href={localizedPath(locale)}
-          data-cursor="default"
+          {...defaultCursor}
           className="font-display text-xl font-light tracking-wide text-foreground transition-opacity hover:opacity-60 md:text-2xl"
           aria-label={dict.nav.home}
         >

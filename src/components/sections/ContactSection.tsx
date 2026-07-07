@@ -9,6 +9,7 @@ import { MaskReveal } from "@/components/motion/MaskReveal";
 import { VisualField } from "@/components/admin/visual/EditableText";
 import { useVisualEditOptional } from "@/components/admin/visual/VisualEditContext";
 import { fadeUp, staggerContainer, defaultViewport } from "@/lib/motion";
+import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 interface ContactSectionProps {
   sourcePage?: string;
@@ -22,6 +23,7 @@ export function ContactSection({
   const dict = useDictionary();
   const siteConfig = useSiteConfig();
   const visualEdit = useVisualEditOptional();
+  const viewCursor = useMountedCursor("view");
 
   return (
     <section
@@ -104,7 +106,7 @@ export function ContactSection({
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  data-cursor="view"
+                  {...viewCursor}
                   className="text-xs font-medium uppercase tracking-[0.2em] text-muted transition-colors duration-300 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                 >
                   {link.label}

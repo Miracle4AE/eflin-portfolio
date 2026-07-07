@@ -11,6 +11,7 @@ import { caseStudyAriaLabel } from "@/i18n/localize";
 import { IMAGE_SIZES } from "@/lib/images";
 import { pickHeroProjectImage } from "@/lib/images.utils";
 import { fadeUp, defaultViewport } from "@/lib/motion";
+import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 interface ProjectShowcaseProps {
   project: ResolvedProject;
@@ -22,6 +23,7 @@ export function ProjectShowcase({ project }: ProjectShowcaseProps) {
   const heroSrc = pickHeroProjectImage(project.images);
   const projectHref = localizedPath(locale, `/work/${project.slug}`);
   const visibleTags = project.tags.slice(0, 4);
+  const viewCursor = useMountedCursor("view");
 
   return (
     <section
@@ -59,7 +61,7 @@ export function ProjectShowcase({ project }: ProjectShowcaseProps) {
             </div>
             <Link
               href={projectHref}
-              data-cursor="view"
+              {...viewCursor}
               className="group mt-10 inline-flex items-center gap-3 text-xs font-medium uppercase tracking-[0.2em] text-foreground transition-colors duration-300 hover:text-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               aria-label={caseStudyAriaLabel(project.title, dict.work.viewCaseStudyAria)}
             >
@@ -73,7 +75,7 @@ export function ProjectShowcase({ project }: ProjectShowcaseProps) {
 
           <Link
             href={projectHref}
-            data-cursor="view"
+            {...viewCursor}
             className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             aria-label={caseStudyAriaLabel(project.title, dict.work.viewCaseStudyAria)}
           >
