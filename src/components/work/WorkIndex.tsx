@@ -26,9 +26,15 @@ const categoryKeys: CategoryFilterKey[] = [
 
 interface WorkIndexProps {
   projects: ResolvedProject[];
+  afterGridItems?: React.ReactNode;
+  onVisualProjectOpen?: (slug: string) => void;
 }
 
-export function WorkIndex({ projects }: WorkIndexProps) {
+export function WorkIndex({
+  projects,
+  afterGridItems,
+  onVisualProjectOpen,
+}: WorkIndexProps) {
   const dict = useDictionary();
   const visualEdit = useVisualEditOptional();
   const [activeCategory, setActiveCategory] = useState<CategoryFilter>("all");
@@ -128,8 +134,10 @@ export function WorkIndex({ projects }: WorkIndexProps) {
               key={project.slug}
               project={project}
               index={index}
+              onVisualOpen={onVisualProjectOpen}
             />
           ))}
+          {afterGridItems}
         </motion.div>
 
         {filtered.length === 0 && (

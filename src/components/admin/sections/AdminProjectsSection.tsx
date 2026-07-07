@@ -11,42 +11,17 @@ import { FieldHint, useContentHints, RequiredMark } from "@/components/admin/ui/
 import { PreviewLinks, EmptyState } from "@/components/admin/ui/PreviewLinks";
 import {
   getProjectCompletion,
-  slugifyTitle,
 } from "@/lib/admin/validation-report";
 import { ls } from "@/lib/content/locale-field";
 import { adminInputClass, adminLabelClass } from "@/components/admin/admin-styles";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
 import { interpolate } from "@/i18n/admin/storage";
-
-const CATEGORIES = ["branding", "editorial", "identity", "digital", "art-direction"] as const;
-
-function emptyProject(slug: string): ContentProject {
-  return {
-    slug,
-    title: ls("New Project", "Yeni Proje"),
-    category: ls("Category", "Kategori"),
-    filterCategory: "branding",
-    year: new Date().getFullYear().toString(),
-    role: ls("", ""),
-    client: ls("", ""),
-    summary: ls("", ""),
-    description: ls("", ""),
-    concept: ls("", ""),
-    challenge: ls("", ""),
-    solution: ls("", ""),
-    visualDirection: ls("", ""),
-    typography: ls("", ""),
-    tags: { en: [], tr: [] },
-    palette: [{ name: ls("Black", "Siyah"), hex: "#0a0a0a" }],
-    galleryItems: [],
-    gradient: "from-[#1a1a2e] via-[#16213e] to-[#0f3460]",
-    aspectRatio: "portrait",
-    featured: false,
-    coverImagePath: `/images/projects/${slug}/cover.jpg`,
-    heroImagePath: `/images/projects/${slug}/hero.jpg`,
-    imageAlt: ls("", ""),
-  };
-}
+import {
+  createProjectDraft,
+  getUniqueProjectSlug,
+  PROJECT_CATEGORIES,
+  slugifyProjectTitle,
+} from "@/lib/admin/create-project";
 
 function CompletionBar({ label, value }: { label: string; value: number }) {
   return (
@@ -102,9 +77,28 @@ export function AdminProjectsSection() {
   }
 
   function addProject() {
-    const base = `project-${content.projects.length + 1}`;
-    updateProjects([...content.projects, emptyProject(base)]);
-    setSelectedSlug(base);
+    const slug = getUniqueProjectSlug(
+      `project-${content.projects.length + 1}`,
+      content.projects.map((project) => project.slug),
+    );
+    updateProjects([
+      ...content.projects,
+      createProjectDraft({
+        titleEn: "New Project",
+        titleTr: "Yeni Proje",
+        slug,
+        filterCategory: "branding",
+        year: new Date().getFullYear().toString(),
+        client: "",
+        roleEn: "",
+        roleTr: "",
+        summaryEn: "",
+        summaryTr: "",
+        coverImagePath: `/images/projects/${slug}/cover.jpg`,
+        heroImagePath: `/images/projects/${slug}/hero.jpg`,
+      }),
+    ]);
+    setSelectedSlug(slug);
   }
 
   function duplicateProject(project: ContentProject) {
@@ -166,7 +160,7 @@ export function AdminProjectsSection() {
               className="rounded-lg border border-border bg-background px-2 py-1.5 text-xs"
             >
               <option value="all">{t.projects.allCategories}</option>
-              {CATEGORIES.map((c) => (
+              {PROJECT_CATEGORIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
@@ -261,7 +255,7 @@ export function AdminProjectsSection() {
                     value={selected.title.en}
                     onChange={(e) => {
                       const title = { ...selected.title, en: e.target.value };
-                      const autoSlug = slugifyTitle(e.target.value);
+                      const autoSlug = slugifyProjectTitle(e.target.value);
                       updateProject({
                         ...selected,
                         title,
@@ -307,7 +301,7 @@ export function AdminProjectsSection() {
                     }
                     className={adminInputClass()}
                   >
-                    {CATEGORIES.map((cat) => (
+                    {PROJECT_CATEGORIES.map((cat) => (
                       <option key={cat} value={cat}>
                         {cat}
                       </option>

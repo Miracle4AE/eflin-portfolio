@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { UploadDestination } from "@/lib/admin/media.constants";
 import { AdminImagePreview } from "@/components/admin/media/AdminImagePreview";
 import { useMediaPicker } from "@/components/admin/media/MediaPickerContext";
@@ -11,6 +11,7 @@ import { interpolate } from "@/i18n/admin/storage";
 type MediaUploadPanelProps = {
   projectSlugs: string[];
   defaultProjectSlug?: string;
+  defaultDestination?: UploadDestination;
   onUploaded?: (publicPath: string) => void;
   compact?: boolean;
 };
@@ -18,13 +19,14 @@ type MediaUploadPanelProps = {
 export function MediaUploadPanel({
   projectSlugs,
   defaultProjectSlug,
+  defaultDestination = "gallery",
   onUploaded,
   compact = false,
 }: MediaUploadPanelProps) {
   const t = useAdminT();
   const { uploadEnabled, refreshMedia } = useMediaPicker();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [destination, setDestination] = useState<UploadDestination>("gallery");
+  const [destination, setDestination] = useState<UploadDestination>(defaultDestination);
   const [projectSlug, setProjectSlug] = useState(defaultProjectSlug ?? projectSlugs[0] ?? "");
   const [dragging, setDragging] = useState(false);
   const [message, setMessage] = useState("");
@@ -34,6 +36,14 @@ export function MediaUploadPanel({
   const [lastUploadPath, setLastUploadPath] = useState("");
 
   const needsProject = destination !== "portrait" && destination !== "general";
+
+  useEffect(() => {
+    setDestination(defaultDestination);
+  }, [defaultDestination]);
+
+  useEffect(() => {
+    setProjectSlug(defaultProjectSlug ?? projectSlugs[0] ?? "");
+  }, [defaultProjectSlug, projectSlugs]);
 
   async function uploadFile(file: File, overwrite = false) {
     setUploading(true);

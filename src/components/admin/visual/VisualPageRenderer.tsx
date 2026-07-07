@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { Locale } from "@/i18n/config";
 import { LocaleProvider } from "@/i18n/locale-context";
 import { Header } from "@/components/layout/Header";
@@ -26,11 +26,16 @@ import { useMediaPicker } from "@/components/admin/media/MediaPickerContext";
 import { buildVisualPreviewData, getVisualProjectGallery } from "@/lib/content/visual-preview";
 import { useDictionary } from "@/i18n/locale-context";
 import type { ResolvedGalleryItem } from "@/types";
+import type { ContentProject } from "@/lib/content/types";
+import { AddProjectCard } from "@/components/admin/visual/AddProjectCard";
+import { CreateProjectModal } from "@/components/admin/visual/CreateProjectModal";
 
 type VisualPageRendererProps = {
   page: VisualPageId;
   editLocale: Locale;
   projectSlug: string;
+  onProjectCreated?: (slug: string) => void;
+  onProjectOpen?: (slug: string) => void;
 };
 
 function ProjectNarrativeSections({ slug }: { slug: string }) {
@@ -65,9 +70,12 @@ export function VisualPageRenderer({
   page,
   editLocale,
   projectSlug,
+  onProjectCreated,
+  onProjectOpen,
 }: VisualPageRendererProps) {
-  const { content } = useAdminContent();
+  const { content, setContent } = useAdminContent();
   const { files } = useMediaPicker();
+  const [createProjectOpen, setCreateProjectOpen] = useState(false);
   const knownMediaPaths = useMemo(
     () => new Set(files.map((file) => file.path)),
     [files],
@@ -100,6 +108,14 @@ export function VisualPageRenderer({
     }));
   }, [content, editLocale, knownMediaPaths, project]);
 
+  function handleCreateProject(projectDraft: ContentProject) {
+    setContent((current) => ({
+      ...current,
+      projects: [...current.projects, projectDraft],
+    }));
+    onProjectCreated?.(projectDraft.slug);
+  }
+
   return (
     <VisualEditProvider page={page} projectSlug={project?.slug} editLocale={editLocale}>
       <LocaleProvider
@@ -121,7 +137,21 @@ export function VisualPageRenderer({
               <Contact />
             </>
           ) : null}
-          {page === "work" ? <WorkIndex projects={preview.projects} /> : null}
+          {page === "work" ? (
+            <>
+              <WorkIndex
+                projects={preview.projects}
+                onVisualProjectOpen={onProjectOpen}
+                afterGridItems={<AddProjectCard onClick={() => setCreateProjectOpen(true)} />}
+              />
+              <CreateProjectModal
+                open={createProjectOpen}
+                existingSlugs={content.projects.map((item) => item.slug)}
+                onClose={() => setCreateProjectOpen(false)}
+                onCreate={handleCreateProject}
+              />
+            </>
+          ) : null}
           {page === "contact" ? (
             <ContactSection sourcePage={`/${editLocale}/contact`} showSocial />
           ) : null}

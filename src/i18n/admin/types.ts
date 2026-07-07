@@ -372,4 +372,40 @@ export type AdminDictionary = {
     mobileHint: string;
     openStructured: string;
   };
+  visualProjectCreator: {
+    cardTitle: string;
+    cardDescription: string;
+    cardButton: string;
+    modalEyebrow: string;
+    modalTitle: string;
+    modalDescription: string;
+    chooseFromLibrary: string;
+    uploadNew: string;
+    hideUpload: string;
+    noImage: string;
+    createDraft: string;
+    create: string;
+    fields: {
+      titleTr: string;
+      titleEn: string;
+      slug: string;
+      category: string;
+      year: string;
+      client: string;
+      roleTr: string;
+      roleEn: string;
+      summaryTr: string;
+      summaryEn: string;
+      coverImage: string;
+      heroImage: string;
+      featured: string;
+    };
+    errors: {
+      titleRequired: string;
+      slugRequired: string;
+      slugInvalid: string;
+      slugDuplicate: string;
+      summaryRequired: string;
+    };
+  };
 };

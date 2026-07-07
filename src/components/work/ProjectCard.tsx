@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { KeyboardEvent, MouseEvent } from "react";
 import { motion } from "framer-motion";
 import type { ResolvedProject } from "@/types";
 import { ProjectImage } from "@/components/work/ProjectImage";
@@ -26,12 +27,14 @@ interface ProjectCardProps {
   project: ResolvedProject;
   index?: number;
   variants?: typeof fadeUp;
+  onVisualOpen?: (slug: string) => void;
 }
 
 export function ProjectCard({
   project,
   index = 0,
   variants = fadeUp,
+  onVisualOpen,
 }: ProjectCardProps) {
   const dict = useDictionary();
   const { locale } = useLocale();
@@ -125,6 +128,23 @@ export function ProjectCard({
     </>
   );
 
+  const openVisualProject = () => onVisualOpen?.(project.slug);
+
+  const shouldIgnoreVisualOpen = (target: EventTarget): boolean => {
+    return target instanceof HTMLElement && Boolean(target.closest("button, a, input, textarea, select"));
+  };
+
+  const handleVisualClick = (event: MouseEvent<HTMLDivElement>) => {
+    if (!onVisualOpen || shouldIgnoreVisualOpen(event.target)) return;
+    openVisualProject();
+  };
+
+  const handleVisualKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!onVisualOpen || (event.key !== "Enter" && event.key !== " ")) return;
+    event.preventDefault();
+    openVisualProject();
+  };
+
   return (
     <motion.article
       variants={variants}
@@ -135,7 +155,11 @@ export function ProjectCard({
     >
       {visualEdit ? (
         <div
-          className="museum-card flex h-full flex-col overflow-hidden rounded-[1.5rem] transition duration-500"
+          role={onVisualOpen ? "button" : undefined}
+          tabIndex={onVisualOpen ? 0 : undefined}
+          onClick={handleVisualClick}
+          onKeyDown={handleVisualKeyDown}
+          className={`museum-card flex h-full flex-col overflow-hidden rounded-[1.5rem] transition duration-500 ${onVisualOpen ? "cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background" : ""}`}
         >
           {cardInner}
         </div>
