@@ -32,6 +32,7 @@ function ImageEditPopover({
   projectSlug,
 }: ImageEditPopoverProps & { anchorRef: React.RefObject<HTMLButtonElement | null> }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const popoverRef = useRef<HTMLDivElement>(null);
   const { uploadEnabled, refreshMedia } = useMediaPicker();
   const [uploading, setUploading] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -46,6 +47,20 @@ function ImageEditPopover({
     const rect = anchorRef.current.getBoundingClientRect();
     setPosition({ top: rect.top + 8, left: rect.left + 8 });
   }, [open, anchorRef]);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function onPointerDown(event: PointerEvent) {
+      const target = event.target as Node;
+      if (popoverRef.current?.contains(target)) return;
+      if (anchorRef.current?.contains(target)) return;
+      onClose();
+    }
+
+    window.addEventListener("pointerdown", onPointerDown);
+    return () => window.removeEventListener("pointerdown", onPointerDown);
+  }, [anchorRef, onClose, open]);
 
   if (!open || !mounted) return null;
 
@@ -87,6 +102,7 @@ function ImageEditPopover({
 
   return createPortal(
     <div
+      ref={popoverRef}
       className="fixed z-[200] min-w-[180px] rounded-xl border border-border-soft bg-surface/95 p-3 shadow-[var(--shadow-editorial)] backdrop-blur"
       style={{ top: position.top, left: position.left }}
       onClick={(event) => event.stopPropagation()}
@@ -95,7 +111,10 @@ function ImageEditPopover({
       <div className="flex flex-col gap-1.5">
         <button
           type="button"
-          onClick={onPick}
+          onClick={() => {
+            onClose();
+            onPick();
+          }}
           className="rounded-lg border border-border px-3 py-1.5 text-left text-xs hover:border-accent"
         >
           Change image

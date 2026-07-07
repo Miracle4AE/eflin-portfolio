@@ -42,7 +42,19 @@ export function VisualEditProvider({
 
   const updateImage = useCallback(
     (path: string, value: string | null) => {
-      setContent((current) => setImagePathByPath(current, path, value));
+      if (process.env.NODE_ENV === "development" && !path?.trim()) {
+        console.warn("[VisualEditor] Missing image fieldPath for selected image");
+      }
+      if (process.env.NODE_ENV === "development" && value !== null && !value?.trim()) {
+        console.warn("[VisualEditor] Selected image has no usable path");
+      }
+      setContent((current) => {
+        const next = setImagePathByPath(current, path, value);
+        if (process.env.NODE_ENV === "development" && next === current) {
+          console.warn(`[VisualEditor] Image field was not updated: ${path}`);
+        }
+        return next;
+      });
     },
     [setContent],
   );

@@ -19,7 +19,7 @@ export type MediaPickerFilter = {
 
 type OpenPickerOptions = {
   filter?: MediaPickerFilter;
-  onSelect: (path: string) => void;
+  onSelect?: (path: string) => void;
 };
 
 type MediaPickerContextValue = {
@@ -61,8 +61,11 @@ export function MediaPickerProvider({ children }: { children: React.ReactNode })
   }, [refreshMedia]);
 
   const openPicker = useCallback((options: OpenPickerOptions) => {
+    if (process.env.NODE_ENV === "development" && !options.onSelect) {
+      console.warn("[MediaPicker] openPicker called without an onSelect callback");
+    }
     setPickerFilter(options.filter ?? { type: "all", projectSlug: "all" });
-    setOnSelect(() => options.onSelect);
+    setOnSelect(() => options.onSelect ?? null);
     setPickerOpen(true);
   }, []);
 
@@ -88,7 +91,20 @@ export function MediaPickerProvider({ children }: { children: React.ReactNode })
         projectSlugs={projectSlugs}
         onClose={() => setPickerOpen(false)}
         onSelect={(path) => {
-          onSelect?.(path);
+          if (!path?.trim()) {
+            if (process.env.NODE_ENV === "development") {
+              console.warn("[MediaPicker] Selected image has no usable path");
+            }
+            return;
+          }
+          if (!onSelect) {
+            if (process.env.NODE_ENV === "development") {
+              console.warn("[MediaPicker] Image selected but no target callback is registered");
+            }
+            setPickerOpen(false);
+            return;
+          }
+          onSelect(path);
           setPickerOpen(false);
         }}
       />

@@ -57,9 +57,57 @@ function warnContentPath(message: string): void {
   }
 }
 
+function setStringLeaf(
+  target: Record<string, unknown>,
+  leafKey: string,
+  path: string,
+  value: string,
+): boolean {
+  const existing = target[leafKey];
+  if (existing === undefined) {
+    warnContentPath(`Image path target not found: ${path}`);
+    return false;
+  }
+  if (typeof existing !== "string") {
+    warnContentPath(`Image path "${path}" is not a string field`);
+    return false;
+  }
+  target[leafKey] = value;
+  return true;
+}
+
 function setStringByPath(content: SiteContent, path: string, value: string): SiteContent | null {
-  const parts = path.split(".");
   const next = structuredClone(content) as SiteContent;
+
+  const projectMatch = path.match(/^projects\.([^.]+)\.(.+)$/);
+  if (projectMatch) {
+    const [, slug, rest] = projectMatch;
+    const project = next.projects.find((p) => p.slug === slug);
+    if (!project) {
+      warnContentPath(`Project slug not found for image path: ${slug}`);
+      return null;
+    }
+
+    const gallery = parseGalleryRest(rest);
+    if (gallery) {
+      const item = project.galleryItems.find((g) => g.id === gallery.id);
+      if (!item) {
+        warnContentPath(`Gallery item not found for image path: ${gallery.id} in project ${slug}`);
+        return null;
+      }
+      if (!setStringLeaf(item as unknown as Record<string, unknown>, gallery.field, path, value)) {
+        return null;
+      }
+      return next;
+    }
+
+    if (!setStringLeaf(project as unknown as Record<string, unknown>, rest, path, value)) {
+      return null;
+    }
+    return next;
+  }
+
+  const parts = path.split(".");
   const target = traverseToParent(next, parts);
   if (!target) {
     warnContentPath(`Path not found: ${path}`);
@@ -67,13 +115,7 @@ function setStringByPath(content: SiteContent, path: string, value: string): Sit
   }
 
   const { parent, leafKey } = target;
-  const existing = parent[leafKey];
-  if (existing !== undefined && typeof existing !== "string" && !isLocaleField(existing)) {
-    warnContentPath(`Path "${path}" is not a string or localized field`);
-    return null;
-  }
-
-  parent[leafKey] = value;
+  if (!setStringLeaf(parent, leafKey, path, value)) return null;
   return next;
 }
 

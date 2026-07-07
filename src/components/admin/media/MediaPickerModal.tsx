@@ -40,6 +40,7 @@ export function MediaPickerModal({
   const [query, setQuery] = useState("");
   const [showUpload, setShowUpload] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [selectedPath, setSelectedPath] = useState("");
 
   useEffect(() => {
     setMounted(true);
@@ -51,6 +52,7 @@ export function MediaPickerModal({
       setProjectFilter(filter.projectSlug ?? "all");
       setQuery("");
       setShowUpload(false);
+      setSelectedPath("");
     }
   }, [open, filter]);
 
@@ -70,10 +72,21 @@ export function MediaPickerModal({
     return true;
   });
 
+  function handleSelect(path: string) {
+    if (!path?.trim()) {
+      if (process.env.NODE_ENV === "development") {
+        console.warn("[MediaPicker] Tried to select an image without a usable path");
+      }
+      return;
+    }
+    setSelectedPath(path);
+    onSelect(path);
+  }
+
   if (!open || !mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+    <div className="fixed inset-0 z-[220] flex items-center justify-center bg-black/70 p-4">
       <div className="flex max-h-[90vh] w-full max-w-5xl flex-col rounded-2xl border border-border-soft bg-surface">
         <div className="flex items-center justify-between border-b border-border-soft px-6 py-4">
           <div>
@@ -144,17 +157,26 @@ export function MediaPickerModal({
             <p className="text-sm text-muted">{t.media.noImagesMatch}</p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((file) => (
-                <button
+              {filtered.map((file) => {
+                const selected = selectedPath === file.path;
+                return (
+                <article
                   key={file.path}
-                  type="button"
-                  onClick={() => onSelect(file.path)}
-                  className="overflow-hidden rounded-xl border border-border-soft bg-background text-left transition hover:border-accent"
+                  className={`overflow-hidden rounded-xl border bg-background text-left transition ${
+                    selected ? "border-accent ring-2 ring-accent/25" : "border-border-soft hover:border-accent"
+                  }`}
                 >
-                  <AdminImagePreview
-                    src={file.path}
-                    className="aspect-[4/3] rounded-none border-0"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => handleSelect(file.path)}
+                    className="block w-full cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                    aria-label={`Use image ${file.filename}`}
+                  >
+                    <AdminImagePreview
+                      src={file.path}
+                      className="aspect-[4/3] rounded-none border-0"
+                    />
+                  </button>
                   <div className="space-y-1 p-3">
                     <p className="truncate text-sm text-foreground">{file.filename}</p>
                     <p className="truncate text-xs text-muted">{file.path}</p>
@@ -164,9 +186,16 @@ export function MediaPickerModal({
                       {" · "}
                       {file.type}
                     </p>
+                    <button
+                      type="button"
+                      onClick={() => handleSelect(file.path)}
+                      className="mt-2 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-background"
+                    >
+                      {selected ? "Selected" : "Use this image"}
+                    </button>
                   </div>
-                </button>
-              ))}
+                </article>
+              )})}
             </div>
           )}
         </div>
