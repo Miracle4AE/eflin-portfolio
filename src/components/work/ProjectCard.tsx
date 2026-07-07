@@ -17,11 +17,7 @@ import { useVisualEditOptional } from "@/components/admin/visual/VisualEditConte
 import { cn } from "@/lib/utils";
 import { fadeUp } from "@/lib/motion";
 
-const cardAspectClasses = {
-  portrait: "aspect-[3/4]",
-  landscape: "aspect-[4/3]",
-  square: "aspect-square",
-} as const;
+const CARD_THUMBNAIL_ASPECT_CLASS = "aspect-[3/4]";
 
 interface ProjectCardProps {
   project: ResolvedProject;
@@ -45,7 +41,6 @@ export function ProjectCard({
     layout === "editorial"
       ? index === 0 || index === 3 || index === 4
       : index === 1 || index === 3;
-  const isTall = layout === "editorial" && index === 2;
   const imageSizes = isWide ? IMAGE_SIZES.cardWide : IMAGE_SIZES.card;
   const coverSrc = pickPrimaryProjectImage(project.images);
 
@@ -73,11 +68,7 @@ export function ProjectCard({
                       sizes={imageSizes}
                       framed={false}
                       overlay
-                      className={cn(
-                        cardAspectClasses[project.aspectRatio],
-                        isWide && "md:aspect-[16/9]",
-                        isTall && "md:aspect-auto md:h-full md:min-h-[480px]",
-                      )}
+                      className={CARD_THUMBNAIL_ASPECT_CLASS}
                     />
                   </VisualImage>
                 ) : (
@@ -92,9 +83,7 @@ export function ProjectCard({
                     framed={false}
                     overlay
                     className={cn(
-                      cardAspectClasses[project.aspectRatio],
-                      isWide && "md:aspect-[16/9]",
-                      isTall && "md:aspect-auto md:h-full md:min-h-[480px]",
+                      CARD_THUMBNAIL_ASPECT_CLASS,
                       "group-hover:scale-[1.01] [&_img]:transition-transform [&_img]:duration-[900ms] [&_img]:ease-out group-hover:[&_img]:scale-[1.04]",
                     )}
                   />
@@ -168,7 +157,6 @@ export function ProjectCard({
       className={cn(
         "group relative",
         isWide && "md:col-span-2",
-        layout === "editorial" && isTall && "md:row-span-2",
       )}
     >
       <Magnetic strength={visualEdit ? 0 : 0.12} className="block">
