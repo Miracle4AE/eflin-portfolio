@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { get, list, put } from "@vercel/blob";
+import { del as deleteBlob, get, list, put } from "@vercel/blob";
 import { buildFallbackSiteContent } from "@/lib/content/fallback";
 import { stampContentRevision, verifyContentMatch } from "@/lib/content/revision";
 import type { SiteContent } from "@/lib/content/types";
@@ -52,6 +52,20 @@ type ReadSourceResult = {
   fallbackActive: boolean;
 };
 
+type BlobWriteInfo = {
+  pathname?: string;
+  url?: string;
+  downloadUrl?: string;
+};
+
+type ContentBlobCandidate = {
+  pathname: string;
+  url?: string;
+  downloadUrl?: string;
+  size?: number;
+  uploadedAt?: string;
+};
+
 const BLOB_PROBE_TTL_MS = 60_000;
 const STORAGE_UNAVAILABLE_MESSAGE =
   "Persistent storage is not available. Connect a Vercel Blob store to this project, or use Export JSON.";
@@ -62,6 +76,10 @@ let cachedContent: SiteContent | null = null;
 let cacheKey = "";
 let blobAccessProbe: BlobAccessProbe | null = null;
 let lastReadSource: StorageStatus["readSource"] = "fallback";
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 function isDevelopment(): boolean {
   return process.env.NODE_ENV === "development";
@@ -138,19 +156,123 @@ async function probeBlobAccess(force = false): Promise<BlobAccessProbe> {
   }
 }
 
-async function readBlobFile(): Promise<SiteContent | null> {
+function isContentBlobPathname(pathname: string | undefined): pathname is string {
+  if (!pathname) return false;
+  const normalized = pathname.replace(/^\/+/, "");
+  return (
+    normalized === CONTENT_BLOB_KEY ||
+    normalized === `content/${CONTENT_BLOB_KEY}` ||
+    /^site-content(?:-[a-zA-Z0-9]+)?\.json$/.test(normalized)
+  );
+}
+
+function candidateUploadedTime(candidate: ContentBlobCandidate): number {
+  if (!candidate.uploadedAt) return 0;
+  const time = new Date(candidate.uploadedAt).getTime();
+  return Number.isFinite(time) ? time : 0;
+}
+
+function sortContentBlobCandidates(
+  candidates: ContentBlobCandidate[],
+): ContentBlobCandidate[] {
+  return [...candidates].sort((a, b) => {
+    const byTime = candidateUploadedTime(b) - candidateUploadedTime(a);
+    if (byTime !== 0) return byTime;
+    return (b.size ?? 0) - (a.size ?? 0);
+  });
+}
+
+async function listContentBlobCandidates(): Promise<ContentBlobCandidate[]> {
+  const prefixes = [CONTENT_BLOB_KEY, "site-content", `content/${CONTENT_BLOB_KEY}`];
+  const candidates = new Map<string, ContentBlobCandidate>();
+
+  for (const prefix of prefixes) {
+    try {
+      const result = await list({ prefix, limit: 100 });
+      for (const blob of result.blobs ?? []) {
+        const candidate = blob as {
+          pathname?: string;
+          url?: string;
+          downloadUrl?: string;
+          size?: number;
+          uploadedAt?: Date | string;
+        };
+        if (!isContentBlobPathname(candidate.pathname)) continue;
+
+        const key = candidate.url ?? candidate.pathname;
+        if (!key) continue;
+        candidates.set(key, {
+          pathname: candidate.pathname,
+          url: candidate.url,
+          downloadUrl: candidate.downloadUrl,
+          size: candidate.size,
+          uploadedAt: candidate.uploadedAt
+            ? new Date(candidate.uploadedAt).toISOString()
+            : undefined,
+        });
+      }
+    } catch (error) {
+      console.warn("[Content] Failed to list content Blob candidates:", error);
+    }
+  }
+
+  return sortContentBlobCandidates([...candidates.values()]);
+}
+
+async function readBlobText(identifier: string): Promise<string | null> {
   try {
-    const result = await get(CONTENT_BLOB_KEY, { access: BLOB_ACCESS });
+    const result = await get(identifier, { access: BLOB_ACCESS });
     if (!result || result.statusCode !== 200 || !result.stream) {
-      return null;
+      throw new Error(`Blob get failed with status ${result?.statusCode ?? "unknown"}`);
     }
 
-    const raw = await new Response(result.stream).text();
-    return parseSiteContent(raw);
+    return await new Response(result.stream).text();
   } catch (error) {
-    console.warn("[Content] Failed to read site content from Vercel Blob:", error);
+    if (!identifier.startsWith("http")) {
+      console.warn("[Content] Failed to read site content from Vercel Blob:", error);
+      return null;
+    }
+  }
+
+  try {
+    const response = await fetch(identifier, { cache: "no-store" });
+    if (!response.ok) return null;
+    return await response.text();
+  } catch (error) {
+    console.warn("[Content] Failed to fetch exact content Blob URL:", error);
     return null;
   }
+}
+
+async function readBlobCandidate(
+  candidate: ContentBlobCandidate,
+): Promise<SiteContent | null> {
+  const identifiers = [
+    candidate.downloadUrl,
+    candidate.url,
+    candidate.pathname,
+    CONTENT_BLOB_KEY,
+  ].filter((value): value is string => Boolean(value));
+
+  for (const identifier of identifiers) {
+    const raw = await readBlobText(identifier);
+    if (!raw) continue;
+    const content = parseSiteContent(raw);
+    if (content) return content;
+  }
+
+  return null;
+}
+
+async function readBlobFile(): Promise<SiteContent | null> {
+  const candidates = await listContentBlobCandidates();
+  for (const candidate of candidates) {
+    const content = await readBlobCandidate(candidate);
+    if (content) return content;
+  }
+
+  const raw = await readBlobText(CONTENT_BLOB_KEY);
+  return raw ? parseSiteContent(raw) : null;
 }
 
 function writeLocalFile(content: SiteContent): void {
@@ -163,13 +285,15 @@ function writeLocalFile(content: SiteContent): void {
   );
 }
 
-async function writeBlobFile(content: SiteContent): Promise<void> {
-  await put(CONTENT_BLOB_KEY, JSON.stringify(content, null, 2), {
+async function writeBlobFile(content: SiteContent): Promise<BlobWriteInfo> {
+  const result = await put(CONTENT_BLOB_KEY, JSON.stringify(content, null, 2), {
     access: BLOB_ACCESS,
     addRandomSuffix: false,
     allowOverwrite: true,
     contentType: "application/json",
-  });
+  }) as BlobWriteInfo;
+
+  return result;
 }
 
 function currentCacheKey(source: StorageStatus["readSource"]): string {
@@ -293,10 +417,112 @@ export async function isBlobStorageAvailable(force = false): Promise<boolean> {
   return probe.available;
 }
 
-async function persistContent(content: SiteContent): Promise<"local" | "blob"> {
+async function readPutResultContent(
+  writeInfo: BlobWriteInfo | undefined,
+): Promise<SiteContent | null> {
+  const identifiers = [
+    writeInfo?.downloadUrl,
+    writeInfo?.url,
+    writeInfo?.pathname,
+  ].filter((value): value is string => Boolean(value));
+
+  for (const identifier of identifiers) {
+    const raw = await readBlobText(identifier);
+    if (!raw) continue;
+    const content = parseSiteContent(raw);
+    if (content) return content;
+  }
+
+  return null;
+}
+
+async function cleanupDuplicateContentBlobs(
+  protectedWriteInfo: BlobWriteInfo | undefined,
+): Promise<number> {
+  if (isDevelopment()) return 0;
+
+  const candidates = await listContentBlobCandidates();
+  if (candidates.length <= 1) return 0;
+
+  const protectedKeys = new Set(
+    [
+      protectedWriteInfo?.url,
+      protectedWriteInfo?.downloadUrl,
+      protectedWriteInfo?.pathname,
+    ].filter((value): value is string => Boolean(value)),
+  );
+  const [newest, ...duplicates] = candidates;
+  let deleted = 0;
+
+  for (const duplicate of duplicates) {
+    const identifier = duplicate.url ?? duplicate.pathname;
+    if (!identifier || protectedKeys.has(identifier)) continue;
+    if (newest.url && identifier === newest.url) continue;
+    if (newest.pathname && identifier === newest.pathname) continue;
+
+    try {
+      await deleteBlob(identifier);
+      deleted += 1;
+    } catch (error) {
+      console.warn("[Content] Failed to delete duplicate content Blob:", error);
+    }
+  }
+
+  return deleted;
+}
+
+async function verifyReadAfterWrite(
+  expected: SiteContent,
+  writeInfo: BlobWriteInfo | undefined,
+): Promise<SiteContent> {
+  const retryDelays = [0, 300, 600, 1000, 1500];
+  let lastRead: SiteContent | null = null;
+  let exactPutRead: SiteContent | null = null;
+  let lastReason = "Blob returned an older revision";
+
+  for (const delay of retryDelays) {
+    if (delay > 0) await sleep(delay);
+
+    if (!exactPutRead) {
+      exactPutRead = await readPutResultContent(writeInfo);
+    }
+
+    const { content } = await readContentFromSource();
+    lastRead = content;
+    const verification = verifyContentMatch(expected, content);
+    if (verification.verified) {
+      await cleanupDuplicateContentBlobs(writeInfo);
+      return content;
+    }
+
+    lastReason = verification.reason ?? lastReason;
+  }
+
+  const exactVerification = exactPutRead
+    ? verifyContentMatch(expected, exactPutRead)
+    : { verified: false, reason: "The newly written Blob could not be read by URL" };
+  const readRevision = lastRead?.meta?.revisionId ?? "unknown";
+  const exactRevision = exactPutRead?.meta?.revisionId ?? "unreadable";
+
+  throw new Error(
+    [
+      "Save verification failed because Blob returned an older revision. Please retry once. If it continues, run debug.",
+      `Expected ${expected.meta?.revisionId ?? "unknown"}, got ${readRevision}.`,
+      `Exact write read revision: ${exactRevision}.`,
+      exactVerification.reason,
+      lastReason,
+    ]
+      .filter(Boolean)
+      .join(" "),
+  );
+}
+
+async function persistContent(
+  content: SiteContent,
+): Promise<{ saveMode: "local" | "blob"; writeInfo?: BlobWriteInfo }> {
   if (isDevelopment()) {
     writeLocalFile(content);
-    return "local";
+    return { saveMode: "local" };
   }
 
   const probe = await probeBlobAccess(true);
@@ -305,9 +531,9 @@ async function persistContent(content: SiteContent): Promise<"local" | "blob"> {
   }
 
   try {
-    await writeBlobFile(content);
+    const writeInfo = await writeBlobFile(content);
     blobAccessProbe = { available: true, checkedAt: Date.now() };
-    return "blob";
+    return { saveMode: "blob", writeInfo };
   } catch (error) {
     blobAccessProbe = null;
     throw new Error(formatBlobStorageError(error));
@@ -315,7 +541,7 @@ async function persistContent(content: SiteContent): Promise<"local" | "blob"> {
 }
 
 export async function writeContent(content: SiteContent): Promise<"local" | "blob"> {
-  const saveMode = await persistContent(content);
+  const { saveMode } = await persistContent(content);
   if (isDevelopment()) {
     cachedContent = content;
     cacheKey = currentCacheKey("local");
@@ -329,10 +555,10 @@ export async function writeAndVerifyContent(
   content: SiteContent,
 ): Promise<WriteContentResult> {
   const stamped = stampContentRevision(content);
-  const saveMode = await persistContent(stamped);
+  const { saveMode, writeInfo } = await persistContent(stamped);
   invalidateStorageCache();
 
-  const { content: readBack } = await readContentFromSource();
+  const readBack = await verifyReadAfterWrite(stamped, writeInfo);
   const verification = verifyContentMatch(stamped, readBack);
 
   if (!verification.verified) {
@@ -360,6 +586,18 @@ export async function getContentDebugSnapshot(): Promise<{
   blobConfigured: boolean;
   blobAccessible: boolean;
   blobKey: string;
+  selectedBlobPathname: string | null;
+  duplicateContentBlobCount: number;
+  contentBlobCandidates: Array<{
+    pathname: string;
+    size?: number;
+    uploadedAt?: string;
+    url?: string;
+    hasDownloadUrl: boolean;
+    revisionId: string | null;
+    updatedAt: string | null;
+    readOk: boolean;
+  }>;
   readSource: StorageStatus["readSource"];
   fallbackActive: boolean;
   revisionId: string | null;
@@ -373,6 +611,22 @@ export async function getContentDebugSnapshot(): Promise<{
   invalidateStorageCache();
   const storage = await getStorageStatus();
   const probe = await probeBlobAccess(true);
+  const candidates = await listContentBlobCandidates();
+  const contentBlobCandidates = await Promise.all(
+    candidates.map(async (candidate) => {
+      const content = await readBlobCandidate(candidate);
+      return {
+        pathname: candidate.pathname,
+        size: candidate.size,
+        uploadedAt: candidate.uploadedAt,
+        url: candidate.url,
+        hasDownloadUrl: Boolean(candidate.downloadUrl),
+        revisionId: content?.meta?.revisionId ?? null,
+        updatedAt: content?.meta?.updatedAt ?? null,
+        readOk: Boolean(content),
+      };
+    }),
+  );
   const { content, source, fallbackActive } = await readContentFromSource();
 
   let warning: string | undefined;
@@ -387,6 +641,9 @@ export async function getContentDebugSnapshot(): Promise<{
     blobConfigured: Boolean(process.env.BLOB_READ_WRITE_TOKEN),
     blobAccessible: probe.available,
     blobKey: CONTENT_BLOB_KEY,
+    selectedBlobPathname: candidates[0]?.pathname ?? null,
+    duplicateContentBlobCount: Math.max(candidates.length - 1, 0),
+    contentBlobCandidates,
     readSource: source,
     fallbackActive,
     revisionId: content.meta?.revisionId ?? null,
