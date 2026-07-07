@@ -76,22 +76,21 @@ export function ProjectShowcase({ project }: ProjectShowcaseProps) {
           <Link
             href={projectHref}
             {...viewCursor}
-            className="group block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            className="group block transition-transform duration-500 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             aria-label={caseStudyAriaLabel(project.title, dict.work.viewCaseStudyAria)}
           >
-            <div className="rounded-[1.75rem] border border-border-soft bg-surface/70 p-2 shadow-[0_30px_90px_rgba(61,56,52,0.12)] transition duration-500 group-hover:-translate-y-1 group-hover:border-accent/25">
-              <ProjectImage
-                src={heroSrc}
-                alt={project.images.imageAlt}
-                gradient={project.gradient}
-                blurDataURL={project.images.blurDataURL}
-                aspectRatio="wide"
-                mode="editorial"
-                sizes={IMAGE_SIZES.hero}
-                framed={false}
-                className="max-w-none rounded-[1.35rem] bg-background group-hover:[&_img]:scale-[1.015] [&_img]:transition-transform [&_img]:duration-700"
-              />
-            </div>
+            <ProjectImage
+              src={heroSrc}
+              alt={project.images.imageAlt}
+              gradient={project.gradient}
+              blurDataURL={project.images.blurDataURL}
+              aspectRatio="wide"
+              mode="editorial"
+              sizes={IMAGE_SIZES.hero}
+              framed={false}
+              className="max-w-none bg-transparent"
+              imageClassName="drop-shadow-[0_28px_60px_rgba(61,56,52,0.12)] transition-transform duration-700 group-hover:scale-[1.01]"
+            />
           </Link>
         </motion.div>
       </Container>
