@@ -50,7 +50,6 @@ export function FeaturedWorks({ projects }: FeaturedWorksProps) {
               key={project.slug}
               project={project}
               index={index}
-              layout="default"
             />
           ))}
         </motion.div>
