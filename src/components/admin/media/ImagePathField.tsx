@@ -5,6 +5,7 @@ import {
   useMediaPicker,
   type MediaPickerFilter,
 } from "@/components/admin/media/MediaPickerContext";
+import { AdminImagePreview } from "@/components/admin/media/AdminImagePreview";
 import { adminInputClass, adminLabelClass } from "@/components/admin/admin-styles";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
 
@@ -36,10 +37,11 @@ export function ImagePathField({
       <p className={adminLabelClass()}>{label}</p>
       <div className="flex gap-3">
         {value ? (
-          <div className="h-20 w-28 shrink-0 overflow-hidden rounded-lg border border-border-soft bg-greige">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={value} alt="" className="h-full w-full object-cover" />
-          </div>
+          <AdminImagePreview
+            src={value}
+            className="h-20 w-28 shrink-0"
+            placeholderLabel="Missing"
+          />
         ) : null}
         <div className="min-w-0 flex-1 space-y-2">
           <input

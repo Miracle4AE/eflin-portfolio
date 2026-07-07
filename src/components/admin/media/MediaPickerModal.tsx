@@ -2,6 +2,7 @@
 
 import { createPortal } from "react-dom";
 import { useEffect, useState } from "react";
+import { AdminImagePreview } from "@/components/admin/media/AdminImagePreview";
 import { MediaUploadPanel } from "@/components/admin/media/MediaUploadPanel";
 import type { MediaFileType } from "@/lib/admin/media.constants";
 import type { MediaPickerFilter } from "@/components/admin/media/MediaPickerContext";
@@ -150,10 +151,10 @@ export function MediaPickerModal({
                   onClick={() => onSelect(file.path)}
                   className="overflow-hidden rounded-xl border border-border-soft bg-background text-left transition hover:border-accent"
                 >
-                  <div className="aspect-[4/3] overflow-hidden bg-greige">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={file.path} alt="" className="h-full w-full object-cover" />
-                  </div>
+                  <AdminImagePreview
+                    src={file.path}
+                    className="aspect-[4/3] rounded-none border-0"
+                  />
                   <div className="space-y-1 p-3">
                     <p className="truncate text-sm text-foreground">{file.filename}</p>
                     <p className="truncate text-xs text-muted">{file.path}</p>

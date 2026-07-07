@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import type { UploadDestination } from "@/lib/admin/media.constants";
+import { AdminImagePreview } from "@/components/admin/media/AdminImagePreview";
 import { useMediaPicker } from "@/components/admin/media/MediaPickerContext";
 import { adminInputClass, adminLabelClass, adminSectionClass } from "@/components/admin/admin-styles";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
@@ -190,10 +191,7 @@ export function MediaUploadPanel({
 
       {lastUploadPath ? (
         <div className="mt-4 flex flex-wrap items-start gap-4 rounded-xl border border-border-soft bg-background p-4">
-          <div className="h-24 w-32 overflow-hidden rounded-lg border border-border-soft bg-greige">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={lastUploadPath} alt="" className="h-full w-full object-cover" />
-          </div>
+          <AdminImagePreview src={lastUploadPath} className="h-24 w-32" />
           <div className="min-w-0 flex-1 space-y-2">
             <p className="truncate text-sm text-foreground">{lastUploadPath}</p>
             <div className="flex flex-wrap gap-2">

@@ -22,6 +22,7 @@ import { CaseStudyNavigation } from "@/components/case-study/CaseStudyNavigation
 import { VisualEditProvider, type VisualPageId, useVisualEdit } from "@/components/admin/visual/VisualEditContext";
 import { pickLocale } from "@/lib/content/locale-field";
 import { useAdminContent } from "@/components/admin/AdminContentContext";
+import { useMediaPicker } from "@/components/admin/media/MediaPickerContext";
 import { buildVisualPreviewData, getVisualProjectGallery } from "@/lib/content/visual-preview";
 import { useDictionary } from "@/i18n/locale-context";
 import type { ResolvedGalleryItem } from "@/types";
@@ -66,10 +67,15 @@ export function VisualPageRenderer({
   projectSlug,
 }: VisualPageRendererProps) {
   const { content } = useAdminContent();
+  const { files } = useMediaPicker();
+  const knownMediaPaths = useMemo(
+    () => new Set(files.map((file) => file.path)),
+    [files],
+  );
 
   const preview = useMemo(
-    () => buildVisualPreviewData(content, editLocale),
-    [content, editLocale],
+    () => buildVisualPreviewData(content, editLocale, knownMediaPaths),
+    [content, editLocale, knownMediaPaths],
   );
 
   const project =
@@ -82,7 +88,7 @@ export function VisualPageRenderer({
 
   const galleryItems: ResolvedGalleryItem[] = useMemo(() => {
     if (!project) return [];
-    return getVisualProjectGallery(content, project.slug, editLocale).map((item) => ({
+    return getVisualProjectGallery(content, project.slug, editLocale, knownMediaPaths).map((item) => ({
       id: item.id,
       file: item.imagePath?.split("/").pop(),
       imagePath: item.imagePath,
@@ -92,7 +98,7 @@ export function VisualPageRenderer({
       alt: item.alt,
       src: item.src,
     }));
-  }, [content, editLocale, project]);
+  }, [content, editLocale, knownMediaPaths, project]);
 
   return (
     <VisualEditProvider page={page} projectSlug={project?.slug} editLocale={editLocale}>

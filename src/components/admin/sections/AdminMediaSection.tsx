@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useAdminContent } from "@/components/admin/AdminContentContext";
+import { AdminImagePreview } from "@/components/admin/media/AdminImagePreview";
 import { MediaUploadPanel } from "@/components/admin/media/MediaUploadPanel";
 import { useMediaPicker } from "@/components/admin/media/MediaPickerContext";
 import { adminSectionClass, adminCardTitle } from "@/components/admin/admin-styles";
@@ -120,10 +121,10 @@ export function AdminMediaSection({ contentProjectSlugs: slugsProp }: AdminMedia
                 key={file.path}
                 className="overflow-hidden rounded-xl border border-border-soft bg-background"
               >
-                <div className="aspect-[4/3] overflow-hidden bg-greige">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={file.path} alt="" className="h-full w-full object-cover" />
-                </div>
+                <AdminImagePreview
+                  src={file.path}
+                  className="aspect-[4/3] rounded-none border-0"
+                />
                 <div className="space-y-2 p-3">
                   <p className="truncate text-sm text-foreground">{file.filename}</p>
                   <p className="truncate text-xs text-muted">{file.path}</p>

@@ -13,14 +13,31 @@ import type { AspectRatio } from "@/types";
 import { pickLocale } from "@/lib/content/locale-field";
 import type { SiteContent } from "@/lib/content/types";
 
+export function resolveVisualImagePath(
+  imagePath: string | undefined,
+  knownMediaPaths: Set<string>,
+): string | null {
+  const normalized = resolveContentImagePath(imagePath);
+  if (!normalized) return null;
+  if (normalized.startsWith("https://") || normalized.startsWith("http://")) {
+    return normalized;
+  }
+  if (normalized.startsWith("/media/")) return normalized;
+  if (normalized.startsWith("/images/")) {
+    return knownMediaPaths.has(normalized) ? normalized : null;
+  }
+  return normalized;
+}
+
 function resolveClientProject(
   project: Project,
   source: SiteContent["projects"][number],
+  knownMediaPaths: Set<string>,
 ): ResolvedProject {
-  const coverImage = resolveContentImagePath(source.coverImagePath);
-  const heroImage = resolveContentImagePath(source.heroImagePath);
+  const coverImage = resolveVisualImagePath(source.coverImagePath, knownMediaPaths);
+  const heroImage = resolveVisualImagePath(source.heroImagePath, knownMediaPaths);
   const firstGallery = source.galleryItems
-    .map((item) => resolveContentImagePath(item.imagePath))
+    .map((item) => resolveVisualImagePath(item.imagePath, knownMediaPaths))
     .find(Boolean);
 
   const resolvedCover = coverImage ?? heroImage ?? firstGallery ?? null;
@@ -51,13 +68,17 @@ export type VisualPreviewData = {
 export function buildVisualPreviewData(
   content: SiteContent,
   locale: Locale,
+  knownMediaPaths: Set<string> = new Set(),
 ): VisualPreviewData {
   const dictionary = mergeContentIntoDictionary(getDictionary(locale), content, locale);
   const siteConfig = contentToSiteConfig(content, locale);
-  const portraitSrc = resolveContentImagePath(content.homepage.portraitImagePath);
+  const portraitSrc = resolveVisualImagePath(
+    content.homepage.portraitImagePath,
+    knownMediaPaths,
+  );
 
   const projects = content.projects.map((source) =>
-    resolveClientProject(contentProjectToProject(source, locale), source),
+    resolveClientProject(contentProjectToProject(source, locale), source, knownMediaPaths),
   );
 
   const featuredSlugs = content.homepage.featuredProjectSlugs;
@@ -98,6 +119,7 @@ export function getVisualProjectGallery(
   content: SiteContent,
   slug: string,
   locale: Locale,
+  knownMediaPaths: Set<string> = new Set(),
 ): VisualGalleryItem[] {
   const source = content.projects.find((p) => p.slug === slug);
   if (!source) return [];
@@ -106,7 +128,7 @@ export function getVisualProjectGallery(
     imagePath: item.imagePath,
     gradient: item.gradient,
     aspectRatio: item.aspectRatio,
-    src: resolveContentImagePath(item.imagePath),
+    src: resolveVisualImagePath(item.imagePath, knownMediaPaths),
     caption: pickLocale(item.caption, locale),
     alt: pickLocale(item.alt, locale),
   }));
