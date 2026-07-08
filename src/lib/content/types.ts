@@ -18,8 +18,25 @@ export type ContentPaletteColor = {
   hex: string;
 };
 
+export type ContentCollection = {
+  id: string;
+  slug: LocaleField;
+  title: LocaleField;
+  description: LocaleField;
+  coverImage?: string;
+  order: number;
+  featured: boolean;
+  seo?: {
+    title?: LocaleField;
+    description?: LocaleField;
+  };
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type ContentProject = {
   slug: string;
+  collectionId?: string;
   title: LocaleField;
   category: LocaleField;
   filterCategory: ProjectCategory;
@@ -126,5 +143,6 @@ export type SiteContent = {
     contactDescription: LocaleField;
     ogImagePath?: string;
   };
+  collections: ContentCollection[];
   projects: ContentProject[];
 };

@@ -6,6 +6,7 @@ import { AdminShell, type AdminSectionId } from "@/components/admin/AdminShell";
 import { AdminDashboard } from "@/components/admin/sections/AdminDashboard";
 import { AdminHomepageSection } from "@/components/admin/sections/AdminHomepageSection";
 import { AdminProjectsSection } from "@/components/admin/sections/AdminProjectsSection";
+import { AdminCollectionsSection } from "@/components/admin/sections/AdminCollectionsSection";
 import { AdminSettingsSection } from "@/components/admin/sections/AdminSettingsSection";
 import { AdminDataSection } from "@/components/admin/sections/AdminDataSection";
 import { AdminMediaSection } from "@/components/admin/sections/AdminMediaSection";
@@ -58,6 +59,7 @@ export function AdminApp() {
           {section === "dashboard" ? <AdminDashboard onNavigate={setSection} /> : null}
           {section === "homepage" ? <AdminHomepageSection /> : null}
           {section === "projects" ? <AdminProjectsSection /> : null}
+          {section === "collections" ? <AdminCollectionsSection /> : null}
           {section === "media" ? <AdminMediaSection /> : null}
           {section === "validation" ? <AdminValidationSection /> : null}
           {section === "settings" ? <AdminSettingsSection /> : null}

@@ -8,6 +8,7 @@ import {
 import { loadSiteContent } from "@/lib/content/loader";
 import type { ResolvedProject } from "@/types";
 import { getSiteUrl } from "@/lib/seo";
+import type { ResolvedWorkCollection } from "@/lib/content/collections";
 
 type JsonLd = Record<string, unknown>;
 
@@ -49,19 +50,20 @@ export async function buildWebsiteSchema(locale: Locale): Promise<JsonLd> {
 export async function buildCollectionPageSchema(
   projects: ResolvedProject[],
   locale: Locale,
+  options?: { title?: string; description?: string; path?: string },
 ): Promise<JsonLd> {
   const siteUrl = getSiteUrl();
   const content = await loadSiteContent();
   const dict = mergeContentIntoDictionary(getDictionary(locale), content, locale);
-  const workPath = localizedPath(locale, "/work");
+  const workPath = localizedPath(locale, options?.path ?? "/work");
 
   return {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     "@id": `${siteUrl}${workPath}#collection`,
     url: `${siteUrl}${workPath}`,
-    name: dict.meta.workTitle,
-    description: dict.meta.workDescription,
+    name: options?.title ?? dict.meta.workTitle,
+    description: options?.description ?? dict.meta.workDescription,
     inLanguage: locale,
     isPartOf: { "@id": `${siteUrl}/#website` },
     author: { "@id": `${siteUrl}/#person` },
@@ -73,6 +75,38 @@ export async function buildCollectionPageSchema(
         position: index + 1,
         url: `${siteUrl}${localizedPath(locale, `/work/${project.slug}`)}`,
         name: project.title,
+      })),
+    },
+  };
+}
+
+export async function buildWorkCollectionsPageSchema(
+  collections: ResolvedWorkCollection[],
+  locale: Locale,
+): Promise<JsonLd> {
+  const siteUrl = getSiteUrl();
+  const content = await loadSiteContent();
+  const dict = mergeContentIntoDictionary(getDictionary(locale), content, locale);
+  const workPath = localizedPath(locale, "/work");
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${siteUrl}${workPath}#collections`,
+    url: `${siteUrl}${workPath}`,
+    name: dict.work.collectionsTitle,
+    description: dict.work.collectionsDescription,
+    inLanguage: locale,
+    isPartOf: { "@id": `${siteUrl}/#website` },
+    author: { "@id": `${siteUrl}/#person` },
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: collections.length,
+      itemListElement: collections.map((collection, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `${siteUrl}${collection.path}`,
+        name: collection.title,
       })),
     },
   };

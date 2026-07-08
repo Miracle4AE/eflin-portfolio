@@ -47,6 +47,10 @@ export const dictionaryEn: Dictionary = {
     inFocus: "In Focus",
     portfolio: "Portfolio",
     emptyCategory: "No projects in this category yet.",
+    collectionsTitle: "Work Collections",
+    collectionsDescription: "Explore the archive by design category.",
+    projectsLabel: "Projects",
+    backToCollections: "Back to all collections",
   },
   caseStudy: {
     projectOverview: "Project Overview",

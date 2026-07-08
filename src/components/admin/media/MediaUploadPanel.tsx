@@ -7,6 +7,7 @@ import { useMediaPicker } from "@/components/admin/media/MediaPickerContext";
 import { adminInputClass, adminLabelClass, adminSectionClass } from "@/components/admin/admin-styles";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
 import { interpolate } from "@/i18n/admin/storage";
+import { getErrorMessage } from "@/lib/errors";
 
 type MediaUploadPanelProps = {
   projectSlugs: string[];
@@ -79,10 +80,10 @@ export function MediaUploadPanel({
             await uploadFile(file, true);
             return;
           }
-          setError(data.error);
+          setError(getErrorMessage(data.error));
           return;
         }
-        setError(data.error || t.media.uploadFailed);
+        setError(data.error ? getErrorMessage(data.error) : t.media.uploadFailed);
         return;
       }
 

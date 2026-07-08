@@ -154,7 +154,7 @@ function ImageEditPopover({
         </button>
         <button
           type="button"
-          onClick={onClose}
+          onClick={() => onClose()}
           className="rounded-lg px-3 py-1.5 text-left text-xs text-muted"
         >
           Close

@@ -8,6 +8,7 @@ import { useMediaPicker } from "@/components/admin/media/MediaPickerContext";
 import { adminSectionClass, adminCardTitle } from "@/components/admin/admin-styles";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
 import type { MediaFileType } from "@/lib/admin/media.constants";
+import { getErrorMessage } from "@/lib/errors";
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -60,7 +61,7 @@ export function AdminMediaSection({ contentProjectSlugs: slugsProp }: AdminMedia
     });
     const data = await response.json();
     if (!response.ok) {
-      window.alert(data.error || t.media.deleteFailed);
+      window.alert(data.error ? getErrorMessage(data.error) : t.media.deleteFailed);
       return;
     }
     await refreshMedia();

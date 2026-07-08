@@ -2,7 +2,7 @@
 
 import { useAdminI18n } from "@/i18n/admin/AdminI18nProvider";
 
-const CARD_HEIGHT_CLASS = "h-[520px] md:h-[560px] lg:h-[540px] 2xl:h-[600px]";
+const CARD_HEIGHT_CLASS = "h-[520px] min-h-[520px]";
 
 type AddProjectCardProps = {
   onClick: () => void;
@@ -16,7 +16,7 @@ export function AddProjectCard({ onClick }: AddProjectCardProps) {
     <article className={`group relative ${CARD_HEIGHT_CLASS}`}>
       <button
         type="button"
-        onClick={onClick}
+        onClick={() => onClick()}
         className="flex h-full w-full flex-col items-center justify-center overflow-hidden rounded-[1.5rem] border border-dashed border-accent/25 bg-surface/35 px-6 text-center transition-[transform,border-color,box-shadow,background-color] duration-500 hover:-translate-y-1 hover:border-accent/55 hover:bg-accent/5 hover:shadow-[0_30px_90px_rgba(121,91,76,0.13)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <span

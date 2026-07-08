@@ -1,16 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { CursorVariant } from "@/components/motion/CustomCursor";
 
-type CursorAttribute = { "data-cursor"?: CursorVariant };
+type CursorAttribute<T extends HTMLElement = HTMLElement> = {
+  ref?: (node: T | null) => void;
+};
 
-export function useMountedCursor(variant?: CursorVariant | null): CursorAttribute {
-  const [mounted, setMounted] = useState(false);
+export function useMountedCursor<T extends HTMLElement = HTMLElement>(
+  variant?: CursorVariant | null,
+): CursorAttribute<T> {
+  const nodeRef = useRef<T | null>(null);
 
-  useEffect(() => {
-    setMounted(true);
+  const ref = useCallback((node: T | null) => {
+    if (nodeRef.current && nodeRef.current !== node) {
+      nodeRef.current.removeAttribute("data-cursor");
+    }
+    nodeRef.current = node;
   }, []);
 
-  return mounted && variant ? { "data-cursor": variant } : {};
+  useEffect(() => {
+    const node = nodeRef.current;
+    if (!node || !variant) return;
+
+    node.setAttribute("data-cursor", variant);
+    return () => {
+      node.removeAttribute("data-cursor");
+    };
+  }, [variant]);
+
+  return variant ? { ref } : {};
 }

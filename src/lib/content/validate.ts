@@ -1,5 +1,6 @@
 import type { ProjectCategory } from "@/types";
 import type { ContentProject, SiteContent } from "@/lib/content/types";
+import { ensureContentCollections } from "@/lib/content/collections";
 
 const VALID_CATEGORIES = new Set<ProjectCategory>([
   "branding",
@@ -60,6 +61,23 @@ function validateProject(project: unknown, index: number, errors: string[]): voi
     errors.push(`projects[${index}].galleryItems must be an array`);
   } else if (p.galleryItems.length > 24) {
     errors.push(`projects[${index}] has too many gallery items`);
+  }
+}
+
+function validateCollection(collection: unknown, index: number, errors: string[]): void {
+  if (!collection || typeof collection !== "object") {
+    errors.push(`collections[${index}] must be an object`);
+    return;
+  }
+  const item = collection as Record<string, unknown>;
+  if (typeof item.id !== "string" || !/^[a-z0-9-]+$/.test(item.id)) {
+    errors.push(`collections[${index}].id must be a lowercase id`);
+  }
+  requireLocaleField(item.slug, `collections[${index}].slug`, errors, true);
+  requireLocaleField(item.title, `collections[${index}].title`, errors, true);
+  requireLocaleField(item.description, `collections[${index}].description`, errors, false);
+  if (typeof item.order !== "number") {
+    errors.push(`collections[${index}].order must be a number`);
   }
 }
 
@@ -146,9 +164,35 @@ export function validateSiteContent(payload: unknown): ValidationResult {
     }
   }
 
+  if (data.collections !== undefined) {
+    if (!Array.isArray(data.collections)) {
+      errors.push("collections must be an array");
+    } else {
+      const ids = new Set<string>();
+      const slugsEn = new Set<string>();
+      const slugsTr = new Set<string>();
+      data.collections.forEach((collection, index) => {
+        validateCollection(collection, index, errors);
+        const item = collection as { id?: unknown; slug?: { en?: unknown; tr?: unknown } };
+        if (typeof item.id === "string") {
+          if (ids.has(item.id)) errors.push(`Duplicate collection id: ${item.id}`);
+          ids.add(item.id);
+        }
+        if (typeof item.slug?.en === "string") {
+          if (slugsEn.has(item.slug.en)) errors.push(`Duplicate collection EN slug: ${item.slug.en}`);
+          slugsEn.add(item.slug.en);
+        }
+        if (typeof item.slug?.tr === "string") {
+          if (slugsTr.has(item.slug.tr)) errors.push(`Duplicate collection TR slug: ${item.slug.tr}`);
+          slugsTr.add(item.slug.tr);
+        }
+      });
+    }
+  }
+
   if (errors.length > 0) {
     return { ok: false, errors };
   }
 
-  return { ok: true, data: payload as SiteContent };
+  return { ok: true, data: ensureContentCollections(payload as SiteContent) };
 }

@@ -60,6 +60,10 @@ export interface Dictionary {
     inFocus: string;
     portfolio: string;
     emptyCategory: string;
+    collectionsTitle: string;
+    collectionsDescription: string;
+    projectsLabel: string;
+    backToCollections: string;
   };
   caseStudy: {
     projectOverview: string;

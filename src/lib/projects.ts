@@ -14,8 +14,15 @@ import {
   getContentProjectBySlug,
   getContentProjectSlugs,
 } from "@/lib/content/resolve";
+import {
+  getCollectionBySlug,
+  getProjectsForCollection,
+  resolveWorkCollection,
+  resolveWorkCollections,
+  type ResolvedWorkCollection,
+} from "@/lib/content/collections";
 import { loadSiteContent } from "@/lib/content/loader";
-import type { ContentProject } from "@/lib/content/types";
+import type { ContentCollection, ContentProject } from "@/lib/content/types";
 import { resolveGalleryItems, resolveProject } from "@/lib/images.server";
 
 function applyStaticLocale(project: Project, locale: Locale): Project {
@@ -146,6 +153,41 @@ export async function getFeaturedProjects(
   const projects = await getAllProjects(locale);
   const featured = projects.filter((project) => project.featured);
   return featured.length > 0 ? featured : projects.slice(0, 4);
+}
+
+export async function getAllWorkCollections(
+  locale: Locale = "en",
+): Promise<ResolvedWorkCollection[]> {
+  const content = await loadSiteContent();
+  return resolveWorkCollections(content.collections, locale);
+}
+
+export async function getWorkCollectionBySlug(
+  slug: string,
+  locale: Locale = "en",
+): Promise<ContentCollection | undefined> {
+  const content = await loadSiteContent();
+  return getCollectionBySlug(content.collections, slug, locale);
+}
+
+export async function getProjectsForWorkCollection(
+  collectionId: string,
+  locale: Locale = "en",
+): Promise<ResolvedProject[]> {
+  const content = await loadSiteContent();
+  const collection = content.collections.find((item) => item.id === collectionId);
+  if (!collection) return [];
+  return getProjectsForCollection(content.projects, content.collections, collectionId).map((source) =>
+    resolveContentProject(contentProjectToProject(source, locale), source),
+  );
+}
+
+export async function getResolvedWorkCollectionBySlug(
+  slug: string,
+  locale: Locale = "en",
+): Promise<ResolvedWorkCollection | undefined> {
+  const collection = await getWorkCollectionBySlug(slug, locale);
+  return collection ? resolveWorkCollection(collection, locale) : undefined;
 }
 
 export async function getProjectGallery(

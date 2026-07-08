@@ -101,7 +101,7 @@ export function MediaPickerModal({
             >
               {showUpload ? t.media.hideUpload : t.media.uploadImage}
             </button>
-            <button type="button" onClick={onClose} className="text-sm text-muted hover:text-foreground">
+            <button type="button" onClick={() => onClose()} className="text-sm text-muted hover:text-foreground">
               {t.common.close}
             </button>
           </div>

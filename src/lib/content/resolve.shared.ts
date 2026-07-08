@@ -38,6 +38,7 @@ export function contentProjectToProject(
 
   const base: Project = {
     slug: project.slug,
+    collectionId: project.collectionId,
     title: pickLocale(project.title, locale),
     category: pickLocale(project.category, locale),
     filterCategory: project.filterCategory,

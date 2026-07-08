@@ -22,6 +22,7 @@ export type CreateProjectDraftInput = {
   titleEn: string;
   titleTr: string;
   slug: string;
+  collectionId: string;
   filterCategory: ProjectCategory;
   year: string;
   client: string;
@@ -76,6 +77,7 @@ export function createProjectDraft(input: CreateProjectDraftInput): ContentProje
 
   return {
     slug,
+    collectionId: input.collectionId,
     title: ls(titleEn, titleTr),
     category,
     filterCategory: input.filterCategory,

@@ -22,12 +22,15 @@ import {
   slugifyProjectTitle,
   type CreateProjectDraftInput,
 } from "@/lib/admin/create-project";
-import type { ContentProject } from "@/lib/content/types";
+import type { ContentCollection, ContentProject } from "@/lib/content/types";
 import { useAdminI18n } from "@/i18n/admin/AdminI18nProvider";
+import { getDefaultCollectionId } from "@/lib/content/collections";
+import { pickLocale } from "@/lib/content/locale-field";
 
 type CreateProjectModalProps = {
   open: boolean;
   existingSlugs: string[];
+  collections: ContentCollection[];
   onClose: () => void;
   onCreate: (project: ContentProject) => void;
 };
@@ -41,6 +44,7 @@ function currentYear() {
 export function CreateProjectModal({
   open,
   existingSlugs,
+  collections,
   onClose,
   onCreate,
 }: CreateProjectModalProps) {
@@ -54,6 +58,7 @@ export function CreateProjectModal({
     titleEn: "",
     titleTr: "",
     slug: "",
+    collectionId: getDefaultCollectionId(collections),
     filterCategory: "branding",
     year: currentYear(),
     client: "",
@@ -78,6 +83,7 @@ export function CreateProjectModal({
       titleEn: "",
       titleTr: "",
       slug: "",
+      collectionId: getDefaultCollectionId(collections),
       filterCategory: "branding",
       year: currentYear(),
       client: "",
@@ -89,7 +95,7 @@ export function CreateProjectModal({
       heroImagePath: "",
       featured: false,
     });
-  }, [open]);
+  }, [collections, open]);
 
   useEffect(() => {
     if (!open) return;
@@ -105,12 +111,14 @@ export function CreateProjectModal({
   const titleMissing = !form.titleEn.trim() && !form.titleTr.trim();
   const slugMissing = !normalizedSlug;
   const slugInvalid = Boolean(normalizedSlug) && !isValidProjectSlug(normalizedSlug);
+  const collectionMissing = !form.collectionId;
 
   const errors = [
     titleMissing ? copy.errors.titleRequired : null,
     slugMissing ? copy.errors.slugRequired : null,
     slugInvalid ? copy.errors.slugInvalid : null,
     slugDuplicate ? copy.errors.slugDuplicate : null,
+    collectionMissing ? copy.errors.collectionRequired : null,
   ].filter((message): message is string => Boolean(message));
 
   const uploadProjectSlugs = useMemo(() => {
@@ -161,7 +169,7 @@ export function CreateProjectModal({
       role="dialog"
       aria-modal="true"
       aria-label={copy.modalTitle}
-      onClick={onClose}
+      onClick={() => onClose()}
     >
       <div
         className="flex max-h-[92vh] w-full max-w-5xl flex-col overflow-hidden rounded-[1.5rem] border border-border-soft bg-surface shadow-[0_30px_100px_rgba(61,56,52,0.22)]"
@@ -181,7 +189,7 @@ export function CreateProjectModal({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={() => onClose()}
             className="rounded-full border border-border px-3 py-1.5 text-xs text-muted transition hover:border-accent hover:text-foreground"
           >
             {t.common.close}
@@ -238,6 +246,28 @@ export function CreateProjectModal({
                   </option>
                 ))}
               </select>
+            </label>
+            <label className={adminLabelClass()}>
+              {copy.fields.collection}
+              <select
+                value={form.collectionId}
+                onChange={(event) =>
+                  setForm((current) => ({
+                    ...current,
+                    collectionId: event.target.value,
+                  }))
+                }
+                className={adminInputClass()}
+              >
+                {collections.map((collection) => (
+                  <option key={collection.id} value={collection.id}>
+                    {pickLocale(collection.title, locale)}
+                  </option>
+                ))}
+              </select>
+              <span className="text-xs font-normal leading-relaxed text-muted">
+                {copy.fields.collectionHelper}
+              </span>
             </label>
             <label className={adminLabelClass()}>
               {copy.fields.year}
@@ -386,7 +416,7 @@ export function CreateProjectModal({
         </div>
 
         <div className="flex flex-wrap justify-end gap-3 border-t border-border-soft px-6 py-4">
-          <button type="button" onClick={onClose} className={adminSecondaryButtonClass()}>
+          <button type="button" onClick={() => onClose()} className={adminSecondaryButtonClass()}>
             {t.common.discard}
           </button>
           <button

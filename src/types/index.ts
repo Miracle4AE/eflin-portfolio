@@ -33,6 +33,7 @@ export interface ProjectImages {
 
 export interface Project {
   slug: string;
+  collectionId?: string;
   title: string;
   category: string;
   filterCategory: ProjectCategory;

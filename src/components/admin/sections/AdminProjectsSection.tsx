@@ -14,7 +14,7 @@ import {
 } from "@/lib/admin/validation-report";
 import { ls } from "@/lib/content/locale-field";
 import { adminInputClass, adminLabelClass } from "@/components/admin/admin-styles";
-import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
+import { useAdminI18n } from "@/i18n/admin/AdminI18nProvider";
 import { interpolate } from "@/i18n/admin/storage";
 import {
   createProjectDraft,
@@ -22,6 +22,8 @@ import {
   PROJECT_CATEGORIES,
   slugifyProjectTitle,
 } from "@/lib/admin/create-project";
+import { pickLocale } from "@/lib/content/locale-field";
+import { getDefaultCollectionId } from "@/lib/content/collections";
 
 function CompletionBar({ label, value }: { label: string; value: number }) {
   return (
@@ -38,7 +40,7 @@ function CompletionBar({ label, value }: { label: string; value: number }) {
 }
 
 export function AdminProjectsSection() {
-  const t = useAdminT();
+  const { t, locale } = useAdminI18n();
   const hints = useContentHints();
   const { content, setContent } = useAdminContent();
   const [selectedSlug, setSelectedSlug] = useState(content.projects[0]?.slug ?? "");
@@ -87,6 +89,7 @@ export function AdminProjectsSection() {
         titleEn: "New Project",
         titleTr: "Yeni Proje",
         slug,
+        collectionId: getDefaultCollectionId(content.collections),
         filterCategory: "branding",
         year: new Date().getFullYear().toString(),
         client: "",
@@ -307,6 +310,27 @@ export function AdminProjectsSection() {
                       </option>
                     ))}
                   </select>
+                </label>
+                <label className={adminLabelClass()}>
+                  {t.projects.collection}
+                  <RequiredMark />
+                  <select
+                    value={selected.collectionId ?? getDefaultCollectionId(content.collections)}
+                    onChange={(e) =>
+                      updateProject({
+                        ...selected,
+                        collectionId: e.target.value,
+                      })
+                    }
+                    className={adminInputClass()}
+                  >
+                    {content.collections.map((collection) => (
+                      <option key={collection.id} value={collection.id}>
+                        {pickLocale(collection.title, locale)}
+                      </option>
+                    ))}
+                  </select>
+                  <FieldHint>{t.projects.collectionHint}</FieldHint>
                 </label>
                 <label className={adminLabelClass()}>
                   {t.projects.year}

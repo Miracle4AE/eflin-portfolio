@@ -12,6 +12,7 @@ export type AdminSectionId =
   | "dashboard"
   | "homepage"
   | "projects"
+  | "collections"
   | "media"
   | "validation"
   | "settings"
@@ -54,6 +55,7 @@ export function AdminShell({
     { id: "dashboard", label: t.nav.dashboard, icon: "◆" },
     { id: "homepage", label: t.nav.homepage, icon: "⌂" },
     { id: "projects", label: t.nav.projects, icon: "▦" },
+    { id: "collections", label: t.nav.collections, icon: "◫" },
     { id: "media", label: t.nav.media, icon: "▣" },
     { id: "validation", label: t.nav.health, icon: "✓" },
     { id: "settings", label: t.nav.settings, icon: "⚙" },

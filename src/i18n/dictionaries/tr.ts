@@ -47,6 +47,10 @@ export const dictionaryTr: Dictionary = {
     inFocus: "Öne Çıkan",
     portfolio: "Portfolyo",
     emptyCategory: "Bu kategoride henüz proje yok.",
+    collectionsTitle: "İş Kategorileri",
+    collectionsDescription: "Tasarım arşivini kategoriye göre keşfedin.",
+    projectsLabel: "Proje",
+    backToCollections: "Tüm koleksiyonlara dön",
   },
   caseStudy: {
     projectOverview: "Proje Özeti",

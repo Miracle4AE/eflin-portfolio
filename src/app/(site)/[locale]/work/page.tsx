@@ -3,9 +3,9 @@ import { notFound } from "next/navigation";
 import { isLocale, type Locale } from "@/i18n/config";
 import { WorkIndex } from "@/components/work/WorkIndex";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { getAllProjects } from "@/lib/projects";
+import { getAllProjects, getAllWorkCollections } from "@/lib/projects";
 import { buildWorkMetadata } from "@/lib/seo";
-import { buildCollectionPageSchema } from "@/lib/schema";
+import { buildWorkCollectionsPageSchema } from "@/lib/schema";
 
 interface WorkPageProps {
   params: Promise<{ locale: string }>;
@@ -25,12 +25,13 @@ export default async function WorkPage({ params }: WorkPageProps) {
   const locale = localeParam as Locale;
 
   const projects = await getAllProjects(locale);
-  const collectionSchema = await buildCollectionPageSchema(projects, locale);
+  const collections = await getAllWorkCollections(locale);
+  const collectionSchema = await buildWorkCollectionsPageSchema(collections, locale);
 
   return (
     <>
       <JsonLd data={collectionSchema} />
-      <WorkIndex projects={projects} />
+      <WorkIndex projects={projects} collections={collections} />
     </>
   );
 }

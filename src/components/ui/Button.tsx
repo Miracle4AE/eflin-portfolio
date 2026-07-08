@@ -156,7 +156,7 @@ export function Button({
 
       type="button"
 
-      onClick={onClick}
+      onClick={onClick ? () => onClick() : undefined}
 
       aria-label={ariaLabel}
 

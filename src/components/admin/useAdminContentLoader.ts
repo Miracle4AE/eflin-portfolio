@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import type { SiteContent } from "@/lib/content/types";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
+import { getErrorMessage } from "@/lib/errors";
 
 export type AdminSaveResult = {
   ok: boolean;
@@ -26,19 +27,24 @@ export function useAdminContentLoader() {
   const loadContent = useCallback(async () => {
     setLoading(true);
     setLoadError("");
-    const contentRes = await fetch("/api/admin/content?fresh=1");
+    try {
+      const contentRes = await fetch("/api/admin/content?fresh=1");
 
-    if (!contentRes.ok) {
-      setLoadError(t.toasts.loadFailed);
+      if (!contentRes.ok) {
+        setLoadError(t.toasts.loadFailed);
+        setLoading(false);
+        return;
+      }
+
+      const data = await contentRes.json();
+      setInitialContent(data.content);
+      setCanWrite(Boolean(data.canWrite));
+      setSaveMode(data.saveMode);
+    } catch (error) {
+      setLoadError(getErrorMessage(error));
+    } finally {
       setLoading(false);
-      return;
     }
-
-    const data = await contentRes.json();
-    setInitialContent(data.content);
-    setCanWrite(Boolean(data.canWrite));
-    setSaveMode(data.saveMode);
-    setLoading(false);
   }, [t.toasts.loadFailed]);
 
   useEffect(() => {
@@ -58,14 +64,19 @@ export function useAdminContentLoader() {
       if (!response.ok) {
         return {
           ok: false,
-          error: data.error || data.details?.join(", ") || t.toasts.saveFailed,
+          error:
+            typeof data.error === "string"
+              ? data.error
+              : Array.isArray(data.details)
+                ? data.details.join(", ")
+                : t.toasts.saveFailed,
         };
       }
 
       if (!data.verified) {
         return {
           ok: false,
-          error: data.error || t.toasts.verificationFailed,
+          error: typeof data.error === "string" ? data.error : t.toasts.verificationFailed,
         };
       }
 
@@ -89,7 +100,7 @@ export function useAdminContentLoader() {
 
       return {
         ok: true,
-        message: data.message || t.toasts.savedVerified,
+        message: typeof data.message === "string" ? data.message : t.toasts.savedVerified,
         revisionId: data.revisionId,
         updatedAt: data.updatedAt,
         verified: true,

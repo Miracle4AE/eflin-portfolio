@@ -23,6 +23,7 @@ import {
 } from "@/lib/admin/draft";
 import type { AdminSaveResult } from "@/components/admin/useAdminContentLoader";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
+import { getErrorMessage } from "@/lib/errors";
 
 export type Toast = {
   id: string;
@@ -106,9 +107,9 @@ export function AdminContentProvider({
 
   const validation = useMemo(() => buildValidationReport(content), [content]);
 
-  const addToast = useCallback((type: Toast["type"], message: string) => {
+  const addToast = useCallback((type: Toast["type"], message: unknown) => {
     const id = `${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev, { id, type, message }]);
+    setToasts((prev) => [...prev, { id, type, message: getErrorMessage(message) }]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((toast) => toast.id !== id));
     }, 5000);
@@ -149,32 +150,37 @@ export function AdminContentProvider({
   const save = useCallback(async () => {
     setSaving(true);
     setSavePhase("saving");
-    const result = await onSave(content, (phase) => setSavePhase(phase));
-    setSaving(false);
-    setSavePhase("idle");
+    try {
+      const result = await onSave(content, (phase) => setSavePhase(phase));
 
-    if (result.ok && result.verified && result.content) {
-      setContent(result.content);
-      setSavedContent(result.content);
-      setLastSavedAt(result.updatedAt ? new Date(result.updatedAt) : new Date());
-      if (result.revisionId && result.updatedAt) {
-        setSaveMeta({
-          revisionId: result.revisionId,
-          updatedAt: result.updatedAt,
-          verified: true,
-        });
+      if (result.ok && result.verified && result.content) {
+        setContent(result.content);
+        setSavedContent(result.content);
+        setLastSavedAt(result.updatedAt ? new Date(result.updatedAt) : new Date());
+        if (result.revisionId && result.updatedAt) {
+          setSaveMeta({
+            revisionId: result.revisionId,
+            updatedAt: result.updatedAt,
+            verified: true,
+          });
+        }
+        clearDraft();
+        addToast("success", result.message ?? t.toasts.savedVerified);
+        return;
       }
-      clearDraft();
-      addToast("success", result.message ?? t.toasts.savedVerified);
-      return;
-    }
 
-    if (result.ok && !result.verified) {
-      addToast("error", t.toasts.verificationFailed);
-      return;
-    }
+      if (result.ok && !result.verified) {
+        addToast("error", t.toasts.verificationFailed);
+        return;
+      }
 
-    addToast("error", result.error ?? t.toasts.saveFailed);
+      addToast("error", result.error ?? t.toasts.saveFailed);
+    } catch (error) {
+      addToast("error", getErrorMessage(error));
+    } finally {
+      setSaving(false);
+      setSavePhase("idle");
+    }
   }, [content, onSave, addToast, t.toasts.savedVerified, t.toasts.verificationFailed, t.toasts.saveFailed]);
 
   const resetChanges = useCallback(() => {

@@ -3,6 +3,7 @@ import { projectTranslationsTr } from "@/data/projects-i18n-tr";
 import { siteConfig } from "@/data/site";
 import { dictionaryEn } from "@/i18n/dictionaries/en";
 import { dictionaryTr } from "@/i18n/dictionaries/tr";
+import { DEFAULT_COLLECTIONS } from "@/lib/content/collections";
 import { ls } from "@/lib/content/locale-field";
 import type { ContentProject, SiteContent } from "@/lib/content/types";
 
@@ -140,6 +141,7 @@ export function buildFallbackSiteContent(): SiteContent {
       contactDescription: ls(en.meta.contactDescription, tr.meta.contactDescription),
       ogImagePath: "/images/portrait.jpg",
     },
+    collections: DEFAULT_COLLECTIONS,
     projects: rawProjects.map((p) => projectToContent(p)),
   };
 }

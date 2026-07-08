@@ -26,9 +26,12 @@ import { useMediaPicker } from "@/components/admin/media/MediaPickerContext";
 import { buildVisualPreviewData, getVisualProjectGallery } from "@/lib/content/visual-preview";
 import { useDictionary } from "@/i18n/locale-context";
 import type { ResolvedGalleryItem } from "@/types";
-import type { ContentProject } from "@/lib/content/types";
+import type { ContentCollection, ContentProject } from "@/lib/content/types";
 import { AddProjectCard } from "@/components/admin/visual/AddProjectCard";
+import { AddCollectionCard } from "@/components/admin/visual/AddCollectionCard";
 import { CreateProjectModal } from "@/components/admin/visual/CreateProjectModal";
+import { CollectionModal } from "@/components/admin/collections/CollectionModal";
+import { useAdminI18n } from "@/i18n/admin/AdminI18nProvider";
 
 type VisualPageRendererProps = {
   page: VisualPageId;
@@ -71,11 +74,13 @@ export function VisualPageRenderer({
   editLocale,
   projectSlug,
   onProjectCreated,
-  onProjectOpen,
 }: VisualPageRendererProps) {
   const { content, setContent } = useAdminContent();
+  const { t: adminT } = useAdminI18n();
   const { files } = useMediaPicker();
   const [createProjectOpen, setCreateProjectOpen] = useState(false);
+  const [collectionModalOpen, setCollectionModalOpen] = useState(false);
+  const [editingCollection, setEditingCollection] = useState<ContentCollection | null>(null);
   const knownMediaPaths = useMemo(
     () => new Set(files.map((file) => file.path)),
     [files],
@@ -116,6 +121,28 @@ export function VisualPageRenderer({
     onProjectCreated?.(projectDraft.slug);
   }
 
+  function handleSaveCollection(collection: ContentCollection) {
+    setContent((current) => {
+      const exists = current.collections.some((item) => item.id === collection.id);
+      return {
+        ...current,
+        collections: exists
+          ? current.collections.map((item) => (item.id === collection.id ? collection : item))
+          : [...current.collections, collection],
+      };
+    });
+  }
+
+  function openCollectionCreate() {
+    setEditingCollection(null);
+    setCollectionModalOpen(true);
+  }
+
+  function openCollectionEdit(collectionId: string) {
+    setEditingCollection(content.collections.find((item) => item.id === collectionId) ?? null);
+    setCollectionModalOpen(true);
+  }
+
   return (
     <VisualEditProvider page={page} projectSlug={project?.slug} editLocale={editLocale}>
       <LocaleProvider
@@ -141,12 +168,28 @@ export function VisualPageRenderer({
             <>
               <WorkIndex
                 projects={preview.projects}
-                onVisualProjectOpen={onProjectOpen}
-                afterGridItems={<AddProjectCard onClick={() => setCreateProjectOpen(true)} />}
+                collections={preview.collections}
+                collectionEditLabel={adminT.collections.editCollectionBadge}
+                onCollectionEdit={openCollectionEdit}
+                afterGridItems={
+                  <>
+                    <AddCollectionCard onClick={openCollectionCreate} />
+                    <AddProjectCard onClick={() => setCreateProjectOpen(true)} />
+                  </>
+                }
+              />
+              <CollectionModal
+                open={collectionModalOpen}
+                collections={content.collections}
+                collection={editingCollection}
+                projects={content.projects}
+                onClose={() => setCollectionModalOpen(false)}
+                onSave={handleSaveCollection}
               />
               <CreateProjectModal
                 open={createProjectOpen}
                 existingSlugs={content.projects.map((item) => item.slug)}
+                collections={content.collections}
                 onClose={() => setCreateProjectOpen(false)}
                 onCreate={handleCreateProject}
               />

@@ -85,7 +85,7 @@ export function Lightbox({
       transition={transition}
       className="fixed inset-0 z-[100] flex items-center justify-center bg-background/95 backdrop-blur-sm"
       role="presentation"
-      onClick={onClose}
+      onClick={() => onClose()}
     >
         <motion.div
           key={item.id}
@@ -108,7 +108,7 @@ export function Lightbox({
             <button
               ref={closeButtonRef}
               type="button"
-              onClick={onClose}
+              onClick={() => onClose()}
               className="flex h-10 w-10 items-center justify-center border border-foreground/15 text-xs uppercase tracking-[0.2em] text-muted transition-colors hover:border-accent/40 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               aria-label={dict.caseStudy.closeGallery}
             >
