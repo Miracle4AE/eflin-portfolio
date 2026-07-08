@@ -12,6 +12,7 @@ import { Services } from "@/components/sections/Services";
 import { ProjectShowcase } from "@/components/sections/ProjectShowcase";
 import { Contact } from "@/components/sections/Contact";
 import { WorkIndex } from "@/components/work/WorkIndex";
+import { CollectionProjectsIndex } from "@/components/work/CollectionProjectsIndex";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { CaseStudyHero } from "@/components/case-study/CaseStudyHero";
 import { CaseStudyMeta } from "@/components/case-study/CaseStudyMeta";
@@ -27,6 +28,7 @@ import { buildVisualPreviewData, getVisualProjectGallery } from "@/lib/content/v
 import { useDictionary } from "@/i18n/locale-context";
 import type { ResolvedGalleryItem } from "@/types";
 import type { ContentCollection, ContentProject } from "@/lib/content/types";
+import { getProjectsForCollection } from "@/lib/content/collections";
 import { AddProjectCard } from "@/components/admin/visual/AddProjectCard";
 import { AddCollectionCard } from "@/components/admin/visual/AddCollectionCard";
 import { CreateProjectModal } from "@/components/admin/visual/CreateProjectModal";
@@ -37,8 +39,11 @@ type VisualPageRendererProps = {
   page: VisualPageId;
   editLocale: Locale;
   projectSlug: string;
+  selectedCollectionId?: string;
   onProjectCreated?: (slug: string) => void;
   onProjectOpen?: (slug: string) => void;
+  onCollectionOpen?: (collectionId: string) => void;
+  onBackToCollections?: () => void;
 };
 
 function ProjectNarrativeSections({ slug }: { slug: string }) {
@@ -73,7 +78,11 @@ export function VisualPageRenderer({
   page,
   editLocale,
   projectSlug,
+  selectedCollectionId,
   onProjectCreated,
+  onProjectOpen,
+  onCollectionOpen,
+  onBackToCollections,
 }: VisualPageRendererProps) {
   const { content, setContent } = useAdminContent();
   const { t: adminT } = useAdminI18n();
@@ -93,6 +102,12 @@ export function VisualPageRenderer({
 
   const project =
     preview.projects.find((p) => p.slug === projectSlug) ?? preview.projects[0];
+  const selectedCollection = selectedCollectionId
+    ? preview.collections.find((collection) => collection.id === selectedCollectionId)
+    : undefined;
+  const selectedCollectionProjects = selectedCollection
+    ? getProjectsForCollection(preview.projects, content.collections, selectedCollection.id)
+    : [];
   const nextProject =
     preview.projects[
       (preview.projects.findIndex((p) => p.slug === project?.slug) + 1) %
@@ -150,7 +165,7 @@ export function VisualPageRenderer({
         dictionary={preview.dictionary}
         siteConfig={preview.siteConfig}
       >
-        <div className="visual-editor-canvas bg-background pt-16">
+        <div className="visual-editor-canvas bg-background pt-28">
           <Header locale={editLocale} previewMode />
           {page === "homepage" ? (
             <>
@@ -166,18 +181,32 @@ export function VisualPageRenderer({
           ) : null}
           {page === "work" ? (
             <>
-              <WorkIndex
-                projects={preview.projects}
-                collections={preview.collections}
-                collectionEditLabel={adminT.collections.editCollectionBadge}
-                onCollectionEdit={openCollectionEdit}
-                afterGridItems={
-                  <>
-                    <AddCollectionCard onClick={openCollectionCreate} />
+              {selectedCollection ? (
+                <CollectionProjectsIndex
+                  collection={selectedCollection}
+                  projects={selectedCollectionProjects}
+                  workPath={`/${editLocale}/work`}
+                  onBackToCollections={onBackToCollections}
+                  onProjectOpen={onProjectOpen}
+                  afterGridItems={
                     <AddProjectCard onClick={() => setCreateProjectOpen(true)} />
-                  </>
-                }
-              />
+                  }
+                />
+              ) : (
+                <WorkIndex
+                  projects={preview.projects}
+                  collections={preview.collections}
+                  collectionEditLabel={adminT.collections.editCollectionBadge}
+                  onCollectionEdit={openCollectionEdit}
+                  onCollectionOpen={onCollectionOpen}
+                  afterGridItems={
+                    <>
+                      <AddCollectionCard onClick={openCollectionCreate} />
+                      <AddProjectCard onClick={() => setCreateProjectOpen(true)} />
+                    </>
+                  }
+                />
+              )}
               <CollectionModal
                 open={collectionModalOpen}
                 collections={content.collections}
@@ -190,6 +219,7 @@ export function VisualPageRenderer({
                 open={createProjectOpen}
                 existingSlugs={content.projects.map((item) => item.slug)}
                 collections={content.collections}
+                defaultCollectionId={selectedCollection?.id}
                 onClose={() => setCreateProjectOpen(false)}
                 onCreate={handleCreateProject}
               />

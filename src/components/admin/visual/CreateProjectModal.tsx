@@ -31,6 +31,7 @@ type CreateProjectModalProps = {
   open: boolean;
   existingSlugs: string[];
   collections: ContentCollection[];
+  defaultCollectionId?: string;
   onClose: () => void;
   onCreate: (project: ContentProject) => void;
 };
@@ -45,6 +46,7 @@ export function CreateProjectModal({
   open,
   existingSlugs,
   collections,
+  defaultCollectionId,
   onClose,
   onCreate,
 }: CreateProjectModalProps) {
@@ -58,7 +60,7 @@ export function CreateProjectModal({
     titleEn: "",
     titleTr: "",
     slug: "",
-    collectionId: getDefaultCollectionId(collections),
+    collectionId: defaultCollectionId ?? getDefaultCollectionId(collections),
     filterCategory: "branding",
     year: currentYear(),
     client: "",
@@ -83,7 +85,7 @@ export function CreateProjectModal({
       titleEn: "",
       titleTr: "",
       slug: "",
-      collectionId: getDefaultCollectionId(collections),
+      collectionId: defaultCollectionId ?? getDefaultCollectionId(collections),
       filterCategory: "branding",
       year: currentYear(),
       client: "",
@@ -95,7 +97,7 @@ export function CreateProjectModal({
       heroImagePath: "",
       featured: false,
     });
-  }, [collections, open]);
+  }, [collections, defaultCollectionId, open]);
 
   useEffect(() => {
     if (!open) return;

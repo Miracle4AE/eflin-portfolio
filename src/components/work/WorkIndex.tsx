@@ -16,6 +16,7 @@ interface WorkIndexProps {
   collections: ResolvedWorkCollection[];
   afterGridItems?: ReactNode;
   onCollectionEdit?: (collectionId: string) => void;
+  onCollectionOpen?: (collectionId: string) => void;
   collectionEditLabel?: string;
 }
 
@@ -24,6 +25,7 @@ export function WorkIndex({
   collections,
   afterGridItems,
   onCollectionEdit,
+  onCollectionOpen,
   collectionEditLabel,
 }: WorkIndexProps) {
   const dict = useDictionary();
@@ -74,6 +76,7 @@ export function WorkIndex({
               projectsLabel={dict.work.projectsLabel}
               editLabel={collectionEditLabel}
               onEdit={onCollectionEdit}
+              onOpen={onCollectionOpen}
             />
           ))}
           {afterGridItems}

@@ -10,12 +10,21 @@ import { VisualEditorToolbar } from "@/components/admin/visual/VisualEditorToolb
 import { VisualPageRenderer } from "@/components/admin/visual/VisualPageRenderer";
 import type { VisualPageId } from "@/components/admin/visual/VisualEditContext";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
+import { pickLocale } from "@/lib/content/locale-field";
+
+type VisualViewMode =
+  | "homepage"
+  | "workCollections"
+  | "collectionProjects"
+  | "projectDetail"
+  | "contact";
 
 function VisualEditorWorkspace({ onLogout }: { onLogout: () => void }) {
   const t = useAdminT();
   const { content } = useAdminContent();
   const [page, setPage] = useState<VisualPageId>("homepage");
   const [projectSlug, setProjectSlug] = useState("");
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | undefined>();
   const [editLocale, setEditLocale] = useState<Locale>("tr");
 
   useEffect(() => {
@@ -24,15 +33,53 @@ function VisualEditorWorkspace({ onLogout }: { onLogout: () => void }) {
     }
   }, [content.projects, projectSlug]);
 
+  useEffect(() => {
+    if (
+      selectedCollectionId &&
+      !content.collections.some((collection) => collection.id === selectedCollectionId)
+    ) {
+      setSelectedCollectionId(undefined);
+    }
+  }, [content.collections, selectedCollectionId]);
+
+  const selectedCollection = selectedCollectionId
+    ? content.collections.find((collection) => collection.id === selectedCollectionId)
+    : undefined;
+  const viewMode: VisualViewMode =
+    page === "homepage"
+      ? "homepage"
+      : page === "contact"
+        ? "contact"
+        : page === "project"
+          ? "projectDetail"
+          : selectedCollection
+            ? "collectionProjects"
+            : "workCollections";
+
   return (
     <>
       <VisualEditorToolbar
         page={page}
         projectSlug={projectSlug}
         projectSlugs={content.projects.map((p) => p.slug)}
+        viewMode={viewMode}
+        breadcrumb={
+          selectedCollection
+            ? `${t.visualEditor.pages.work} / ${pickLocale(selectedCollection.title, editLocale)}`
+            : undefined
+        }
+        onBackToCollections={
+          selectedCollection
+            ? () => {
+                setSelectedCollectionId(undefined);
+                setPage("work");
+              }
+            : undefined
+        }
         editLocale={editLocale}
         onPageChange={(nextPage, slug) => {
           setPage(nextPage);
+          setSelectedCollectionId(undefined);
           if (slug) setProjectSlug(slug);
         }}
         onLocaleChange={setEditLocale}
@@ -44,10 +91,19 @@ function VisualEditorWorkspace({ onLogout }: { onLogout: () => void }) {
           page={page}
           editLocale={editLocale}
           projectSlug={projectSlug}
+          selectedCollectionId={selectedCollection?.id}
           onProjectCreated={(slug) => setProjectSlug(slug)}
           onProjectOpen={(slug) => {
             setProjectSlug(slug);
             setPage("project");
+          }}
+          onCollectionOpen={(collectionId) => {
+            setSelectedCollectionId(collectionId);
+            setPage("work");
+          }}
+          onBackToCollections={() => {
+            setSelectedCollectionId(undefined);
+            setPage("work");
           }}
         />
       </div>

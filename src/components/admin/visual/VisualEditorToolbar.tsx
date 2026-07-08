@@ -12,6 +12,9 @@ type VisualEditorToolbarProps = {
   page: VisualPageId;
   projectSlug: string;
   projectSlugs: string[];
+  viewMode?: string;
+  breadcrumb?: string;
+  onBackToCollections?: () => void;
   editLocale: Locale;
   onPageChange: (page: VisualPageId, projectSlug?: string) => void;
   onLocaleChange: (locale: Locale) => void;
@@ -22,6 +25,9 @@ export function VisualEditorToolbar({
   page,
   projectSlug,
   projectSlugs,
+  viewMode,
+  breadcrumb,
+  onBackToCollections,
   editLocale,
   onPageChange,
   onLocaleChange,
@@ -53,8 +59,24 @@ export function VisualEditorToolbar({
             <p className="text-[10px] uppercase tracking-[0.22em] text-accent">
               {t.visualEditor.brand}
             </p>
-            <p className="truncate text-sm text-muted">{t.visualEditor.subtitle}</p>
+            <p className="truncate text-sm text-muted">{breadcrumb ?? t.visualEditor.subtitle}</p>
           </div>
+
+          {onBackToCollections ? (
+            <button
+              type="button"
+              onClick={() => onBackToCollections()}
+              className="rounded-full border border-border-soft bg-surface/60 px-3 py-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-muted transition hover:border-accent/35 hover:text-foreground"
+            >
+              ← {editLocale === "tr" ? "Koleksiyonlara dön" : "Back to collections"}
+            </button>
+          ) : null}
+
+          {viewMode ? (
+            <span className="rounded-full border border-border-soft px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-muted">
+              {viewMode}
+            </span>
+          ) : null}
 
           <label className="flex items-center gap-2 text-xs text-muted">
             <span>{t.visualEditor.page}</span>
