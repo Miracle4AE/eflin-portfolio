@@ -29,6 +29,10 @@ import { useDictionary } from "@/i18n/locale-context";
 import type { ResolvedGalleryItem } from "@/types";
 import type { ContentCollection, ContentProject } from "@/lib/content/types";
 import { getProjectsForCollection } from "@/lib/content/collections";
+import {
+  deleteCollectionAndReassignProjects,
+  type DeleteCollectionStrategy,
+} from "@/lib/admin/collections";
 import { AddProjectCard } from "@/components/admin/visual/AddProjectCard";
 import { AddCollectionCard } from "@/components/admin/visual/AddCollectionCard";
 import { CreateProjectModal } from "@/components/admin/visual/CreateProjectModal";
@@ -148,6 +152,21 @@ export function VisualPageRenderer({
     });
   }
 
+  function handleDeleteCollection(collection: ContentCollection, strategy: DeleteCollectionStrategy) {
+    setContent((current) => ({
+      ...current,
+      ...deleteCollectionAndReassignProjects({
+        collections: current.collections,
+        projects: current.projects,
+        collectionId: collection.id,
+        strategy,
+      }),
+    }));
+    if (collection.id === selectedCollectionId) {
+      onBackToCollections?.();
+    }
+  }
+
   function openCollectionCreate() {
     setEditingCollection(null);
     setCollectionModalOpen(true);
@@ -214,6 +233,7 @@ export function VisualPageRenderer({
                 projects={content.projects}
                 onClose={() => setCollectionModalOpen(false)}
                 onSave={handleSaveCollection}
+                onDelete={handleDeleteCollection}
               />
               <CreateProjectModal
                 open={createProjectOpen}

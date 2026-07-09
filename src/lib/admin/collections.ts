@@ -19,6 +19,7 @@ export type CollectionFormValues = {
 };
 
 export type DeleteCollectionStrategy =
+  | { type: "delete-empty" }
   | { type: "move-to-other" }
   | { type: "move-to-collection"; targetCollectionId: string }
   | { type: "block" };
@@ -143,6 +144,30 @@ export function reorderCollections(
   }));
 }
 
+function buildOtherCollection(order: number): ContentCollection {
+  const now = new Date().toISOString();
+  return {
+    id: "other",
+    slug: ls("other", "diger"),
+    title: ls("Other", "Diğer"),
+    description: ls(
+      "Projects that are not assigned to a specific collection.",
+      "Belirli bir koleksiyona atanmayan projeler.",
+    ),
+    order,
+    featured: true,
+    seo: {
+      title: ls("Other", "Diğer"),
+      description: ls(
+        "Other selected portfolio projects.",
+        "Diğer seçili portfolyo projeleri.",
+      ),
+    },
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
 export function deleteCollectionAndReassignProjects({
   collections,
   projects,
@@ -158,25 +183,43 @@ export function deleteCollectionAndReassignProjects({
     return { collections, projects };
   }
 
-  const remainingCollections = collections
+  const deletedProjectCount = projects.filter((project) => project.collectionId === collectionId).length;
+  const targetFromStrategy =
+    strategy.type === "move-to-collection" ? strategy.targetCollectionId : undefined;
+  const canDeleteEmpty = deletedProjectCount === 0 && strategy.type === "delete-empty";
+  const needsOtherCollection = deletedProjectCount > 0 && strategy.type === "move-to-other";
+
+  let remainingCollections = collections
     .filter((collection) => collection.id !== collectionId)
     .map((collection, index) => ({
       ...collection,
       order: (index + 1) * 10,
     }));
-  const targetCollectionId =
-    strategy.type === "move-to-collection"
-      ? strategy.targetCollectionId
-      : remainingCollections[0]?.id;
 
-  if (!targetCollectionId) {
+  if (needsOtherCollection && !remainingCollections.some((collection) => collection.id === "other")) {
+    remainingCollections = [
+      ...remainingCollections,
+      buildOtherCollection((remainingCollections.length + 1) * 10),
+    ];
+  }
+
+  const targetCollectionId = needsOtherCollection ? "other" : targetFromStrategy;
+  const targetExists = targetCollectionId
+    ? remainingCollections.some((collection) => collection.id === targetCollectionId)
+    : false;
+
+  if (remainingCollections.length === 0 || (!canDeleteEmpty && !targetExists)) {
     return { collections, projects };
   }
 
   return {
-    collections: remainingCollections,
+    collections: remainingCollections.map((collection, index) => ({
+      ...collection,
+      order: (index + 1) * 10,
+      updatedAt: new Date().toISOString(),
+    })),
     projects: projects.map((project) =>
-      project.collectionId === collectionId
+      targetCollectionId && project.collectionId === collectionId
         ? { ...project, collectionId: targetCollectionId }
         : project,
     ),

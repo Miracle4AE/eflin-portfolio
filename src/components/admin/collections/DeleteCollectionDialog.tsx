@@ -6,7 +6,6 @@ import type { ContentCollection, ContentProject } from "@/lib/content/types";
 import type { DeleteCollectionStrategy } from "@/lib/admin/collections";
 import {
   adminInputClass,
-  adminPrimaryButtonClass,
   adminSecondaryButtonClass,
 } from "@/components/admin/admin-styles";
 import { pickLocale } from "@/lib/content/locale-field";
@@ -31,7 +30,7 @@ export function DeleteCollectionDialog({
 }: DeleteCollectionDialogProps) {
   const { locale, t } = useAdminI18n();
   const [mounted, setMounted] = useState(false);
-  const [strategy, setStrategy] = useState<DeleteCollectionStrategy["type"]>("block");
+  const [strategy, setStrategy] = useState<DeleteCollectionStrategy["type"]>("delete-empty");
   const remainingCollections = useMemo(
     () => collections.filter((item) => item.id !== collection?.id),
     [collection?.id, collections],
@@ -40,17 +39,29 @@ export function DeleteCollectionDialog({
   const projectCount = collection
     ? projects.filter((project) => project.collectionId === collection.id).length
     : 0;
+  const isLastCollection = collections.length <= 1;
+  const canMoveToOther = collection?.id !== "other";
+  const wouldLeaveNoCollection = isLastCollection && (projectCount === 0 || !canMoveToOther);
+  const canConfirm =
+    !wouldLeaveNoCollection &&
+    (projectCount === 0 ||
+      (strategy === "move-to-other" && canMoveToOther) ||
+      (strategy === "move-to-collection" && Boolean(targetCollectionId)));
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (!open) return;
-    setStrategy(projectCount > 0 ? "block" : "move-to-other");
-    setTargetCollectionId(remainingCollections[0]?.id ?? "");
-  }, [open, projectCount, remainingCollections]);
+    setStrategy(projectCount > 0 ? (canMoveToOther ? "move-to-other" : "move-to-collection") : "delete-empty");
+    setTargetCollectionId("");
+  }, [canMoveToOther, open, projectCount]);
 
   function handleDelete() {
     if (!collection) return;
-    if (projectCount > 0 && strategy === "block") return;
+    if (!canConfirm) return;
+    if (projectCount === 0) {
+      onConfirm({ type: "delete-empty" });
+      return;
+    }
     if (strategy === "move-to-collection") {
       if (!targetCollectionId) return;
       onConfirm({ type: "move-to-collection", targetCollectionId });
@@ -79,65 +90,59 @@ export function DeleteCollectionDialog({
         <h2 className="mt-3 font-display text-3xl font-light text-foreground">
           {t.collections.deleteTitle}
         </h2>
+        <p className="mt-3 text-sm leading-7 text-muted">{t.collections.deleteDescription}</p>
         <p className="mt-3 text-sm leading-7 text-muted">
           {t.collections.deleteProjectCount.replace("{count}", String(projectCount))}
         </p>
-        <p className="mt-1 text-sm text-muted">{t.collections.deleteQuestion}</p>
+        {wouldLeaveNoCollection ? (
+          <div className="mt-4 rounded-2xl border border-red-300/20 bg-red-400/10 px-4 py-3 text-sm text-red-300">
+            {t.collections.atLeastOneCollection}
+          </div>
+        ) : null}
 
-        <div className="mt-6 space-y-3">
-          <label className="flex gap-3 rounded-2xl border border-border-soft bg-background/45 p-4 text-sm">
-            <input
-              type="radio"
-              checked={strategy === "move-to-other"}
-              onChange={() => setStrategy("move-to-other")}
-              disabled={remainingCollections.length === 0}
-            />
-            <span>
-              <span className="block text-foreground">{t.collections.moveToOther}</span>
-              <span className="text-xs text-muted">
-                {remainingCollections[0]
-                  ? pickLocale(remainingCollections[0].title, locale)
-                  : t.collections.noTargetCollection}
-              </span>
-            </span>
-          </label>
-
-          <label className="rounded-2xl border border-border-soft bg-background/45 p-4 text-sm">
-            <span className="flex gap-3">
+        {projectCount > 0 && !wouldLeaveNoCollection ? (
+          <div className="mt-6 space-y-3">
+            <label className="flex gap-3 rounded-2xl border border-border-soft bg-background/45 p-4 text-sm">
               <input
                 type="radio"
-                checked={strategy === "move-to-collection"}
-                onChange={() => setStrategy("move-to-collection")}
-                disabled={remainingCollections.length === 0}
+                checked={strategy === "move-to-other"}
+                onChange={() => setStrategy("move-to-other")}
+                disabled={!canMoveToOther}
               />
-              <span className="text-foreground">{t.collections.moveToSelected}</span>
-            </span>
-            <select
-              value={targetCollectionId}
-              onChange={(event) => setTargetCollectionId(event.target.value)}
-              disabled={strategy !== "move-to-collection"}
-              className={adminInputClass()}
-            >
-              {remainingCollections.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {pickLocale(item.title, locale)}
-                </option>
-              ))}
-            </select>
-          </label>
+              <span>
+                <span className="block text-foreground">{t.collections.moveToOther}</span>
+                <span className="text-xs text-muted">
+                  {canMoveToOther ? t.collections.moveToOtherHint : t.collections.noTargetCollection}
+                </span>
+              </span>
+            </label>
 
-          <label className="flex gap-3 rounded-2xl border border-border-soft bg-background/45 p-4 text-sm">
-            <input
-              type="radio"
-              checked={strategy === "block"}
-              onChange={() => setStrategy("block")}
-            />
-            <span>
-              <span className="block text-foreground">{t.collections.blockDelete}</span>
-              <span className="text-xs text-muted">{t.collections.blockDeleteHint}</span>
-            </span>
-          </label>
-        </div>
+            <label className="rounded-2xl border border-border-soft bg-background/45 p-4 text-sm">
+              <span className="flex gap-3">
+                <input
+                  type="radio"
+                  checked={strategy === "move-to-collection"}
+                  onChange={() => setStrategy("move-to-collection")}
+                  disabled={remainingCollections.length === 0}
+                />
+                <span className="text-foreground">{t.collections.moveToSelected}</span>
+              </span>
+              <select
+                value={targetCollectionId}
+                onChange={(event) => setTargetCollectionId(event.target.value)}
+                disabled={strategy !== "move-to-collection"}
+                className={`${adminInputClass()} mt-3`}
+              >
+                <option value="">{t.collections.selectTargetCollection}</option>
+                {remainingCollections.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {pickLocale(item.title, locale)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        ) : null}
 
         <div className="mt-6 flex justify-end gap-3">
           <button type="button" onClick={() => onClose()} className={adminSecondaryButtonClass()}>
@@ -146,10 +151,10 @@ export function DeleteCollectionDialog({
           <button
             type="button"
             onClick={handleDelete}
-            disabled={projectCount > 0 && strategy === "block"}
-            className={adminPrimaryButtonClass()}
+            disabled={!canConfirm}
+            className="rounded-lg border border-red-300/25 bg-red-400/10 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-400/35 hover:bg-red-400/15 disabled:cursor-not-allowed disabled:opacity-45"
           >
-            {t.collections.delete}
+            {t.collections.confirmDelete}
           </button>
         </div>
       </div>

@@ -81,16 +81,20 @@ export function AdminCollectionsSection() {
 
   function handleDelete(strategy: DeleteCollectionStrategy) {
     if (!deletingCollection) return;
+    deleteCollection(deletingCollection, strategy);
+    setDeletingCollection(null);
+  }
+
+  function deleteCollection(collection: ContentCollection, strategy: DeleteCollectionStrategy) {
     setContent((current) => ({
       ...current,
       ...deleteCollectionAndReassignProjects({
         collections: current.collections,
         projects: current.projects,
-        collectionId: deletingCollection.id,
+        collectionId: collection.id,
         strategy,
       }),
     }));
-    setDeletingCollection(null);
   }
 
   function handleDrop(dropIndex: number) {
@@ -222,6 +226,7 @@ export function AdminCollectionsSection() {
         projects={content.projects}
         onClose={() => setModalOpen(false)}
         onSave={upsertCollection}
+        onDelete={deleteCollection}
       />
       <DeleteCollectionDialog
         open={Boolean(deletingCollection)}

@@ -6,6 +6,7 @@ import type { ContentCollection, ContentProject } from "@/lib/content/types";
 import { AdminImagePreview } from "@/components/admin/media/AdminImagePreview";
 import { MediaUploadPanel } from "@/components/admin/media/MediaUploadPanel";
 import { useMediaPicker } from "@/components/admin/media/MediaPickerContext";
+import { DeleteCollectionDialog } from "@/components/admin/collections/DeleteCollectionDialog";
 import {
   adminInputClass,
   adminLabelClass,
@@ -18,6 +19,7 @@ import {
   getCollectionValidationErrors,
   slugifyCollectionValue,
   type CollectionFormValues,
+  type DeleteCollectionStrategy,
 } from "@/lib/admin/collections";
 import { resolveWorkCollection } from "@/lib/content/collections";
 import { pickLocale } from "@/lib/content/locale-field";
@@ -30,6 +32,7 @@ type CollectionModalProps = {
   projects?: ContentProject[];
   onClose: () => void;
   onSave: (collection: ContentCollection) => void;
+  onDelete?: (collection: ContentCollection, strategy: DeleteCollectionStrategy) => void;
 };
 
 function PreviewCard({
@@ -84,11 +87,13 @@ export function CollectionModal({
   projects = [],
   onClose,
   onSave,
+  onDelete,
 }: CollectionModalProps) {
   const { t, locale } = useAdminI18n();
   const { openPicker, projectSlugs } = useMediaPicker();
   const [mounted, setMounted] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
   const [slugTouched, setSlugTouched] = useState({ en: false, tr: false });
   const [values, setValues] = useState<CollectionFormValues>(() =>
     getCollectionFormValues(collection ?? undefined),
@@ -101,6 +106,7 @@ export function CollectionModal({
     setValues(getCollectionFormValues(collection ?? undefined));
     setSlugTouched({ en: Boolean(collection), tr: Boolean(collection) });
     setShowUpload(false);
+    setDeleteOpen(false);
   }, [collection, open]);
 
   useEffect(() => {
@@ -136,6 +142,13 @@ export function CollectionModal({
   function handleSave() {
     if (errors.length > 0) return;
     onSave(collectionFromForm(values, collections, collection ?? undefined));
+    onClose();
+  }
+
+  function handleDelete(strategy: DeleteCollectionStrategy) {
+    if (!collection || !onDelete) return;
+    onDelete(collection, strategy);
+    setDeleteOpen(false);
     onClose();
   }
 
@@ -406,20 +419,41 @@ export function CollectionModal({
           </aside>
         </div>
 
-        <div className="flex flex-wrap justify-end gap-3 border-t border-border-soft px-6 py-4">
-          <button type="button" onClick={() => onClose()} className={adminSecondaryButtonClass()}>
-            {t.common.discard}
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={errors.length > 0}
-            className={adminPrimaryButtonClass()}
-          >
-            {collection ? t.collections.saveChanges : t.collections.create}
-          </button>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border-soft px-6 py-4">
+          <div>
+            {collection && onDelete ? (
+              <button
+                type="button"
+                onClick={() => setDeleteOpen(true)}
+                className="rounded-lg border border-red-300/25 bg-red-400/10 px-4 py-2 text-sm font-medium text-red-600 transition hover:border-red-400/35 hover:bg-red-400/15"
+              >
+                {t.collections.deleteCollection}
+              </button>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap justify-end gap-3">
+            <button type="button" onClick={() => onClose()} className={adminSecondaryButtonClass()}>
+              {t.common.discard}
+            </button>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={errors.length > 0}
+              className={adminPrimaryButtonClass()}
+            >
+              {collection ? t.collections.saveChanges : t.collections.create}
+            </button>
+          </div>
         </div>
       </div>
+      <DeleteCollectionDialog
+        open={deleteOpen}
+        collection={collection ?? null}
+        collections={collections}
+        projects={projects}
+        onClose={() => setDeleteOpen(false)}
+        onConfirm={handleDelete}
+      />
     </div>,
     document.body,
   );

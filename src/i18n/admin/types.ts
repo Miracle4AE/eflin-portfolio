@@ -257,16 +257,22 @@ export type AdminDictionary = {
     descriptionPlaceholder: string;
     edit: string;
     delete: string;
+    deleteCollection: string;
     drag: string;
     deleteTitle: string;
+    deleteDescription: string;
     deleteProjectCount: string;
     deleteQuestion: string;
     dangerZone: string;
     moveToOther: string;
+    moveToOtherHint: string;
     moveToSelected: string;
+    selectTargetCollection: string;
     blockDelete: string;
     blockDeleteHint: string;
     noTargetCollection: string;
+    atLeastOneCollection: string;
+    confirmDelete: string;
     editCollectionBadge: string;
   };
   media: {
