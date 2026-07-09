@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import type { SiteContent } from "@/lib/content/types";
@@ -21,7 +22,7 @@ import {
   saveDraft,
   type DraftMeta,
 } from "@/lib/admin/draft";
-import type { AdminSaveResult } from "@/components/admin/useAdminContentLoader";
+import type { AdminSavePhase, AdminSaveResult } from "@/components/admin/useAdminContentLoader";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
 import { getErrorMessage } from "@/lib/errors";
 
@@ -46,7 +47,7 @@ type AdminContentContextValue = {
   canWrite: boolean;
   saveMode: "local" | "blob" | "unconfigured";
   saving: boolean;
-  savePhase: "idle" | "saving" | "verifying";
+  savePhase: "idle" | AdminSavePhase;
   saveMeta: SaveMeta | null;
   save: () => Promise<void>;
   resetChanges: () => void;
@@ -76,7 +77,7 @@ export function AdminContentProvider({
   saveMode: "local" | "blob" | "unconfigured";
   onSave: (
     content: SiteContent,
-    onPhase?: (phase: "saving" | "verifying") => void,
+    onPhase?: (phase: AdminSavePhase) => void,
   ) => Promise<AdminSaveResult>;
 }) {
   const t = useAdminT();
@@ -95,7 +96,8 @@ export function AdminContentProvider({
       : null,
   );
   const [saving, setSaving] = useState(false);
-  const [savePhase, setSavePhase] = useState<"idle" | "saving" | "verifying">("idle");
+  const savingRef = useRef(false);
+  const [savePhase, setSavePhase] = useState<"idle" | AdminSavePhase>("idle");
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [draftMeta, setDraftMeta] = useState<DraftMeta | null>(null);
@@ -148,6 +150,8 @@ export function AdminContentProvider({
   }, [isDirty]);
 
   const save = useCallback(async () => {
+    if (savingRef.current) return;
+    savingRef.current = true;
     setSaving(true);
     setSavePhase("saving");
     try {
@@ -178,6 +182,7 @@ export function AdminContentProvider({
     } catch (error) {
       addToast("error", getErrorMessage(error));
     } finally {
+      savingRef.current = false;
       setSaving(false);
       setSavePhase("idle");
     }

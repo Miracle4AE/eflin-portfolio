@@ -3,6 +3,7 @@ import {
   getContentStorageStatus,
   loadSiteContent,
   readSiteContentFresh,
+  StorageVerificationError,
   writeSiteContent,
 } from "@/lib/content/loader";
 import { revalidateSiteContent } from "@/lib/content/revalidate";
@@ -96,6 +97,8 @@ export async function POST(request: NextRequest) {
       updatedAt: result.updatedAt,
       saveMode: result.saveMode,
       message,
+      debug: result.verification,
+      content: result.content,
       warnings: collectContentWarnings(result.content),
     });
   } catch (error) {
@@ -103,6 +106,13 @@ export async function POST(request: NextRequest) {
       error instanceof Error
         ? error.message
         : "Save failed verification. The site was not updated.";
-    return NextResponse.json({ error: message, verified: false }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: message,
+        verified: false,
+        debug: error instanceof StorageVerificationError ? error.debug : undefined,
+      },
+      { status: 500 },
+    );
   }
 }

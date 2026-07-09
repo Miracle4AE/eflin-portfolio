@@ -5,6 +5,16 @@ import type { SiteContent } from "@/lib/content/types";
 import { useAdminT } from "@/i18n/admin/AdminI18nProvider";
 import { getErrorMessage } from "@/lib/errors";
 
+export type AdminSavePhase = "saving" | "verifying" | "waiting" | "revalidating" | "saved";
+
+type SaveVerificationDebug = {
+  attempts: number;
+  lastSeenRevisionId: string | null;
+  expectedRevisionId: string;
+  verified: boolean;
+  elapsedMs: number;
+};
+
 export type AdminSaveResult = {
   ok: boolean;
   message?: string;
@@ -14,6 +24,7 @@ export type AdminSaveResult = {
   verified?: boolean;
   saveMode?: "local" | "blob";
   content?: SiteContent;
+  debug?: SaveVerificationDebug;
 };
 
 export function useAdminContentLoader() {
@@ -52,14 +63,37 @@ export function useAdminContentLoader() {
   }, [loadContent]);
 
   const handleSave = useCallback(
-    async (content: SiteContent, onPhase?: (phase: "saving" | "verifying") => void): Promise<AdminSaveResult> => {
+    async (content: SiteContent, onPhase?: (phase: AdminSavePhase) => void): Promise<AdminSaveResult> => {
       onPhase?.("saving");
-      const response = await fetch("/api/admin/content", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ content }),
-      });
-      const data = await response.json();
+      const phaseTimers = [
+        window.setTimeout(() => onPhase?.("verifying"), 250),
+        window.setTimeout(() => onPhase?.("waiting"), 1500),
+        window.setTimeout(() => onPhase?.("revalidating"), 4500),
+      ];
+
+      let response: Response;
+      let data: {
+        error?: unknown;
+        details?: unknown;
+        message?: unknown;
+        verified?: boolean;
+        revisionId?: string;
+        updatedAt?: string;
+        saveMode?: "local" | "blob";
+        content?: SiteContent;
+        debug?: SaveVerificationDebug;
+      };
+
+      try {
+        response = await fetch("/api/admin/content", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ content }),
+        });
+        data = await response.json();
+      } finally {
+        phaseTimers.forEach((timer) => window.clearTimeout(timer));
+      }
 
       if (!response.ok) {
         return {
@@ -70,6 +104,7 @@ export function useAdminContentLoader() {
               : Array.isArray(data.details)
                 ? data.details.join(", ")
                 : t.toasts.saveFailed,
+          debug: data.debug,
         };
       }
 
@@ -77,6 +112,21 @@ export function useAdminContentLoader() {
         return {
           ok: false,
           error: typeof data.error === "string" ? data.error : t.toasts.verificationFailed,
+          debug: data.debug,
+        };
+      }
+
+      if (data.content?.meta?.revisionId === data.revisionId) {
+        onPhase?.("saved");
+        return {
+          ok: true,
+          message: typeof data.message === "string" ? data.message : t.toasts.savedVerified,
+          revisionId: data.revisionId,
+          updatedAt: data.updatedAt,
+          verified: true,
+          saveMode: data.saveMode,
+          content: data.content,
+          debug: data.debug,
         };
       }
 
@@ -88,6 +138,7 @@ export function useAdminContentLoader() {
         return {
           ok: false,
           error: t.toasts.verifyReadFailed,
+          debug: data.debug,
         };
       }
 
@@ -95,9 +146,11 @@ export function useAdminContentLoader() {
         return {
           ok: false,
           error: t.toasts.verificationFailed,
+          debug: data.debug,
         };
       }
 
+      onPhase?.("saved");
       return {
         ok: true,
         message: typeof data.message === "string" ? data.message : t.toasts.savedVerified,
@@ -106,6 +159,7 @@ export function useAdminContentLoader() {
         verified: true,
         saveMode: data.saveMode,
         content: verifyData.content,
+        debug: data.debug,
       };
     },
     [t.toasts.saveFailed, t.toasts.savedVerified, t.toasts.verificationFailed, t.toasts.verifyReadFailed],

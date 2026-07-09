@@ -38,7 +38,26 @@ export type WriteContentResult = {
   updatedAt: string;
   verified: boolean;
   content: SiteContent;
+  verification: VerificationDebug;
 };
+
+export type VerificationDebug = {
+  attempts: number;
+  lastSeenRevisionId: string | null;
+  expectedRevisionId: string;
+  verified: boolean;
+  elapsedMs: number;
+};
+
+export class StorageVerificationError extends Error {
+  debug: VerificationDebug;
+
+  constructor(message: string, debug: VerificationDebug) {
+    super(message);
+    this.name = "StorageVerificationError";
+    this.debug = debug;
+  }
+}
 
 type BlobAccessProbe = {
   available: boolean;
@@ -275,6 +294,10 @@ async function readBlobFile(): Promise<SiteContent | null> {
   return raw ? parseSiteContent(raw) : null;
 }
 
+async function readBlobFreshForVerification(): Promise<SiteContent | null> {
+  return readBlobFile();
+}
+
 function writeLocalFile(content: SiteContent): void {
   const dir = path.dirname(LOCAL_CONTENT_PATH);
   fs.mkdirSync(dir, { recursive: true });
@@ -474,25 +497,54 @@ async function cleanupDuplicateContentBlobs(
 async function verifyReadAfterWrite(
   expected: SiteContent,
   writeInfo: BlobWriteInfo | undefined,
-): Promise<SiteContent> {
-  const retryDelays = [0, 300, 600, 1000, 1500];
+): Promise<{ content: SiteContent; debug: VerificationDebug }> {
+  const startedAt = Date.now();
+  const retryDelays = [0, 500, 1000, 2000, 3000, 5000];
+  const expectedRevisionId = expected.meta?.revisionId ?? "unknown";
   let lastRead: SiteContent | null = null;
   let exactPutRead: SiteContent | null = null;
   let lastReason = "Blob returned an older revision";
+  let attempts = 0;
 
   for (const delay of retryDelays) {
     if (delay > 0) await sleep(delay);
+    attempts += 1;
 
-    if (!exactPutRead) {
-      exactPutRead = await readPutResultContent(writeInfo);
+    exactPutRead = await readPutResultContent(writeInfo);
+    if (exactPutRead) {
+      const exactVerification = verifyContentMatch(expected, exactPutRead);
+      if (exactVerification.verified) {
+        await cleanupDuplicateContentBlobs(writeInfo);
+        return {
+          content: exactPutRead,
+          debug: {
+            attempts,
+            lastSeenRevisionId: exactPutRead.meta?.revisionId ?? null,
+            expectedRevisionId,
+            verified: true,
+            elapsedMs: Date.now() - startedAt,
+          },
+        };
+      }
+      lastReason = exactVerification.reason ?? lastReason;
     }
 
-    const { content } = await readContentFromSource();
-    lastRead = content;
-    const verification = verifyContentMatch(expected, content);
+    lastRead = await readBlobFreshForVerification();
+    const verification = lastRead
+      ? verifyContentMatch(expected, lastRead)
+      : { verified: false, reason: "The newly written Blob could not be read from storage" };
     if (verification.verified) {
       await cleanupDuplicateContentBlobs(writeInfo);
-      return content;
+      return {
+        content: lastRead!,
+        debug: {
+          attempts,
+          lastSeenRevisionId: lastRead!.meta?.revisionId ?? null,
+          expectedRevisionId,
+          verified: true,
+          elapsedMs: Date.now() - startedAt,
+        },
+      };
     }
 
     lastReason = verification.reason ?? lastReason;
@@ -504,9 +556,17 @@ async function verifyReadAfterWrite(
   const readRevision = lastRead?.meta?.revisionId ?? "unknown";
   const exactRevision = exactPutRead?.meta?.revisionId ?? "unreadable";
 
-  throw new Error(
+  const debug: VerificationDebug = {
+    attempts,
+    lastSeenRevisionId: lastRead?.meta?.revisionId ?? exactPutRead?.meta?.revisionId ?? null,
+    expectedRevisionId,
+    verified: false,
+    elapsedMs: Date.now() - startedAt,
+  };
+
+  throw new StorageVerificationError(
     [
-      "Save verification failed because Blob returned an older revision. Please retry once. If it continues, run debug.",
+      "Storage verification timed out. Please retry once.",
       `Expected ${expected.meta?.revisionId ?? "unknown"}, got ${readRevision}.`,
       `Exact write read revision: ${exactRevision}.`,
       exactVerification.reason,
@@ -514,6 +574,7 @@ async function verifyReadAfterWrite(
     ]
       .filter(Boolean)
       .join(" "),
+    debug,
   );
 }
 
@@ -558,7 +619,33 @@ export async function writeAndVerifyContent(
   const { saveMode, writeInfo } = await persistContent(stamped);
   invalidateStorageCache();
 
-  const readBack = await verifyReadAfterWrite(stamped, writeInfo);
+  if (saveMode === "local") {
+    const readBack = await readContent({ fresh: true });
+    const verification = verifyContentMatch(stamped, readBack);
+    if (!verification.verified) {
+      throw new Error(
+        verification.reason ?? "Save failed verification. The site was not updated.",
+      );
+    }
+    cachedContent = readBack;
+    cacheKey = currentCacheKey("local");
+    return {
+      saveMode,
+      revisionId: stamped.meta!.revisionId,
+      updatedAt: stamped.meta!.updatedAt,
+      verified: true,
+      content: readBack,
+      verification: {
+        attempts: 1,
+        lastSeenRevisionId: readBack.meta?.revisionId ?? null,
+        expectedRevisionId: stamped.meta!.revisionId,
+        verified: true,
+        elapsedMs: 0,
+      },
+    };
+  }
+
+  const { content: readBack, debug } = await verifyReadAfterWrite(stamped, writeInfo);
   const verification = verifyContentMatch(stamped, readBack);
 
   if (!verification.verified) {
@@ -567,17 +654,13 @@ export async function writeAndVerifyContent(
     );
   }
 
-  if (isDevelopment()) {
-    cachedContent = readBack;
-    cacheKey = currentCacheKey("local");
-  }
-
   return {
     saveMode,
     revisionId: stamped.meta!.revisionId,
     updatedAt: stamped.meta!.updatedAt,
     verified: true,
     content: readBack,
+    verification: debug,
   };
 }
 

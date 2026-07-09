@@ -63,6 +63,9 @@ export type AdminDictionary = {
     backup: string;
     saving: string;
     verifying: string;
+    waitingStorage: string;
+    revalidating: string;
+    saved: string;
     saveChanges: string;
     exportToSave: string;
     storageRequiredForSaving: string;

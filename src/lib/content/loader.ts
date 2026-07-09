@@ -13,7 +13,7 @@ import { SITE_CONTENT_TAG } from "@/lib/content/revalidate";
 import type { SiteContent } from "@/lib/content/types";
 
 export { LOCAL_CONTENT_PATH as CONTENT_FILE_PATH } from "@/lib/content/storage";
-export { CONTENT_BLOB_KEY } from "@/lib/content/storage";
+export { CONTENT_BLOB_KEY, StorageVerificationError } from "@/lib/content/storage";
 
 const getProductionSiteContent = unstable_cache(
   async () => readContent({ fresh: true }),

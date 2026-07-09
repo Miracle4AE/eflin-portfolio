@@ -72,6 +72,15 @@ export function AdminShell({
     });
   }
 
+  function saveButtonLabel(): string {
+    if (!saving) return canWrite ? t.header.saveChanges : t.header.storageRequiredForSaving;
+    if (savePhase === "verifying") return t.header.verifying;
+    if (savePhase === "waiting") return t.header.waitingStorage;
+    if (savePhase === "revalidating") return t.header.revalidating;
+    if (savePhase === "saved") return t.header.saved;
+    return t.header.saving;
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground lg:flex">
       <aside className="border-b border-border-soft lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:flex-col lg:border-b-0 lg:border-r">
@@ -181,13 +190,7 @@ export function AdminShell({
                 title={!canWrite ? t.header.storageRequiredForSaving : undefined}
                 className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-background disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {saving
-                  ? savePhase === "verifying"
-                    ? t.header.verifying
-                    : t.header.saving
-                  : canWrite
-                    ? t.header.saveChanges
-                    : t.header.storageRequiredForSaving}
+                {saveButtonLabel()}
               </button>
             </div>
           </div>

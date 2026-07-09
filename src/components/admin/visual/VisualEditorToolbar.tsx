@@ -51,6 +51,15 @@ export function VisualEditorToolbar({
     discardDraft,
   } = useAdminContent();
 
+  function saveButtonLabel(): string {
+    if (!saving) return t.header.saveChanges;
+    if (savePhase === "verifying") return t.header.verifying;
+    if (savePhase === "waiting") return t.header.waitingStorage;
+    if (savePhase === "revalidating") return t.header.revalidating;
+    if (savePhase === "saved") return t.header.saved;
+    return t.header.saving;
+  }
+
   return (
     <>
       <header className="visual-editor-toolbar">
@@ -153,11 +162,7 @@ export function VisualEditorToolbar({
             disabled={saving || !canWrite || !isDirty}
             className="rounded-lg bg-accent px-4 py-1.5 text-xs font-medium text-background disabled:opacity-50"
           >
-            {saving
-              ? savePhase === "verifying"
-                ? t.header.verifying
-                : t.header.saving
-              : t.header.saveChanges}
+            {saveButtonLabel()}
           </button>
           <Link
             href="/admin/structured"
