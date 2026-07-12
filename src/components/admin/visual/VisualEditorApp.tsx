@@ -84,6 +84,7 @@ function VisualEditorWorkspace({ onLogout }: { onLogout: () => void }) {
         }}
         onLocaleChange={setEditLocale}
         onLogout={onLogout}
+        bookPreviewActive={selectedCollection?.presentationMode === "book"}
       />
 
       <div className="hidden lg:block">

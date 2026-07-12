@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { isLocale, locales, type Locale } from "@/i18n/config";
 import { localizedPath } from "@/i18n/navigation";
-import { CollectionProjectsIndex } from "@/components/work/CollectionProjectsIndex";
+import { CollectionExperience } from "@/components/work/CollectionExperience";
+import { buildServerBookExperienceData } from "@/lib/work/book-pages.server";
 import { JsonLd } from "@/components/seo/JsonLd";
 import {
   getCollectionSlug,
@@ -49,6 +50,10 @@ export default async function WorkCollectionPage({ params }: CollectionPageProps
 
   const resolvedCollection = resolveWorkCollection(collection, locale);
   const projects = await getProjectsForWorkCollection(collection.id, locale);
+  const bookData =
+    resolvedCollection.presentationMode === "book"
+      ? buildServerBookExperienceData(resolvedCollection, projects, locale)
+      : undefined;
   const schema = await buildCollectionPageSchema(projects, locale, {
     title: resolvedCollection.title,
     path: `/work/collections/${resolvedCollection.slug}`,
@@ -57,10 +62,11 @@ export default async function WorkCollectionPage({ params }: CollectionPageProps
   return (
     <>
       <JsonLd data={schema} />
-      <CollectionProjectsIndex
+      <CollectionExperience
         collection={resolvedCollection}
         projects={projects}
         workPath={localizedPath(locale, "/work")}
+        bookData={bookData}
       />
     </>
   );

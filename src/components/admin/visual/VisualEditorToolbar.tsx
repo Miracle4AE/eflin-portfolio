@@ -15,6 +15,7 @@ type VisualEditorToolbarProps = {
   viewMode?: string;
   breadcrumb?: string;
   onBackToCollections?: () => void;
+  bookPreviewActive?: boolean;
   editLocale: Locale;
   onPageChange: (page: VisualPageId, projectSlug?: string) => void;
   onLocaleChange: (locale: Locale) => void;
@@ -28,6 +29,7 @@ export function VisualEditorToolbar({
   viewMode,
   breadcrumb,
   onBackToCollections,
+  bookPreviewActive,
   editLocale,
   onPageChange,
   onLocaleChange,
@@ -79,6 +81,12 @@ export function VisualEditorToolbar({
             >
               ← {editLocale === "tr" ? "Koleksiyonlara dön" : "Back to collections"}
             </button>
+          ) : null}
+
+          {bookPreviewActive ? (
+            <span className="rounded-full border border-accent/25 bg-accent/10 px-2.5 py-1 text-[10px] uppercase tracking-[0.16em] text-accent">
+              {t.collections.openBookPreview}
+            </span>
           ) : null}
 
           {viewMode ? (

@@ -1,4 +1,10 @@
-import type { ContentCollection, ContentProject, LocaleField } from "@/lib/content/types";
+import type {
+  CollectionBookSettings,
+  CollectionPresentationMode,
+  ContentCollection,
+  ContentProject,
+  LocaleField,
+} from "@/lib/content/types";
 import { ls } from "@/lib/content/locale-field";
 import { slugifyProjectTitle } from "@/lib/admin/create-project";
 
@@ -12,6 +18,14 @@ export type CollectionFormValues = {
   descriptionEn: string;
   coverImage?: string;
   featured: boolean;
+  presentationMode: CollectionPresentationMode;
+  bookSubtitleTr: string;
+  bookSubtitleEn: string;
+  bookIntroTr: string;
+  bookIntroEn: string;
+  bookCoverImage: string;
+  bookSoundEnabled: boolean;
+  bookPaperStyle: NonNullable<CollectionBookSettings["paperStyle"]>;
   seoTitleTr: string;
   seoTitleEn: string;
   seoDescriptionTr: string;
@@ -39,6 +53,14 @@ export function getCollectionFormValues(collection?: ContentCollection): Collect
     descriptionEn: collection?.description.en ?? "",
     coverImage: collection?.coverImage ?? "",
     featured: collection?.featured ?? true,
+    presentationMode: collection?.presentationMode ?? "grid",
+    bookSubtitleTr: collection?.bookSettings?.subtitle?.tr ?? "",
+    bookSubtitleEn: collection?.bookSettings?.subtitle?.en ?? "",
+    bookIntroTr: collection?.bookSettings?.intro?.tr ?? "",
+    bookIntroEn: collection?.bookSettings?.intro?.en ?? "",
+    bookCoverImage: collection?.bookSettings?.coverImage ?? "",
+    bookSoundEnabled: collection?.bookSettings?.soundEnabled ?? true,
+    bookPaperStyle: collection?.bookSettings?.paperStyle ?? "ivory",
     seoTitleTr: collection?.seo?.title?.tr ?? "",
     seoTitleEn: collection?.seo?.title?.en ?? "",
     seoDescriptionTr: collection?.seo?.description?.tr ?? "",
@@ -79,6 +101,18 @@ export function collectionFromForm(
   const now = new Date().toISOString();
   const seoTitle = optionalLocaleField(values.seoTitleEn, values.seoTitleTr);
   const seoDescription = optionalLocaleField(values.seoDescriptionEn, values.seoDescriptionTr);
+  const bookSubtitle = optionalLocaleField(values.bookSubtitleEn, values.bookSubtitleTr);
+  const bookIntro = optionalLocaleField(values.bookIntroEn, values.bookIntroTr);
+  const bookSettings: CollectionBookSettings | undefined =
+    values.presentationMode === "book"
+      ? {
+          ...(bookSubtitle && { subtitle: bookSubtitle }),
+          ...(bookIntro && { intro: bookIntro }),
+          ...(values.bookCoverImage.trim() && { coverImage: values.bookCoverImage.trim() }),
+          soundEnabled: values.bookSoundEnabled,
+          paperStyle: values.bookPaperStyle,
+        }
+      : existing?.bookSettings;
 
   return {
     id: existing?.id ?? createCollectionId(slugEn, collections.map((collection) => collection.id)),
@@ -88,6 +122,8 @@ export function collectionFromForm(
     coverImage: values.coverImage?.trim() || undefined,
     order: existing?.order ?? getNextCollectionOrder(collections),
     featured: values.featured,
+    presentationMode: values.presentationMode,
+    bookSettings: values.presentationMode === "book" ? bookSettings : undefined,
     seo:
       seoTitle || seoDescription
         ? {
@@ -156,6 +192,7 @@ function buildOtherCollection(order: number): ContentCollection {
     ),
     order,
     featured: true,
+    presentationMode: "grid",
     seo: {
       title: ls("Other", "Diğer"),
       description: ls(

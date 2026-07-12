@@ -1,7 +1,13 @@
 import type { Locale } from "@/i18n/config";
 import { localizedPath } from "@/i18n/navigation";
 import type { Project } from "@/types";
-import type { ContentCollection, ContentProject, SiteContent } from "@/lib/content/types";
+import type {
+  CollectionBookSettings,
+  CollectionPresentationMode,
+  ContentCollection,
+  ContentProject,
+  SiteContent,
+} from "@/lib/content/types";
 import { ls, pickLocale } from "@/lib/content/locale-field";
 
 const SEEDED_AT = "2026-01-01T00:00:00.000Z";
@@ -17,6 +23,19 @@ export const DEFAULT_COLLECTIONS: ContentCollection[] = [
     ),
     order: 10,
     featured: true,
+    presentationMode: "book",
+    bookSettings: {
+      subtitle: ls(
+        "A curated catalogue of cover systems and jacket design.",
+        "Kapak sistemleri ve cilt tasarımından seçkiler.",
+      ),
+      intro: ls(
+        "Turn the pages to explore each commission in this collection.",
+        "Bu koleksiyondaki her projeyi keşfetmek için sayfaları çevirin.",
+      ),
+      soundEnabled: true,
+      paperStyle: "ivory",
+    },
     seo: {
       title: ls("Book Cover Design", "Kitap Kapağı Tasarımı"),
       description: ls(
@@ -189,11 +208,26 @@ function sortCollections(collections: ContentCollection[]): ContentCollection[] 
   return [...collections].sort((a, b) => a.order - b.order || a.title.en.localeCompare(b.title.en));
 }
 
+function defaultPresentationMode(collection: ContentCollection): CollectionPresentationMode {
+  if (collection.presentationMode === "book" || collection.presentationMode === "grid") {
+    return collection.presentationMode;
+  }
+  return collection.id === "book-cover-design" ? "book" : "grid";
+}
+
+function normalizeCollection(collection: ContentCollection): ContentCollection {
+  return {
+    ...collection,
+    presentationMode: defaultPresentationMode(collection),
+    bookSettings: collection.bookSettings,
+  };
+}
+
 export function ensureContentCollections(content: SiteContent): SiteContent {
   const source = content as SiteContent & { collections?: ContentCollection[] };
   const collections =
     Array.isArray(source.collections) && source.collections.length > 0
-      ? source.collections
+      ? source.collections.map(normalizeCollection)
       : DEFAULT_COLLECTIONS;
   const collectionIds = new Set(collections.map((collection) => collection.id));
   const fallbackId = collections[0]?.id ?? DEFAULT_COLLECTIONS[0].id;
@@ -259,6 +293,14 @@ export function getSortedCollections(collections: ContentCollection[]): ContentC
   return sortCollections(collections).filter((collection) => collection.featured !== false);
 }
 
+export type ResolvedBookSettings = {
+  subtitle?: string;
+  intro?: string;
+  coverImage?: string;
+  soundEnabled: boolean;
+  paperStyle: CollectionBookSettings["paperStyle"];
+};
+
 export type ResolvedWorkCollection = {
   id: string;
   slug: string;
@@ -268,10 +310,26 @@ export type ResolvedWorkCollection = {
   coverImage?: string;
   order: number;
   featured: boolean;
+  presentationMode: CollectionPresentationMode;
+  bookSettings?: ResolvedBookSettings;
   seoTitle?: string;
   seoDescription?: string;
   source: ContentCollection;
 };
+
+function resolveBookSettings(
+  settings: CollectionBookSettings | undefined,
+  locale: Locale,
+): ResolvedBookSettings | undefined {
+  if (!settings) return undefined;
+  return {
+    subtitle: settings.subtitle ? pickLocale(settings.subtitle, locale) : undefined,
+    intro: settings.intro ? pickLocale(settings.intro, locale) : undefined,
+    coverImage: settings.coverImage,
+    soundEnabled: settings.soundEnabled ?? true,
+    paperStyle: settings.paperStyle ?? "ivory",
+  };
+}
 
 export function resolveWorkCollection(
   collection: ContentCollection,
@@ -286,6 +344,8 @@ export function resolveWorkCollection(
     coverImage: collection.coverImage,
     order: collection.order,
     featured: collection.featured,
+    presentationMode: defaultPresentationMode(collection),
+    bookSettings: resolveBookSettings(collection.bookSettings, locale),
     seoTitle: collection.seo?.title ? pickLocale(collection.seo.title, locale) : undefined,
     seoDescription: collection.seo?.description
       ? pickLocale(collection.seo.description, locale)

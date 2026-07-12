@@ -255,6 +255,111 @@ export function CollectionModal({
             </div>
 
             <section className="rounded-2xl border border-border-soft bg-background/45 p-4">
+              <p className={adminLabelClass()}>{t.collections.presentationStyle}</p>
+              <select
+                value={values.presentationMode}
+                onChange={(event) =>
+                  setValues((current) => ({
+                    ...current,
+                    presentationMode: event.target.value as CollectionFormValues["presentationMode"],
+                  }))
+                }
+                className={`${adminInputClass()} mt-2`}
+              >
+                <option value="grid">{t.collections.presentationGrid}</option>
+                <option value="book">{t.collections.presentationBook}</option>
+              </select>
+
+              {values.presentationMode === "book" ? (
+                <div className="mt-5 grid gap-5 md:grid-cols-2">
+                  <label className={adminLabelClass()}>
+                    {t.collections.bookSubtitleTr}
+                    <input
+                      value={values.bookSubtitleTr}
+                      onChange={(event) =>
+                        setValues((current) => ({ ...current, bookSubtitleTr: event.target.value }))
+                      }
+                      className={adminInputClass()}
+                    />
+                  </label>
+                  <label className={adminLabelClass()}>
+                    {t.collections.bookSubtitleEn}
+                    <input
+                      value={values.bookSubtitleEn}
+                      onChange={(event) =>
+                        setValues((current) => ({ ...current, bookSubtitleEn: event.target.value }))
+                      }
+                      className={adminInputClass()}
+                    />
+                  </label>
+                  <label className={`${adminLabelClass()} md:col-span-2`}>
+                    {t.collections.bookIntroTr}
+                    <textarea
+                      value={values.bookIntroTr}
+                      onChange={(event) =>
+                        setValues((current) => ({ ...current, bookIntroTr: event.target.value }))
+                      }
+                      rows={2}
+                      className={`${adminInputClass()} resize-y`}
+                    />
+                  </label>
+                  <label className={`${adminLabelClass()} md:col-span-2`}>
+                    {t.collections.bookIntroEn}
+                    <textarea
+                      value={values.bookIntroEn}
+                      onChange={(event) =>
+                        setValues((current) => ({ ...current, bookIntroEn: event.target.value }))
+                      }
+                      rows={2}
+                      className={`${adminInputClass()} resize-y`}
+                    />
+                  </label>
+                  <label className={`${adminLabelClass()} md:col-span-2`}>
+                    {t.collections.bookCoverImage}
+                    <input
+                      value={values.bookCoverImage}
+                      onChange={(event) =>
+                        setValues((current) => ({ ...current, bookCoverImage: event.target.value }))
+                      }
+                      className={adminInputClass()}
+                      placeholder="/images/... or /media/..."
+                    />
+                  </label>
+                  <label className={adminLabelClass()}>
+                    {t.collections.bookPaperStyle}
+                    <select
+                      value={values.bookPaperStyle}
+                      onChange={(event) =>
+                        setValues((current) => ({
+                          ...current,
+                          bookPaperStyle: event.target.value as CollectionFormValues["bookPaperStyle"],
+                        }))
+                      }
+                      className={adminInputClass()}
+                    >
+                      <option value="ivory">{t.collections.bookPaperIvory}</option>
+                      <option value="linen">{t.collections.bookPaperLinen}</option>
+                      <option value="warm-white">{t.collections.bookPaperWarmWhite}</option>
+                    </select>
+                  </label>
+                  <label className="flex items-center gap-3 self-end text-sm text-foreground">
+                    <input
+                      type="checkbox"
+                      checked={values.bookSoundEnabled}
+                      onChange={(event) =>
+                        setValues((current) => ({
+                          ...current,
+                          bookSoundEnabled: event.target.checked,
+                        }))
+                      }
+                    />
+                    {t.collections.bookSoundEnabled}
+                  </label>
+                </div>
+              ) : null}
+            </section>
+
+            <section className="rounded-2xl border border-border-soft bg-background/45 p-4">
               <p className={adminLabelClass()}>{t.collections.coverImage}</p>
               <div className="mt-3 flex gap-4">
                 <AdminImagePreview

@@ -64,6 +64,19 @@ export interface Dictionary {
     collectionsDescription: string;
     projectsLabel: string;
     backToCollections: string;
+    openBook: string;
+    closeBook: string;
+    bookPrevious: string;
+    bookNext: string;
+    soundOn: string;
+    soundOff: string;
+    bookProgress: string;
+    bookPageStatus: string;
+    bookClosed: string;
+    bookEndOfCollection: string;
+    bookPreviousPage: string;
+    bookNextPage: string;
+    soundUnavailable: string;
   };
   caseStudy: {
     projectOverview: string;

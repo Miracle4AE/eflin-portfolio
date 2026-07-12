@@ -79,6 +79,13 @@ function validateCollection(collection: unknown, index: number, errors: string[]
   if (typeof item.order !== "number") {
     errors.push(`collections[${index}].order must be a number`);
   }
+  if (
+    item.presentationMode !== undefined &&
+    item.presentationMode !== "grid" &&
+    item.presentationMode !== "book"
+  ) {
+    errors.push(`collections[${index}].presentationMode must be "grid" or "book"`);
+  }
 }
 
 export function validateSiteContent(payload: unknown): ValidationResult {

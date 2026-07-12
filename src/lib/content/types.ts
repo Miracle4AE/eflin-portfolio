@@ -18,6 +18,18 @@ export type ContentPaletteColor = {
   hex: string;
 };
 
+export type CollectionPresentationMode = "grid" | "book";
+
+export type CollectionBookPaperStyle = "ivory" | "linen" | "warm-white";
+
+export type CollectionBookSettings = {
+  subtitle?: LocaleField;
+  intro?: LocaleField;
+  coverImage?: string;
+  soundEnabled?: boolean;
+  paperStyle?: CollectionBookPaperStyle;
+};
+
 export type ContentCollection = {
   id: string;
   slug: LocaleField;
@@ -26,6 +38,8 @@ export type ContentCollection = {
   coverImage?: string;
   order: number;
   featured: boolean;
+  presentationMode?: CollectionPresentationMode;
+  bookSettings?: CollectionBookSettings;
   seo?: {
     title?: LocaleField;
     description?: LocaleField;

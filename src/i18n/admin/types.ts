@@ -277,6 +277,20 @@ export type AdminDictionary = {
     atLeastOneCollection: string;
     confirmDelete: string;
     editCollectionBadge: string;
+    presentationStyle: string;
+    presentationGrid: string;
+    presentationBook: string;
+    bookSubtitleTr: string;
+    bookSubtitleEn: string;
+    bookIntroTr: string;
+    bookIntroEn: string;
+    bookCoverImage: string;
+    bookSoundEnabled: string;
+    bookPaperStyle: string;
+    bookPaperIvory: string;
+    bookPaperLinen: string;
+    bookPaperWarmWhite: string;
+    openBookPreview: string;
   };
   media: {
     library: string;

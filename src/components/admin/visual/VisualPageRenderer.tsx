@@ -12,7 +12,8 @@ import { Services } from "@/components/sections/Services";
 import { ProjectShowcase } from "@/components/sections/ProjectShowcase";
 import { Contact } from "@/components/sections/Contact";
 import { WorkIndex } from "@/components/work/WorkIndex";
-import { CollectionProjectsIndex } from "@/components/work/CollectionProjectsIndex";
+import { CollectionExperience } from "@/components/work/CollectionExperience";
+import { buildBookExperienceData, resolveClientGallery } from "@/lib/work/book-pages";
 import { ContactSection } from "@/components/sections/ContactSection";
 import { CaseStudyHero } from "@/components/case-study/CaseStudyHero";
 import { CaseStudyMeta } from "@/components/case-study/CaseStudyMeta";
@@ -109,9 +110,22 @@ export function VisualPageRenderer({
   const selectedCollection = selectedCollectionId
     ? preview.collections.find((collection) => collection.id === selectedCollectionId)
     : undefined;
-  const selectedCollectionProjects = selectedCollection
-    ? getProjectsForCollection(preview.projects, content.collections, selectedCollection.id)
-    : [];
+  const selectedCollectionProjects = useMemo(
+    () =>
+      selectedCollection
+        ? getProjectsForCollection(preview.projects, content.collections, selectedCollection.id)
+        : [],
+    [content.collections, preview.projects, selectedCollection],
+  );
+  const selectedBookData = useMemo(() => {
+    if (!selectedCollection || selectedCollection.presentationMode !== "book") return undefined;
+    return buildBookExperienceData(
+      selectedCollection,
+      selectedCollectionProjects,
+      editLocale,
+      resolveClientGallery,
+    );
+  }, [editLocale, selectedCollection, selectedCollectionProjects]);
   const nextProject =
     preview.projects[
       (preview.projects.findIndex((p) => p.slug === project?.slug) + 1) %
@@ -204,10 +218,11 @@ export function VisualPageRenderer({
           {page === "work" ? (
             <>
               {selectedCollection ? (
-                <CollectionProjectsIndex
+                <CollectionExperience
                   collection={selectedCollection}
                   projects={selectedCollectionProjects}
                   workPath={`/${editLocale}/work`}
+                  bookData={selectedBookData}
                   onBackToCollections={onBackToCollections}
                   onProjectOpen={onProjectOpen}
                   afterGridItems={
