@@ -5,12 +5,21 @@ import type { ResolvedGalleryItem, ResolvedProject } from "@/types";
 
 export type BookPageKind =
   | "intro"
-  | "project-meta"
+  | "project-overview"
   | "project-cover"
   | "gallery-image"
   | "excerpt"
   | "closing"
-  | "filler";
+  | "filler"
+  | "detail-intro"
+  | "detail-meta"
+  | "detail-closing";
+
+export type BookLightboxImage = {
+  src: string;
+  alt: string;
+  caption?: string;
+};
 
 export type BookPageData = {
   id: string;
@@ -23,17 +32,20 @@ export type BookPageData = {
   client?: string;
   role?: string;
   summary?: string;
+  shortTagline?: string;
   projectIndex?: number;
   projectTotal?: number;
   imageSrc?: string | null;
   imageAlt?: string;
   imageGradient?: string;
+  imageCaption?: string;
   excerptTitle?: string;
   excerptBody?: string;
   introTitle?: string;
   introSubtitle?: string;
   introDescription?: string;
   projectCount?: number;
+  lightboxEnabled?: boolean;
 };
 
 export type BookSpreadData = {
@@ -42,12 +54,19 @@ export type BookSpreadData = {
   right: BookPageData;
 };
 
-export type BookExperienceData = {
+export type ProjectDetailData = {
   spreads: BookSpreadData[];
   flatPages: BookPageData[];
 };
 
-const SUMMARY_CHUNK = 360;
+export type BookExperienceData = {
+  spreads: BookSpreadData[];
+  flatPages: BookPageData[];
+  projectSpreadIndexBySlug: Record<string, number>;
+  projectDetails: Record<string, ProjectDetailData>;
+  projectLightboxImages: Record<string, BookLightboxImage[]>;
+};
+
 const EXCERPT_CHUNK = 420;
 
 function hasText(value?: string | null): boolean {
@@ -73,21 +92,32 @@ function chunkText(text: string, maxLength: number): string[] {
   return chunks;
 }
 
+function firstSentence(text: string, maxLength = 110): string | undefined {
+  const trimmed = text.trim();
+  if (!trimmed) return undefined;
+  const match = trimmed.match(/^[^.!?]+[.!?]?/);
+  const sentence = (match?.[0] ?? trimmed).trim();
+  if (sentence.length <= maxLength) return sentence;
+  return `${sentence.slice(0, maxLength - 1).trim()}…`;
+}
+
 function excerptLabels(locale: Locale) {
   return locale === "tr"
     ? {
         concept: "Konsept",
         challenge: "Zorluk",
         solution: "Çözüm",
-        summaryContinued: "Özet (devam)",
+        visualDirection: "Görsel Yön",
         continued: "devam",
+        projectEnd: "Proje Sonu",
       }
     : {
         concept: "Concept",
         challenge: "Challenge",
         solution: "Solution",
-        summaryContinued: "Summary (continued)",
+        visualDirection: "Visual Direction",
         continued: "continued",
+        projectEnd: "End of Project",
       };
 }
 
@@ -109,7 +139,6 @@ function createClosingPage(collection: ResolvedWorkCollection, locale: Locale): 
       locale === "tr"
         ? "Bu koleksiyondaki tüm projeleri incelediniz."
         : "You have reached the end of this collection.",
-    projectCount: undefined,
   };
 }
 
@@ -120,6 +149,8 @@ function createImagePage(
   imageSrc: string | null,
   imageAlt: string,
   imageGradient: string,
+  caption?: string,
+  lightboxEnabled = true,
 ): BookPageData {
   return {
     id,
@@ -130,10 +161,12 @@ function createImagePage(
     imageSrc,
     imageAlt,
     imageGradient,
+    imageCaption: caption,
+    lightboxEnabled,
   };
 }
 
-function pairExcerptPages(
+function pairPages(
   pages: BookPageData[],
   project: ResolvedProject,
   projectPath: string,
@@ -159,26 +192,250 @@ function pairExcerptPages(
           )
         : createFillerPage(`${spreadPrefix}-filler-${i}`, project.title));
 
-    spreads.push({
-      id: `${spreadPrefix}-${i}`,
-      left,
-      right,
-    });
+    spreads.push({ id: `${spreadPrefix}-${i}`, left, right });
   }
 
   return spreads;
 }
 
-function appendClosingSpread(
-  spreads: BookSpreadData[],
-  collection: ResolvedWorkCollection,
-  locale: Locale,
-): void {
-  spreads.push({
-    id: "closing",
-    left: createClosingPage(collection, locale),
-    right: createFillerPage("closing-filler"),
+function buildProjectLightboxImages(
+  project: ResolvedProject,
+  cover: string | null,
+  coverAlt: string,
+  gallery: ResolvedGalleryItem[],
+): BookLightboxImage[] {
+  const images: BookLightboxImage[] = [];
+  if (cover) {
+    images.push({ src: cover, alt: coverAlt, caption: project.title });
+  }
+  gallery.forEach((item) => {
+    if (!item.src) return;
+    images.push({
+      src: item.src,
+      alt: item.alt ?? project.title,
+      caption: item.caption,
+    });
   });
+  return images;
+}
+
+function buildProjectDetailSpreads(
+  project: ResolvedProject,
+  locale: Locale,
+  gallery: ResolvedGalleryItem[],
+): ProjectDetailData {
+  const spreads: BookSpreadData[] = [];
+  const projectPath = localizedPath(locale, `/work/${project.slug}`);
+  const cover = project.images.coverImage ?? project.images.heroImage ?? null;
+  const labels = excerptLabels(locale);
+
+  spreads.push({
+    id: `${project.slug}-detail-intro`,
+    left: {
+      id: `${project.slug}-detail-intro-left`,
+      kind: "detail-intro",
+      projectSlug: project.slug,
+      projectTitle: project.title,
+      projectPath,
+      summary: hasText(project.summary) ? project.summary : undefined,
+    },
+    right: cover
+      ? {
+          id: `${project.slug}-detail-hero`,
+          kind: "project-cover",
+          projectSlug: project.slug,
+          projectTitle: project.title,
+          projectPath,
+          imageSrc: cover,
+          imageAlt: project.images.imageAlt,
+          imageGradient: project.gradient,
+          lightboxEnabled: true,
+        }
+      : createFillerPage(`${project.slug}-detail-hero-filler`, project.title),
+  });
+
+  const metaPage: BookPageData = {
+    id: `${project.slug}-detail-meta`,
+    kind: "detail-meta",
+    projectSlug: project.slug,
+    projectTitle: project.title,
+    projectPath,
+    year: hasText(project.year) ? project.year : undefined,
+    category: hasText(project.category) ? project.category : undefined,
+    client: hasText(project.client) ? project.client : undefined,
+    role: hasText(project.role) ? project.role : undefined,
+  };
+
+  const conceptChunks = hasText(project.concept) ? chunkText(project.concept, EXCERPT_CHUNK) : [];
+  if (conceptChunks.length > 0) {
+    spreads.push({
+      id: `${project.slug}-detail-meta-concept`,
+      left: metaPage,
+      right: {
+        id: `${project.slug}-detail-concept-0`,
+        kind: "excerpt",
+        projectSlug: project.slug,
+        projectTitle: project.title,
+        projectPath,
+        excerptTitle: labels.concept,
+        excerptBody: conceptChunks[0],
+      },
+    });
+    if (conceptChunks.length > 1) {
+      spreads.push(
+        ...pairPages(
+          conceptChunks.slice(1).map((body, index) => ({
+            id: `${project.slug}-detail-concept-${index + 1}`,
+            kind: "excerpt" as const,
+            projectSlug: project.slug,
+            projectTitle: project.title,
+            projectPath,
+            excerptTitle: `${labels.concept} (${labels.continued})`,
+            excerptBody: body,
+          })),
+          project,
+          projectPath,
+          cover,
+          project.images.imageAlt,
+          project.gradient,
+          `${project.slug}-detail-concept-extra`,
+        ),
+      );
+    }
+  } else {
+    spreads.push({
+      id: `${project.slug}-detail-meta-only`,
+      left: metaPage,
+      right: cover
+        ? createImagePage(
+            `${project.slug}-detail-meta-image`,
+            project,
+            projectPath,
+            cover,
+            project.images.imageAlt,
+            project.gradient,
+          )
+        : createFillerPage(`${project.slug}-detail-meta-filler`, project.title),
+    });
+  }
+
+  const challengeSolutionPages: BookPageData[] = [];
+  if (hasText(project.challenge)) {
+    chunkText(project.challenge, EXCERPT_CHUNK).forEach((body, index) => {
+      challengeSolutionPages.push({
+        id: `${project.slug}-detail-challenge-${index}`,
+        kind: "excerpt",
+        projectSlug: project.slug,
+        projectTitle: project.title,
+        projectPath,
+        excerptTitle: index === 0 ? labels.challenge : `${labels.challenge} (${labels.continued})`,
+        excerptBody: body,
+      });
+    });
+  }
+  if (hasText(project.solution)) {
+    chunkText(project.solution, EXCERPT_CHUNK).forEach((body, index) => {
+      challengeSolutionPages.push({
+        id: `${project.slug}-detail-solution-${index}`,
+        kind: "excerpt",
+        projectSlug: project.slug,
+        projectTitle: project.title,
+        projectPath,
+        excerptTitle: index === 0 ? labels.solution : `${labels.solution} (${labels.continued})`,
+        excerptBody: body,
+      });
+    });
+  }
+  if (challengeSolutionPages.length > 0) {
+    spreads.push(
+      ...pairPages(
+        challengeSolutionPages,
+        project,
+        projectPath,
+        cover,
+        project.images.imageAlt,
+        project.gradient,
+        `${project.slug}-detail-process`,
+      ),
+    );
+  }
+
+  if (hasText(project.visualDirection)) {
+    chunkText(project.visualDirection, EXCERPT_CHUNK).forEach((body, index) => {
+      spreads.push({
+        id: `${project.slug}-detail-visual-${index}`,
+        left: {
+          id: `${project.slug}-detail-visual-left-${index}`,
+          kind: "excerpt",
+          projectSlug: project.slug,
+          projectTitle: project.title,
+          projectPath,
+          excerptTitle:
+            index === 0 ? labels.visualDirection : `${labels.visualDirection} (${labels.continued})`,
+          excerptBody: body,
+        },
+        right:
+          index === 0 && cover
+            ? createImagePage(
+                `${project.slug}-detail-visual-image-${index}`,
+                project,
+                projectPath,
+                cover,
+                project.images.imageAlt,
+                project.gradient,
+              )
+            : createFillerPage(`${project.slug}-detail-visual-filler-${index}`, project.title),
+      });
+    });
+  }
+
+  if (gallery.length > 0) {
+    for (let i = 0; i < gallery.length; i += 2) {
+      const leftItem = gallery[i];
+      const rightItem = gallery[i + 1];
+      spreads.push({
+        id: `${project.slug}-detail-gallery-${i}`,
+        left: createImagePage(
+          `${project.slug}-detail-gallery-left-${i}`,
+          project,
+          projectPath,
+          leftItem.src,
+          leftItem.alt ?? project.title,
+          leftItem.gradient ?? project.gradient,
+          leftItem.caption,
+        ),
+        right: rightItem
+          ? createImagePage(
+              `${project.slug}-detail-gallery-right-${i}`,
+              project,
+              projectPath,
+              rightItem.src,
+              rightItem.alt ?? project.title,
+              rightItem.gradient ?? project.gradient,
+              rightItem.caption,
+            )
+          : createFillerPage(`${project.slug}-detail-gallery-filler-${i}`, project.title),
+      });
+    }
+  }
+
+  spreads.push({
+    id: `${project.slug}-detail-closing`,
+    left: {
+      id: `${project.slug}-detail-closing-page`,
+      kind: "detail-closing",
+      projectSlug: project.slug,
+      projectTitle: project.title,
+      introTitle: project.title,
+      introSubtitle: labels.projectEnd,
+    },
+    right: createFillerPage(`${project.slug}-detail-closing-filler`),
+  });
+
+  return {
+    spreads,
+    flatPages: spreads.flatMap((spread) => [spread.left, spread.right]),
+  };
 }
 
 export function buildBookExperienceData(
@@ -188,11 +445,14 @@ export function buildBookExperienceData(
   resolveGallery: (project: ResolvedProject) => ResolvedGalleryItem[],
 ): BookExperienceData {
   const spreads: BookSpreadData[] = [];
+  const projectSpreadIndexBySlug: Record<string, number> = {};
+  const projectDetails: Record<string, ProjectDetailData> = {};
+  const projectLightboxImages: Record<string, BookLightboxImage[]> = {};
+
   const settings = collection.bookSettings;
   const coverImage =
     settings?.coverImage ?? collection.coverImage ?? projects[0]?.images.coverImage ?? null;
   const defaultGradient = projects[0]?.gradient ?? "from-[#f6eee4] via-[#ead8ce] to-[#b98f83]";
-  const labels = excerptLabels(locale);
 
   const introDescription = settings?.intro ?? collection.description;
   const introSubtitle = settings?.subtitle ?? collection.description;
@@ -214,6 +474,7 @@ export function buildBookExperienceData(
           imageSrc: coverImage,
           imageAlt: collection.title,
           imageGradient: defaultGradient,
+          lightboxEnabled: false,
         }
       : createFillerPage("intro-right-filler", collection.title),
   });
@@ -222,39 +483,33 @@ export function buildBookExperienceData(
     const projectPath = localizedPath(locale, `/work/${project.slug}`);
     const cover = project.images.coverImage ?? project.images.heroImage ?? null;
     const gallery = resolveGallery(project).filter((item) => item.src);
-    const summaryChunks = hasText(project.summary)
-      ? chunkText(project.summary, SUMMARY_CHUNK)
-      : [];
-    const primarySummary = summaryChunks[0];
-    const extraSummaryPages = summaryChunks.slice(1).map((body, chunkIndex) => ({
-      id: `${project.slug}-summary-extra-${chunkIndex}`,
-      kind: "excerpt" as const,
-      projectSlug: project.slug,
-      projectTitle: project.title,
-      projectPath,
-      excerptTitle: labels.summaryContinued,
-      excerptBody: body,
-    }));
+
+    projectSpreadIndexBySlug[project.slug] = spreads.length;
+    projectLightboxImages[project.slug] = buildProjectLightboxImages(
+      project,
+      cover,
+      project.images.imageAlt,
+      gallery,
+    );
+    projectDetails[project.slug] = buildProjectDetailSpreads(project, locale, gallery);
 
     spreads.push({
-      id: `${project.slug}-main`,
+      id: `${project.slug}-overview`,
       left: {
-        id: `${project.slug}-meta`,
-        kind: "project-meta",
+        id: `${project.slug}-overview-left`,
+        kind: "project-overview",
         projectSlug: project.slug,
         projectTitle: project.title,
         projectPath,
         year: hasText(project.year) ? project.year : undefined,
         category: hasText(project.category) ? project.category : undefined,
-        client: hasText(project.client) ? project.client : undefined,
-        role: hasText(project.role) ? project.role : undefined,
-        summary: primarySummary,
+        shortTagline: firstSentence(project.summary),
         projectIndex: index + 1,
         projectTotal: projects.length,
       },
       right: cover
         ? {
-            id: `${project.slug}-cover`,
+            id: `${project.slug}-overview-cover`,
             kind: "project-cover",
             projectSlug: project.slug,
             projectTitle: project.title,
@@ -262,103 +517,10 @@ export function buildBookExperienceData(
             imageSrc: cover,
             imageAlt: project.images.imageAlt,
             imageGradient: project.gradient,
+            lightboxEnabled: true,
           }
-        : createFillerPage(`${project.slug}-cover-filler`, project.title),
+        : createFillerPage(`${project.slug}-overview-cover-filler`, project.title),
     });
-
-    if (extraSummaryPages.length > 0) {
-      spreads.push(
-        ...pairExcerptPages(
-          extraSummaryPages,
-          project,
-          projectPath,
-          cover,
-          project.images.imageAlt,
-          project.gradient,
-          `${project.slug}-summary`,
-        ),
-      );
-    }
-
-    if (gallery.length === 0) {
-      spreads.push({
-        id: `${project.slug}-gallery-empty`,
-        left: createFillerPage(`${project.slug}-gallery-empty-left`, project.title),
-        right: cover
-          ? createImagePage(
-              `${project.slug}-gallery-empty-image`,
-              project,
-              projectPath,
-              cover,
-              project.images.imageAlt,
-              project.gradient,
-            )
-          : createFillerPage(`${project.slug}-gallery-empty-right`, project.title),
-      });
-    } else {
-      for (let i = 0; i < gallery.length; i += 2) {
-        const leftItem = gallery[i];
-        const rightItem = gallery[i + 1];
-        spreads.push({
-          id: `${project.slug}-gallery-${i}`,
-          left: createImagePage(
-            `${project.slug}-gallery-left-${i}`,
-            project,
-            projectPath,
-            leftItem.src,
-            leftItem.alt ?? project.title,
-            leftItem.gradient ?? project.gradient,
-          ),
-          right: rightItem
-            ? createImagePage(
-                `${project.slug}-gallery-right-${i}`,
-                project,
-                projectPath,
-                rightItem.src,
-                rightItem.alt ?? project.title,
-                rightItem.gradient ?? project.gradient,
-              )
-            : createFillerPage(`${project.slug}-gallery-filler-${i}`, project.title),
-        });
-      }
-    }
-
-    const excerptPages: BookPageData[] = [];
-    const excerptSources = [
-      { title: labels.concept, body: project.concept },
-      { title: labels.challenge, body: project.challenge },
-      { title: labels.solution, body: project.solution },
-    ].filter((item) => hasText(item.body));
-
-    excerptSources.forEach((item, sourceIndex) => {
-      const chunks = chunkText(item.body, EXCERPT_CHUNK);
-      chunks.forEach((body, chunkIndex) => {
-        excerptPages.push({
-          id: `${project.slug}-excerpt-${sourceIndex}-${chunkIndex}`,
-          kind: "excerpt",
-          projectSlug: project.slug,
-          projectTitle: project.title,
-          projectPath,
-          excerptTitle:
-            chunkIndex === 0 ? item.title : `${item.title} (${labels.continued})`,
-          excerptBody: body,
-        });
-      });
-    });
-
-    if (excerptPages.length > 0) {
-      spreads.push(
-        ...pairExcerptPages(
-          excerptPages,
-          project,
-          projectPath,
-          cover,
-          project.images.imageAlt,
-          project.gradient,
-          `${project.slug}-excerpt`,
-        ),
-      );
-    }
   });
 
   if (projects.length === 0) {
@@ -368,12 +530,22 @@ export function buildBookExperienceData(
       right: createFillerPage("empty-collection-filler"),
     });
   } else {
-    appendClosingSpread(spreads, collection, locale);
+    spreads.push({
+      id: "closing",
+      left: createClosingPage(collection, locale),
+      right: createFillerPage("closing-filler"),
+    });
   }
 
   const flatPages = spreads.flatMap((spread) => [spread.left, spread.right]);
 
-  return { spreads, flatPages };
+  return {
+    spreads,
+    flatPages,
+    projectSpreadIndexBySlug,
+    projectDetails,
+    projectLightboxImages,
+  };
 }
 
 export function getSpreadIndexForPage(spreads: BookSpreadData[], pageIndex: number): number {
@@ -383,14 +555,6 @@ export function getSpreadIndexForPage(spreads: BookSpreadData[], pageIndex: numb
     if (pageIndex < count) return spreadIndex;
   }
   return Math.max(0, spreads.length - 1);
-}
-
-export function getPageIndexForSpread(spreads: BookSpreadData[], spreadIndex: number): number {
-  let count = 0;
-  for (let index = 0; index < spreadIndex; index += 1) {
-    count += 2;
-  }
-  return Math.min(count, Math.max(0, spreads.length * 2 - 1));
 }
 
 export function resolveClientGallery(project: ResolvedProject): ResolvedGalleryItem[] {

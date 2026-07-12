@@ -4,16 +4,19 @@ type PageTurnControlsProps = {
   previousLabel: string;
   nextLabel: string;
   closeLabel: string;
+  backToBookLabel?: string;
   soundOnLabel: string;
   soundOffLabel: string;
   canGoBack: boolean;
   canGoForward: boolean;
   isAnimating: boolean;
+  showBackToBook?: boolean;
   soundEnabled: boolean;
   soundAvailable: boolean;
   onPrevious: () => void;
   onNext: () => void;
   onClose: () => void;
+  onBackToBook?: () => void;
   onToggleSound: () => void;
 };
 
@@ -21,16 +24,19 @@ export function PageTurnControls({
   previousLabel,
   nextLabel,
   closeLabel,
+  backToBookLabel,
   soundOnLabel,
   soundOffLabel,
   canGoBack,
   canGoForward,
   isAnimating,
+  showBackToBook,
   soundEnabled,
   soundAvailable,
   onPrevious,
   onNext,
   onClose,
+  onBackToBook,
   onToggleSound,
 }: PageTurnControlsProps) {
   const buttonClass =
@@ -41,6 +47,11 @@ export function PageTurnControls({
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
+      {showBackToBook && backToBookLabel && onBackToBook ? (
+        <button type="button" className={buttonClass} onClick={onBackToBook}>
+          {backToBookLabel}
+        </button>
+      ) : null}
       <button
         type="button"
         className={buttonClass}

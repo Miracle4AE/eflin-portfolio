@@ -1,12 +1,22 @@
 "use client";
 
 type BookProgressProps = {
+  mode: "collection" | "project-detail";
   current: number;
   total: number;
   projectTitle?: string;
+  projectLabel: string;
+  detailPageLabel: string;
 };
 
-export function BookProgress({ current, total, projectTitle }: BookProgressProps) {
+export function BookProgress({
+  mode,
+  current,
+  total,
+  projectTitle,
+  projectLabel,
+  detailPageLabel,
+}: BookProgressProps) {
   const progress = total > 0 ? (current / total) * 100 : 0;
   const currentLabel = String(current).padStart(2, "0");
   const totalLabel = String(total).padStart(2, "0");
@@ -15,9 +25,18 @@ export function BookProgress({ current, total, projectTitle }: BookProgressProps
     <div className="mx-auto w-full max-w-[min(1180px,88vw)]">
       <div className="flex items-center justify-between gap-4 text-[10px] uppercase tracking-[0.24em] text-muted">
         <span className="tabular-nums text-foreground/75">
-          {currentLabel} — {totalLabel}
+          {mode === "collection" ? (
+            <>
+              {projectLabel} {currentLabel} / {totalLabel}
+            </>
+          ) : (
+            <>
+              {projectTitle ? `${projectTitle} — ` : ""}
+              {detailPageLabel} {currentLabel} / {totalLabel}
+            </>
+          )}
         </span>
-        {projectTitle ? (
+        {mode === "collection" && projectTitle ? (
           <span className="truncate text-right text-muted/90">{projectTitle}</span>
         ) : null}
       </div>

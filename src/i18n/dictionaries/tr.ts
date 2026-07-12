@@ -64,6 +64,13 @@ export const dictionaryTr: Dictionary = {
     bookPreviousPage: "Önceki sayfa",
     bookNextPage: "Sonraki sayfa",
     soundUnavailable: "Sayfa çevirme sesi kullanılamıyor",
+    viewProjectDetail: "Projeyi Detaylı Görüntüle",
+    backToBook: "Kitaba Dön",
+    openStandalonePage: "Bağımsız sayfada aç",
+    viewFullSize: "Tam boyut görüntüle",
+    bookProjectLabel: "Proje",
+    bookDetailPageLabel: "Sayfa",
+    lightboxClose: "Kapat",
   },
   caseStudy: {
     projectOverview: "Proje Özeti",

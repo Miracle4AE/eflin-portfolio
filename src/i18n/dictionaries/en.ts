@@ -64,6 +64,13 @@ export const dictionaryEn: Dictionary = {
     bookPreviousPage: "Previous page",
     bookNextPage: "Next page",
     soundUnavailable: "Page turn sound is unavailable",
+    viewProjectDetail: "View Project Details",
+    backToBook: "Back to Book",
+    openStandalonePage: "Open standalone page",
+    viewFullSize: "View full size",
+    bookProjectLabel: "Project",
+    bookDetailPageLabel: "Page",
+    lightboxClose: "Close",
   },
   caseStudy: {
     projectOverview: "Project Overview",

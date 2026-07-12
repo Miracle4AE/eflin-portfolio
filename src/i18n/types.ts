@@ -77,6 +77,13 @@ export interface Dictionary {
     bookPreviousPage: string;
     bookNextPage: string;
     soundUnavailable: string;
+    viewProjectDetail: string;
+    backToBook: string;
+    openStandalonePage: string;
+    viewFullSize: string;
+    bookProjectLabel: string;
+    bookDetailPageLabel: string;
+    lightboxClose: string;
   };
   caseStudy: {
     projectOverview: string;

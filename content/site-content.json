@@ -434,6 +434,7 @@
     },
     {
       "slug": "meridian",
+      "collectionId": "book-cover-design",
       "title": {
         "en": "Meridian",
         "tr": "Meridian"

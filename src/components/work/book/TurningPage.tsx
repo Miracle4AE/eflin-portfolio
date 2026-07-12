@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { BookPageData } from "@/lib/work/book-pages";
+import type { BookLightboxImage, BookPageData } from "@/lib/work/book-pages";
 import { BookPage } from "@/components/work/book/BookPage";
 import { cn } from "@/lib/utils";
+import { BOOK_PAPER_BACK_CLASS } from "@/components/work/book/book-styles";
 
 type TurningPageProps = {
   front: BookPageData;
@@ -13,6 +14,8 @@ type TurningPageProps = {
   reducedMotion: boolean;
   pageNumberFront?: number;
   pageNumberBack?: number;
+  onOpenLightbox?: (images: BookLightboxImage[], index: number) => void;
+  projectLightboxImages?: Record<string, BookLightboxImage[]>;
   onComplete: () => void;
 };
 
@@ -24,6 +27,8 @@ export function TurningPage({
   reducedMotion,
   pageNumberFront,
   pageNumberBack,
+  onOpenLightbox,
+  projectLightboxImages = {},
   onComplete,
 }: TurningPageProps) {
   const isForward = direction === "forward";
@@ -43,7 +48,10 @@ export function TurningPage({
           paperClass={paperClass}
           side={isForward ? "right" : "left"}
           pageNumber={pageNumberFront}
-          showProjectLink={false}
+          onOpenLightbox={onOpenLightbox}
+          projectLightboxImages={
+            front.projectSlug ? projectLightboxImages[front.projectSlug] ?? [] : []
+          }
         />
       </motion.div>
     );
@@ -59,9 +67,7 @@ export function TurningPage({
       animate={{ rotateY: isForward ? -180 : 0 }}
       transition={{ duration, ease: [0.65, 0, 0.35, 1] }}
       onAnimationComplete={onComplete}
-      style={{
-        transformOrigin: isForward ? "left center" : "right center",
-      }}
+      style={{ transformOrigin: isForward ? "left center" : "right center" }}
     >
       <div
         className="absolute inset-0 [backface-visibility:hidden]"
@@ -72,11 +78,22 @@ export function TurningPage({
           paperClass={paperClass}
           side={isForward ? "right" : "left"}
           pageNumber={pageNumberFront}
-          showProjectLink={false}
+          onOpenLightbox={onOpenLightbox}
+          projectLightboxImages={
+            front.projectSlug ? projectLightboxImages[front.projectSlug] ?? [] : []
+          }
         />
-        <div
+        <motion.div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-[rgba(42,30,24,0.08)]"
+          className="pointer-events-none absolute inset-0"
+          initial={{ opacity: 0.04 }}
+          animate={{ opacity: isForward ? 0.16 : 0.08 }}
+          transition={{ duration: duration * 0.9 }}
+          style={{
+            background: isForward
+              ? "linear-gradient(90deg, transparent, rgba(36,26,20,0.18))"
+              : "linear-gradient(270deg, transparent, rgba(36,26,20,0.14))",
+          }}
         />
       </div>
       <div
@@ -88,10 +105,13 @@ export function TurningPage({
       >
         <BookPage
           page={back}
-          paperClass={paperClass}
+          paperClass={BOOK_PAPER_BACK_CLASS}
           side={isForward ? "left" : "right"}
           pageNumber={pageNumberBack}
-          showProjectLink={false}
+          onOpenLightbox={onOpenLightbox}
+          projectLightboxImages={
+            back.projectSlug ? projectLightboxImages[back.projectSlug] ?? [] : []
+          }
         />
       </div>
     </motion.div>
