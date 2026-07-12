@@ -189,7 +189,10 @@ export function VisualPageRenderer({
           {page === "homepage" ? (
             <>
               <Hero portraitSrc={preview.portraitSrc} />
-              <FeaturedWorks projects={preview.featuredProjects} />
+              <FeaturedWorks
+                projects={preview.projects}
+                collections={preview.homepageCollections}
+              />
               <About />
               <Services />
               {preview.showcaseProject ? (

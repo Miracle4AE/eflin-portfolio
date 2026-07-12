@@ -12,7 +12,11 @@ import {
 import type { AspectRatio } from "@/types";
 import { pickLocale } from "@/lib/content/locale-field";
 import type { SiteContent } from "@/lib/content/types";
-import { resolveWorkCollection, type ResolvedWorkCollection } from "@/lib/content/collections";
+import {
+  resolveWorkCollection,
+  selectHomepageCollections,
+  type ResolvedWorkCollection,
+} from "@/lib/content/collections";
 
 export function resolveVisualImagePath(
   imagePath: string | undefined,
@@ -65,6 +69,7 @@ export type VisualPreviewData = {
   showcaseProject: ResolvedProject | null;
   projectSlugs: string[];
   collections: ResolvedWorkCollection[];
+  homepageCollections: ResolvedWorkCollection[];
 };
 
 export function buildVisualPreviewData(
@@ -86,6 +91,7 @@ export function buildVisualPreviewData(
     ...resolveWorkCollection(collection, locale),
     coverImage: resolveVisualImagePath(collection.coverImage, knownMediaPaths) ?? undefined,
   }));
+  const homepageCollections = selectHomepageCollections(collections);
 
   const featuredSlugs = content.homepage.featuredProjectSlugs;
   const featuredProjects =
@@ -109,6 +115,7 @@ export function buildVisualPreviewData(
     showcaseProject,
     projectSlugs: content.projects.map((p) => p.slug),
     collections,
+    homepageCollections,
   };
 }
 

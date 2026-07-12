@@ -306,3 +306,13 @@ export function resolveWorkCollections(
 export function getDefaultCollectionId(collections: ContentCollection[]): string {
   return getSortedCollections(collections)[0]?.id ?? DEFAULT_COLLECTIONS[0].id;
 }
+
+export const HOMEPAGE_COLLECTION_LIMIT = 4;
+
+export function selectHomepageCollections(
+  collections: ResolvedWorkCollection[],
+): ResolvedWorkCollection[] {
+  const featured = collections.filter((collection) => collection.featured);
+  const homepageCollections = featured.length > 0 ? featured : collections;
+  return homepageCollections.slice(0, HOMEPAGE_COLLECTION_LIMIT);
+}

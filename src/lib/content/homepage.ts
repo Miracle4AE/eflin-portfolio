@@ -1,11 +1,14 @@
 import type { Locale } from "@/i18n/config";
 import type { ResolvedProject } from "@/types";
+import type { ResolvedWorkCollection } from "@/lib/content/collections";
 import {
   getContentProjectBySlug,
   resolveContentPortrait,
 } from "@/lib/content/resolve";
 import { loadSiteContent } from "@/lib/content/loader";
+import { resolveWorkCollections, selectHomepageCollections } from "@/lib/content/collections";
 import {
+  getAllProjects,
   getFeaturedProjects,
   getProjectBySlug,
   resolveContentProjectWithSource,
@@ -13,6 +16,17 @@ import {
 
 export async function getHomepagePortrait(): Promise<string | null> {
   return resolveContentPortrait();
+}
+
+export async function getHomepageProjects(locale: Locale): Promise<ResolvedProject[]> {
+  return getAllProjects(locale);
+}
+
+export async function getHomepageWorkCollections(
+  locale: Locale,
+): Promise<ResolvedWorkCollection[]> {
+  const content = await loadSiteContent();
+  return selectHomepageCollections(resolveWorkCollections(content.collections, locale));
 }
 
 export async function getHomepageFeaturedProjects(

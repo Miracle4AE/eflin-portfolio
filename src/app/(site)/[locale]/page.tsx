@@ -9,9 +9,10 @@ import { Contact } from "@/components/sections/Contact";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { buildWebsiteSchema } from "@/lib/schema";
 import {
-  getHomepageFeaturedProjects,
   getHomepagePortrait,
+  getHomepageProjects,
   getHomepageShowcaseProject,
+  getHomepageWorkCollections,
 } from "@/lib/content/homepage";
 
 interface HomePageProps {
@@ -23,8 +24,9 @@ export default async function HomePage({ params }: HomePageProps) {
   if (!isLocale(localeParam)) notFound();
   const locale = localeParam as Locale;
 
-  const [featured, showcase, portraitSrc, websiteSchema] = await Promise.all([
-    getHomepageFeaturedProjects(locale),
+  const [projects, collections, showcase, portraitSrc, websiteSchema] = await Promise.all([
+    getHomepageProjects(locale),
+    getHomepageWorkCollections(locale),
     getHomepageShowcaseProject(locale),
     getHomepagePortrait(),
     buildWebsiteSchema(locale),
@@ -38,7 +40,7 @@ export default async function HomePage({ params }: HomePageProps) {
     <>
       <JsonLd data={websiteSchema} />
       <Hero portraitSrc={portraitSrc} />
-      <FeaturedWorks projects={featured} />
+      <FeaturedWorks projects={projects} collections={collections} />
       <About />
       <Services />
       <ProjectShowcase project={showcase} />

@@ -115,9 +115,9 @@ export function buildFallbackSiteContent(): SiteContent {
         featuredLabel: ls(en.work.featuredLabel, tr.work.featuredLabel),
         featuredTitle: ls(en.work.featuredTitle, tr.work.featuredTitle),
         featuredDescription: ls(en.work.featuredDescription, tr.work.featuredDescription),
-        indexLabel: ls(en.work.indexLabel, tr.work.indexLabel),
-        indexTitle: ls(en.work.indexTitle, tr.work.indexTitle),
-        indexDescription: ls(en.work.indexDescription, tr.work.indexDescription),
+        indexLabel: ls(en.work.portfolio, tr.work.portfolio),
+        indexTitle: ls(en.nav.work, tr.nav.work),
+        indexDescription: ls(en.work.collectionsDescription, tr.work.collectionsDescription),
       },
     },
     contact: {

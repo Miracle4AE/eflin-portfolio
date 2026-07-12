@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { ResolvedProject } from "@/types";
-import { ProjectCard } from "@/components/work/ProjectCard";
+import type { ResolvedWorkCollection } from "@/lib/content/collections";
+import { getProjectsForCollection } from "@/lib/content/collections";
+import { WorkCollectionCard } from "@/components/work/WorkCollectionCard";
 import { Container } from "@/components/ui/Container";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { useDictionary, useLocale } from "@/i18n/locale-context";
@@ -14,9 +16,10 @@ import { useMountedCursor } from "@/lib/hooks/useMountedCursor";
 
 interface FeaturedWorksProps {
   projects: ResolvedProject[];
+  collections: ResolvedWorkCollection[];
 }
 
-export function FeaturedWorks({ projects }: FeaturedWorksProps) {
+export function FeaturedWorks({ projects, collections }: FeaturedWorksProps) {
   const dict = useDictionary();
   const { locale } = useLocale();
   const visualEdit = useVisualEditOptional();
@@ -26,15 +29,13 @@ export function FeaturedWorks({ projects }: FeaturedWorksProps) {
     <section id="work" className="border-t border-border-soft bg-section py-24 md:py-32 lg:py-40" aria-labelledby="work-heading">
       <Container>
         <SectionHeading
-          label={dict.work.featuredLabel}
-          title={dict.work.featuredTitle}
-          description={dict.work.featuredDescription}
+          label={dict.work.portfolio}
+          title={dict.nav.work}
+          description={dict.work.collectionsDescription}
           editPaths={
             visualEdit
               ? {
-                  label: "homepage.work.featuredLabel",
-                  title: "homepage.work.featuredTitle",
-                  description: "homepage.work.featuredDescription",
+                  description: "homepage.work.indexDescription",
                 }
               : undefined
           }
@@ -45,13 +46,19 @@ export function FeaturedWorks({ projects }: FeaturedWorksProps) {
           whileInView="visible"
           viewport={defaultViewport}
           variants={staggerContainer}
-          className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-x-8 md:gap-y-16"
+          className="grid grid-cols-1 gap-6 md:grid-cols-2 md:gap-7"
         >
-          {projects.map((project, index) => (
-            <ProjectCard
-              key={project.slug}
-              project={project}
+          {collections.map((collection, index) => (
+            <WorkCollectionCard
+              key={collection.id}
+              collection={collection}
+              projects={getProjectsForCollection(
+                projects,
+                collections.map((item) => item.source),
+                collection.id,
+              )}
               index={index}
+              projectsLabel={dict.work.projectsLabel}
             />
           ))}
         </motion.div>
