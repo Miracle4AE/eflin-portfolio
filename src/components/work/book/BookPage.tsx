@@ -5,36 +5,45 @@ import type { BookPageData } from "@/lib/work/book-pages";
 import { ProjectImage } from "@/components/work/ProjectImage";
 import { useDictionary } from "@/i18n/locale-context";
 import { cn } from "@/lib/utils";
-import { BOOK_TEXTURE_CLASS } from "@/components/work/book/book-styles";
+import {
+  BOOK_PAGE_HEIGHT,
+  BOOK_TEXTURE_CLASS,
+  bookPageEdgeShadow,
+  bookPageSideClass,
+} from "@/components/work/book/book-styles";
 
 type BookPageProps = {
   page: BookPageData;
   paperClass: string;
+  side?: "left" | "right";
+  pageNumber?: number;
   onProjectOpen?: (slug: string) => void;
   onPersistBeforeNavigate?: () => void;
+  showProjectLink?: boolean;
   interactive?: boolean;
 };
 
-const PAGE_SHELL_CLASS =
-  "relative flex h-[460px] flex-col overflow-hidden border border-[#e8ddd2]/80 p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] md:p-8";
 const IMAGE_FRAME_CLASS =
-  "relative h-[300px] w-full shrink-0 overflow-hidden rounded-[1rem] border border-[#e8ddd2]/60 bg-[#f3ebe2]/50";
+  "relative mx-auto h-[min(340px,48vh)] w-full max-w-[92%] overflow-hidden";
 
 export function BookPage({
   page,
   paperClass,
+  side = "left",
+  pageNumber,
   onProjectOpen,
   onPersistBeforeNavigate,
+  showProjectLink = false,
   interactive = true,
 }: BookPageProps) {
   const dict = useDictionary();
 
-  const metadataRows = [
-    { label: dict.caseStudy.year, value: page.year },
-    { label: dict.caseStudy.category, value: page.category },
-    { label: dict.caseStudy.client, value: page.client },
-    { label: dict.caseStudy.role, value: page.role },
-  ].filter((row) => row.value?.trim());
+  const metadataItems = [
+    page.year ? `${page.year}` : null,
+    page.role?.trim() ? page.role : null,
+    page.client?.trim() ? page.client : null,
+    page.category?.trim() ? page.category : null,
+  ].filter(Boolean) as string[];
 
   const handleProjectNavigate = (slug: string) => {
     onPersistBeforeNavigate?.();
@@ -42,45 +51,64 @@ export function BookPage({
   };
 
   const projectLink =
-    page.projectPath && page.projectSlug ? (
+    showProjectLink && page.projectPath && page.projectSlug ? (
       onProjectOpen ? (
         <button
           type="button"
-          onClick={() => handleProjectNavigate(page.projectSlug!)}
-          className="mt-auto inline-flex items-center gap-2 pt-6 text-[10px] font-medium uppercase tracking-[0.22em] text-accent transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          onClick={(event) => {
+            event.stopPropagation();
+            handleProjectNavigate(page.projectSlug!);
+          }}
+          className="group/link inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.24em] text-accent/90 transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          {dict.work.viewCaseStudy}
+          <span className="border-b border-accent/35 pb-0.5 transition group-hover/link:border-foreground/50">
+            {dict.work.viewCaseStudy}
+          </span>
           <span aria-hidden="true">→</span>
         </button>
       ) : (
         <Link
           href={page.projectPath}
-          onClick={() => onPersistBeforeNavigate?.()}
-          className="mt-auto inline-flex items-center gap-2 pt-6 text-[10px] font-medium uppercase tracking-[0.22em] text-accent transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          onClick={(event) => {
+            event.stopPropagation();
+            onPersistBeforeNavigate?.();
+          }}
+          className="group/link inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.24em] text-accent/90 transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
-          {dict.work.viewCaseStudy}
+          <span className="border-b border-accent/35 pb-0.5 transition group-hover/link:border-foreground/50">
+            {dict.work.viewCaseStudy}
+          </span>
           <span aria-hidden="true">→</span>
         </Link>
       )
     ) : null;
 
   return (
-    <div className={cn(PAGE_SHELL_CLASS, paperClass, BOOK_TEXTURE_CLASS)}>
+    <div
+      className={cn(
+        "relative flex flex-col overflow-hidden px-7 py-8 md:px-9 md:py-10",
+        BOOK_PAGE_HEIGHT,
+        paperClass,
+        BOOK_TEXTURE_CLASS,
+        bookPageSideClass(side),
+        bookPageEdgeShadow(side),
+      )}
+    >
       {page.kind === "intro" ? (
-        <div className="flex min-h-0 flex-1 flex-col">
-          <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-accent/80">
+        <div className="flex min-h-0 flex-1 flex-col justify-center">
+          <p className="text-[10px] font-medium uppercase tracking-[0.32em] text-accent/75">
             {page.projectCount} {dict.work.projectsLabel}
           </p>
-          <h2 className="mt-6 line-clamp-3 font-display text-3xl font-light leading-[1.05] tracking-[-0.03em] text-foreground md:text-4xl">
+          <h2 className="mt-8 line-clamp-3 font-display text-[clamp(2rem,4vw,2.75rem)] font-light leading-[1.04] tracking-[-0.035em] text-foreground">
             {page.introTitle}
           </h2>
           {page.introSubtitle ? (
-            <p className="mt-4 line-clamp-2 text-sm uppercase tracking-[0.18em] text-muted">
+            <p className="mt-5 line-clamp-2 text-xs uppercase tracking-[0.2em] text-muted">
               {page.introSubtitle}
             </p>
           ) : null}
           {page.introDescription ? (
-            <p className="mt-6 line-clamp-[8] max-w-md text-sm leading-7 text-muted">
+            <p className="mt-8 line-clamp-[7] max-w-md text-sm leading-[1.85] text-muted">
               {page.introDescription}
             </p>
           ) : null}
@@ -89,17 +117,17 @@ export function BookPage({
 
       {page.kind === "closing" ? (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center text-center">
-          <p className="text-[10px] font-medium uppercase tracking-[0.32em] text-accent/70">
+          <p className="text-[10px] font-medium uppercase tracking-[0.34em] text-accent/65">
             Eflin
           </p>
-          <h2 className="mt-6 line-clamp-3 max-w-sm font-display text-3xl font-light leading-[1.05] tracking-[-0.03em] text-foreground">
+          <h2 className="mt-8 line-clamp-3 max-w-sm font-display text-3xl font-light leading-[1.05] tracking-[-0.03em] text-foreground">
             {page.introTitle}
           </h2>
-          <p className="mt-5 text-sm uppercase tracking-[0.22em] text-muted">
+          <p className="mt-6 text-xs uppercase tracking-[0.26em] text-muted">
             {page.introSubtitle ?? dict.work.bookEndOfCollection}
           </p>
           {page.introDescription ? (
-            <p className="mt-4 line-clamp-3 max-w-xs text-sm leading-7 text-muted/90">
+            <p className="mt-5 line-clamp-3 max-w-xs text-sm leading-7 text-muted/90">
               {page.introDescription}
             </p>
           ) : null}
@@ -108,9 +136,9 @@ export function BookPage({
 
       {page.kind === "filler" ? (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center text-center">
-          <div className="h-px w-16 bg-[#d8c8bb]/80" aria-hidden="true" />
+          <div className="h-px w-14 bg-[#d5c5b8]/75" aria-hidden="true" />
           {page.introTitle ? (
-            <p className="mt-6 line-clamp-2 max-w-[16rem] text-[10px] font-medium uppercase tracking-[0.28em] text-accent/55">
+            <p className="mt-8 line-clamp-2 max-w-[14rem] text-[10px] font-medium uppercase tracking-[0.3em] text-accent/50">
               {page.introTitle}
             </p>
           ) : null}
@@ -118,65 +146,72 @@ export function BookPage({
       ) : null}
 
       {page.kind === "project-meta" ? (
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <p className="text-[10px] font-medium uppercase tracking-[0.28em] text-accent/80">
-            {page.projectIndex} / {page.projectTotal}
+        <div className="flex min-h-0 flex-1 flex-col">
+          <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-accent/70">
+            {String(page.projectIndex).padStart(2, "0")} /{" "}
+            {String(page.projectTotal).padStart(2, "0")}
           </p>
-          <h3 className="mt-5 line-clamp-3 font-display text-3xl font-light leading-[1.05] tracking-[-0.03em] text-foreground">
+          <h3 className="mt-8 line-clamp-3 font-display text-[clamp(1.85rem,3.2vw,2.6rem)] font-light leading-[1.06] tracking-[-0.03em] text-foreground">
             {page.projectTitle}
           </h3>
-          {metadataRows.length > 0 ? (
-            <dl className="mt-6 space-y-3 text-sm text-muted">
-              {metadataRows.map((row) => (
-                <div
-                  key={row.label}
-                  className="flex justify-between gap-4 border-b border-[#e8ddd2]/70 pb-2"
-                >
-                  <dt>{row.label}</dt>
-                  <dd className="line-clamp-2 text-right text-foreground">{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-          ) : null}
           {page.summary ? (
-            <p className="mt-6 line-clamp-[7] text-sm leading-7 text-muted">{page.summary}</p>
+            <p className="mt-8 line-clamp-[6] max-w-md text-sm leading-[1.9] text-muted">
+              {page.summary}
+            </p>
           ) : null}
-          {interactive ? projectLink : null}
+          {metadataItems.length > 0 ? (
+            <p className="mt-auto pt-10 text-[10px] uppercase tracking-[0.22em] text-muted/90">
+              {metadataItems.join(" · ")}
+            </p>
+          ) : null}
+          {interactive && projectLink ? (
+            <div className="mt-6">{projectLink}</div>
+          ) : null}
         </div>
       ) : null}
 
       {page.kind === "project-cover" || page.kind === "gallery-image" ? (
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          {page.projectTitle ? (
-            <p className="mb-4 line-clamp-1 text-[10px] font-medium uppercase tracking-[0.24em] text-accent/75">
-              {page.projectTitle}
-            </p>
-          ) : null}
-          <div className={IMAGE_FRAME_CLASS}>
+        <div className="flex min-h-0 flex-1 flex-col">
+          <div className={cn(IMAGE_FRAME_CLASS, "mt-2 flex flex-1 items-center justify-center")}>
             <ProjectImage
               src={page.imageSrc}
               alt={page.imageAlt ?? page.projectTitle ?? "Project artwork"}
               gradient={page.imageGradient ?? "from-[#f6eee4] via-[#ead8ce] to-[#b98f83]"}
               mode="contain"
               className="h-full w-full"
-              imageClassName="p-2"
-              sizes="(min-width: 1024px) 40vw, 90vw"
+              imageClassName="p-3"
+              sizes="(min-width: 1024px) 38vw, 90vw"
             />
           </div>
-          {page.kind === "project-cover" && interactive ? projectLink : null}
+          {page.projectTitle ? (
+            <p className="mt-5 text-center text-[10px] uppercase tracking-[0.26em] text-muted/85">
+              {page.projectTitle}
+            </p>
+          ) : null}
         </div>
       ) : null}
 
       {page.kind === "excerpt" ? (
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <p className="line-clamp-1 text-[10px] font-medium uppercase tracking-[0.28em] text-accent/80">
+        <div className="flex min-h-0 flex-1 flex-col">
+          <p className="line-clamp-1 text-[10px] font-medium uppercase tracking-[0.3em] text-accent/70">
             {page.projectTitle}
           </p>
-          <h3 className="mt-5 line-clamp-2 font-display text-2xl font-light text-foreground">
+          <h3 className="mt-8 line-clamp-2 font-display text-2xl font-light text-foreground">
             {page.excerptTitle}
           </h3>
-          <p className="mt-5 line-clamp-[14] text-sm leading-7 text-muted">{page.excerptBody}</p>
+          <p className="mt-6 line-clamp-[12] text-sm leading-[1.9] text-muted">{page.excerptBody}</p>
         </div>
+      ) : null}
+
+      {pageNumber ? (
+        <p
+          className={cn(
+            "pointer-events-none absolute bottom-5 text-[10px] tabular-nums tracking-[0.18em] text-muted/55",
+            side === "left" ? "left-7 md:left-9" : "right-7 md:right-9",
+          )}
+        >
+          {String(pageNumber).padStart(2, "0")}
+        </p>
       ) : null}
     </div>
   );

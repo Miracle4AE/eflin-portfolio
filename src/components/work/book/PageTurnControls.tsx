@@ -6,12 +6,11 @@ type PageTurnControlsProps = {
   closeLabel: string;
   soundOnLabel: string;
   soundOffLabel: string;
-  soundUnavailableLabel: string;
   canGoBack: boolean;
   canGoForward: boolean;
+  isAnimating: boolean;
   soundEnabled: boolean;
   soundAvailable: boolean;
-  soundProbed: boolean;
   onPrevious: () => void;
   onNext: () => void;
   onClose: () => void;
@@ -24,26 +23,40 @@ export function PageTurnControls({
   closeLabel,
   soundOnLabel,
   soundOffLabel,
-  soundUnavailableLabel,
   canGoBack,
   canGoForward,
+  isAnimating,
   soundEnabled,
   soundAvailable,
-  soundProbed,
   onPrevious,
   onNext,
   onClose,
   onToggleSound,
 }: PageTurnControlsProps) {
   const buttonClass =
-    "rounded-full border border-border-soft bg-surface/70 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.18em] text-muted transition hover:border-accent/35 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-40";
+    "rounded-full border border-border-soft/80 bg-surface/55 px-4 py-2 text-[10px] font-medium uppercase tracking-[0.2em] text-muted transition hover:border-accent/30 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:cursor-not-allowed disabled:opacity-35";
+
+  const backDisabled = !canGoBack || isAnimating;
+  const forwardDisabled = !canGoForward || isAnimating;
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3">
-      <button type="button" className={buttonClass} onClick={onPrevious} disabled={!canGoBack}>
+      <button
+        type="button"
+        className={buttonClass}
+        onClick={onPrevious}
+        disabled={backDisabled}
+        aria-disabled={backDisabled}
+      >
         {previousLabel}
       </button>
-      <button type="button" className={buttonClass} onClick={onNext} disabled={!canGoForward}>
+      <button
+        type="button"
+        className={buttonClass}
+        onClick={onNext}
+        disabled={forwardDisabled}
+        aria-disabled={forwardDisabled}
+      >
         {nextLabel}
       </button>
       <button type="button" className={buttonClass} onClick={onClose}>
@@ -58,16 +71,6 @@ export function PageTurnControls({
           aria-label={soundEnabled ? soundOnLabel : soundOffLabel}
         >
           {soundEnabled ? soundOnLabel : soundOffLabel}
-        </button>
-      ) : soundProbed ? (
-        <button
-          type="button"
-          className={buttonClass}
-          disabled
-          title={soundUnavailableLabel}
-          aria-label={soundUnavailableLabel}
-        >
-          {soundOffLabel}
         </button>
       ) : null}
     </div>

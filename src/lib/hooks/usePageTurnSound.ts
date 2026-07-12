@@ -1,33 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  PAGE_TURN_AUDIO_ENABLED,
+  PAGE_TURN_AUDIO_SRC,
+} from "@/lib/work/book-audio-config";
 
 const STORAGE_KEY = "eflin-book-sound-enabled";
-const AUDIO_SRC = "/audio/page-turn.mp3";
 const VOLUME = 0.22;
-
-let audioProbePromise: Promise<boolean> | null = null;
-
-async function probeAudioAsset(): Promise<boolean> {
-  if (audioProbePromise) return audioProbePromise;
-  audioProbePromise = (async () => {
-    try {
-      const response = await fetch(AUDIO_SRC, { method: "HEAD", cache: "no-store" });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  })();
-  return audioProbePromise;
-}
 
 export function usePageTurnSound(defaultEnabled = true) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const probeStartedRef = useRef(false);
+  const unlockStartedRef = useRef(false);
   const [enabled, setEnabled] = useState(defaultEnabled);
-  const [unlocked, setUnlocked] = useState(false);
-  const [available, setAvailable] = useState(false);
-  const [probed, setProbed] = useState(false);
+  const [available, setAvailable] = useState(PAGE_TURN_AUDIO_ENABLED);
+  const [probed] = useState(!PAGE_TURN_AUDIO_ENABLED);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -36,32 +23,18 @@ export function usePageTurnSound(defaultEnabled = true) {
     if (stored === "1") setEnabled(true);
   }, []);
 
-  const unlock = useCallback(async () => {
-    if (unlocked || probeStartedRef.current) return;
-    probeStartedRef.current = true;
-    const exists = await probeAudioAsset();
-    setProbed(true);
-    setUnlocked(true);
-    if (!exists) {
-      setAvailable(false);
-      return;
-    }
-    const audio = new Audio(AUDIO_SRC);
+  const unlock = useCallback(() => {
+    if (!PAGE_TURN_AUDIO_ENABLED || unlockStartedRef.current) return;
+    unlockStartedRef.current = true;
+
+    const audio = new Audio(PAGE_TURN_AUDIO_SRC);
     audio.volume = VOLUME;
-    audio.preload = "auto";
-    audio.addEventListener(
-      "error",
-      () => setAvailable(false),
-      { once: true },
-    );
-    audio.addEventListener(
-      "canplaythrough",
-      () => setAvailable(true),
-      { once: true },
-    );
+    audio.preload = "none";
+    audio.addEventListener("error", () => setAvailable(false), { once: true });
+    audio.addEventListener("canplaythrough", () => setAvailable(true), { once: true });
     audioRef.current = audio;
     audio.load();
-  }, [unlocked]);
+  }, []);
 
   const toggle = useCallback(() => {
     if (!available) return;
@@ -73,18 +46,16 @@ export function usePageTurnSound(defaultEnabled = true) {
   }, [available]);
 
   const play = useCallback(() => {
-    if (!enabled || !unlocked || !available) return;
+    if (!PAGE_TURN_AUDIO_ENABLED || !enabled || !available) return;
     const audio = audioRef.current;
     if (!audio) return;
     try {
       audio.currentTime = 0;
-      void audio.play().catch(() => {
-        setAvailable(false);
-      });
+      void audio.play().catch(() => undefined);
     } catch {
-      setAvailable(false);
+      // Silent — audio must never block navigation.
     }
-  }, [available, enabled, unlocked]);
+  }, [available, enabled]);
 
   useEffect(() => {
     return () => {
@@ -97,5 +68,5 @@ export function usePageTurnSound(defaultEnabled = true) {
     };
   }, []);
 
-  return { enabled, available, unlocked, probed, unlock, toggle, play };
+  return { enabled, available, probed, unlock, toggle, play };
 }
